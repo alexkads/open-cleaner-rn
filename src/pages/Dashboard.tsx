@@ -2,6 +2,7 @@ import { clsx } from 'clsx';
 import { AnimatePresence, motion, useAnimation } from 'framer-motion';
 import {
   AlertTriangle,
+  Bug,
   CheckCircle,
   Clock,
   Cpu,
@@ -17,8 +18,15 @@ import {
   Zap
 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import DebugPanel from '../components/DebugPanel';
 import { CleaningHistory, DatabaseService } from '../services/database';
-import { CleaningResult, formatBytes, formatDuration, ScanResult, TauriService } from '../services/tauri';
+import { MockTauriService } from '../services/mock-tauri';
+import { CleaningResult, formatBytes, formatDuration, ScanResult } from '../services/tauri';
+import { runToastDemo } from '../utils/toast-demo';
+
+// Use MockTauriService temporariamente para testes
+const TestTauriService = MockTauriService;
 
 // Tipos de tarefa de limpeza
 interface CleaningTask {
@@ -43,7 +51,7 @@ const CLEANING_TASKS: Omit<CleaningTask, 'status' | 'size' | 'items'>[] = [
     description: 'Clean Expo development cache and temporary files',
     category: 'cache',
     icon: Smartphone,
-    scanFunction: TauriService.scanExpoCache,
+    scanFunction: TestTauriService.scanExpoCache,
     color: 'text-blue-400'
   },
   {
@@ -52,7 +60,7 @@ const CLEANING_TASKS: Omit<CleaningTask, 'status' | 'size' | 'items'>[] = [
     description: 'Clean Metro bundler cache files',
     category: 'cache',
     icon: Layers,
-    scanFunction: TauriService.scanMetroCache,
+    scanFunction: TestTauriService.scanMetroCache,
     color: 'text-green-400'
   },
   {
@@ -61,7 +69,7 @@ const CLEANING_TASKS: Omit<CleaningTask, 'status' | 'size' | 'items'>[] = [
     description: 'Clean Node.js package manager cache',
     category: 'cache',
     icon: Download,
-    scanFunction: TauriService.scanNpmCache,
+    scanFunction: TestTauriService.scanNpmCache,
     color: 'text-red-400'
   },
   {
@@ -70,7 +78,7 @@ const CLEANING_TASKS: Omit<CleaningTask, 'status' | 'size' | 'items'>[] = [
     description: 'Clean iOS simulator and build artifacts',
     category: 'build',
     icon: Cpu,
-    scanFunction: TauriService.scanIosCache,
+    scanFunction: TestTauriService.scanIosCache,
     color: 'text-purple-400'
   },
   {
@@ -79,7 +87,7 @@ const CLEANING_TASKS: Omit<CleaningTask, 'status' | 'size' | 'items'>[] = [
     description: 'Clean Android build cache and temporary files',
     category: 'build',
     icon: Shield,
-    scanFunction: TauriService.scanAndroidCache,
+    scanFunction: TestTauriService.scanAndroidCache,
     color: 'text-yellow-400'
   },
   {
@@ -88,7 +96,7 @@ const CLEANING_TASKS: Omit<CleaningTask, 'status' | 'size' | 'items'>[] = [
     description: 'Clean Watchman file watching service logs',
     category: 'logs',
     icon: Clock,
-    scanFunction: TauriService.scanWatchmanCache,
+    scanFunction: TestTauriService.scanWatchmanCache,
     color: 'text-orange-400'
   },
   {
@@ -97,7 +105,7 @@ const CLEANING_TASKS: Omit<CleaningTask, 'status' | 'size' | 'items'>[] = [
     description: 'Clean CocoaPods dependency cache',
     category: 'cache',
     icon: HardDrive,
-    scanFunction: TauriService.scanCocoaPodsCache,
+    scanFunction: TestTauriService.scanCocoaPodsCache,
     color: 'text-pink-400'
   },
   {
@@ -106,7 +114,7 @@ const CLEANING_TASKS: Omit<CleaningTask, 'status' | 'size' | 'items'>[] = [
     description: 'Clean Flipper debugging tool logs',
     category: 'logs',
     icon: AlertTriangle,
-    scanFunction: TauriService.scanFlipperLogs,
+    scanFunction: TestTauriService.scanFlipperLogs,
     color: 'text-cyan-400'
   },
   {
@@ -115,7 +123,7 @@ const CLEANING_TASKS: Omit<CleaningTask, 'status' | 'size' | 'items'>[] = [
     description: 'Clean system temporary files',
     category: 'temp',
     icon: Trash2,
-    scanFunction: TauriService.scanTempFiles,
+    scanFunction: TestTauriService.scanTempFiles,
     color: 'text-gray-400'
   }
 ];
@@ -184,6 +192,10 @@ export default function Dashboard() {
     total_sessions: 0,
     avg_duration: 0
   });
+  
+  // Debug panel state
+  const [showDebugPanel, setShowDebugPanel] = useState(false);
+  const [lastError, setLastError] = useState<string | undefined>();
 
   const scanButtonControls = useAnimation();
   const cleanButtonControls = useAnimation();
@@ -192,6 +204,30 @@ export default function Dashboard() {
   useEffect(() => {
     initializeDashboard();
   }, []);
+
+  // Debug event listener
+  useEffect(() => {
+    const handleDebugLogTasks = () => {
+      console.log('=== TASK DEBUG FROM DASHBOARD ===');
+      console.log('Current tasks state:', tasks.map(t => ({
+        id: t.id,
+        name: t.name,
+        status: t.status,
+        size: t.size,
+        itemsLength: t.items.length,
+        items: t.items
+      })));
+      console.log('Current states:', {
+        isScanning,
+        isCleaning,
+        totalSpaceFound,
+        cleanableTasks: tasks.filter(task => task.status === 'found' && task.items.length > 0).length
+      });
+    };
+
+    window.addEventListener('debug-log-tasks', handleDebugLogTasks);
+    return () => window.removeEventListener('debug-log-tasks', handleDebugLogTasks);
+  }, [tasks, isScanning, isCleaning, totalSpaceFound]);
 
   const initializeDashboard = async () => {
     try {
@@ -205,8 +241,21 @@ export default function Dashboard() {
         loadStats(),
         checkSystemStatus()
       ]);
+      
+      // Toast de boas-vindas
+      toast.success('Sistema inicializado com sucesso!', {
+        description: 'Clean RN está pronto para otimizar seu ambiente de desenvolvimento',
+        duration: 3000
+      });
+      
     } catch (error) {
       console.error('Failed to initialize dashboard:', error);
+      setLastError(`Initialization failed: ${error}`);
+      
+      toast.error('Falha na inicialização do sistema', {
+        description: 'Alguns recursos podem não funcionar corretamente',
+        duration: 5000
+      });
     }
   };
 
@@ -264,6 +313,12 @@ export default function Dashboard() {
   const handleScan = useCallback(async () => {
     if (isScanning || isCleaning) return;
     
+    // Toast de início do scan
+    const scanToast = toast.loading('Iniciando scan do sistema...', {
+      duration: Infinity,
+      description: 'Procurando por arquivos cache e temporários'
+    });
+    
     try {
       setIsScanning(true);
       setTotalSpaceFound(0);
@@ -283,12 +338,19 @@ export default function Dashboard() {
       })));
 
       let totalFound = 0;
+      let completedTasks = 0;
       
       // Scan each task
       for (const task of CLEANING_TASKS) {
         try {
           setCurrentTask(task.name);
           updateTaskStatus(task.id, { status: 'scanning' });
+          
+          // Atualizar toast com progresso
+          toast.loading(`Scaneando ${task.name}...`, {
+            id: scanToast,
+            description: `${completedTasks + 1}/${CLEANING_TASKS.length} - ${formatBytes(totalFound)} encontrados`
+          });
           
           const results = await task.scanFunction();
           const taskSize = results.reduce((sum, item) => sum + item.size, 0);
@@ -301,18 +363,40 @@ export default function Dashboard() {
           
           totalFound += taskSize;
           setTotalSpaceFound(totalFound);
+          completedTasks++;
           
         } catch (error) {
           console.error(`Failed to scan ${task.name}:`, error);
+          setLastError(`Failed to scan ${task.name}: ${error}`);
           updateTaskStatus(task.id, { status: 'error' });
+          
+          // Toast de erro específico da task
+          toast.error(`Erro ao scanear ${task.name}`, {
+            description: `${error}`
+          });
         }
         
         // Pequena pausa para UX
         await new Promise(resolve => setTimeout(resolve, 300));
       }
       
+      // Toast de sucesso
+      toast.success('Scan concluído com sucesso!', {
+        id: scanToast,
+        description: `${formatBytes(totalFound)} encontrados em ${completedTasks} categorias`,
+        duration: 5000
+      });
+      
     } catch (error) {
       console.error('Scan failed:', error);
+      setLastError(`Scan failed: ${error}`);
+      
+      // Toast de erro geral
+      toast.error('Falha no scan do sistema', {
+        id: scanToast,
+        description: `${error}`,
+        duration: 5000
+      });
     } finally {
       setIsScanning(false);
       setCurrentTask(null);
@@ -322,20 +406,68 @@ export default function Dashboard() {
   const handleClean = useCallback(async () => {
     if (isScanning || isCleaning) return;
     
+    // Debug: Log estado atual das tasks
+    console.log('=== DEBUG CLEAN ===');
+    console.log('Total tasks:', tasks.length);
+    console.log('Tasks detail:', tasks.map(t => ({
+      id: t.id,
+      name: t.name,
+      status: t.status,
+      itemsLength: t.items.length,
+      size: t.size
+    })));
+    
     const cleanableTasks = tasks.filter(task => 
       task.status === 'found' && task.items.length > 0
     );
     
+    console.log('Cleanable tasks:', cleanableTasks.length);
+    console.log('Cleanable tasks detail:', cleanableTasks.map(t => ({
+      id: t.id,
+      name: t.name,
+      status: t.status,
+      itemsLength: t.items.length
+    })));
+    
+    // Improved condition check with more detailed feedback
     if (cleanableTasks.length === 0) {
-      alert('No items found to clean. Please scan first.');
+      // Check what's wrong
+      const tasksWithItems = tasks.filter(task => task.items.length > 0);
+      const tasksWithFoundStatus = tasks.filter(task => task.status === 'found');
+      
+      let errorMessage = 'Nenhum item encontrado para limpeza';
+      let errorDescription = '';
+      
+      if (tasks.length === 0) {
+        errorDescription = 'Nenhuma tarefa foi carregada.';
+      } else if (tasksWithItems.length === 0) {
+        errorDescription = 'Execute um scan primeiro para encontrar arquivos.';
+      } else if (tasksWithFoundStatus.length === 0) {
+        errorDescription = `Status das tarefas: ${tasks.map(t => `${t.name}:${t.status}`).slice(0, 3).join(', ')}`;
+      } else {
+        errorDescription = 'Erro desconhecido na filtragem de tarefas.';
+      }
+      
+      console.error('Clean failed:', errorMessage, errorDescription);
+      toast.warning(errorMessage, {
+        description: errorDescription,
+        duration: 5000
+      });
       return;
     }
+    
+    // Toast de início da limpeza
+    const cleanToast = toast.loading('Iniciando limpeza...', {
+      duration: Infinity,
+      description: `${cleanableTasks.length} categorias serão limpas`
+    });
     
     try {
       setIsCleaning(true);
       const startTime = Date.now();
       let totalSpaceCleaned = 0;
       let totalFilesDeleted = 0;
+      let completedTasks = 0;
       const errors: string[] = [];
       
       await cleanButtonControls.start({
@@ -349,15 +481,29 @@ export default function Dashboard() {
           setCurrentTask(`Cleaning ${task.name}`);
           updateTaskStatus(task.id, { status: 'cleaning' });
           
+          // Atualizar toast com progresso
+          toast.loading(`Limpando ${task.name}...`, {
+            id: cleanToast,
+            description: `${completedTasks + 1}/${cleanableTasks.length} - ${formatBytes(totalSpaceCleaned)} liberados`
+          });
+          
           const filePaths = task.items
             .filter(item => item.can_delete)
             .map(item => item.path);
           
+          console.log(`Cleaning ${task.name}:`, filePaths.length, 'files');
+          
           if (filePaths.length > 0) {
-            const result = await TauriService.cleanFiles(filePaths);
+            const result = await TestTauriService.cleanFiles(filePaths);
             totalSpaceCleaned += result.space_freed;
             totalFilesDeleted += result.files_deleted;
             errors.push(...result.errors);
+            
+            console.log(`Cleaned ${task.name}:`, {
+              files: result.files_deleted,
+              space: result.space_freed,
+              errors: result.errors
+            });
           }
           
           updateTaskStatus(task.id, { 
@@ -366,16 +512,53 @@ export default function Dashboard() {
             items: []
           });
           
+          completedTasks++;
+          
         } catch (error) {
           console.error(`Failed to clean ${task.name}:`, error);
+          setLastError(`Failed to clean ${task.name}: ${error}`);
           updateTaskStatus(task.id, { status: 'error' });
           errors.push(`Failed to clean ${task.name}: ${error}`);
+          
+          // Toast de erro específico da task
+          toast.error(`Erro ao limpar ${task.name}`, {
+            description: `${error}`
+          });
         }
         
         await new Promise(resolve => setTimeout(resolve, 500));
       }
       
       const duration = Date.now() - startTime;
+      
+      console.log('Clean completed:', {
+        totalSpaceCleaned,
+        totalFilesDeleted,
+        duration,
+        errors
+      });
+      
+      // Toast de sucesso
+      const hasErrors = errors.length > 0;
+      const toastType = hasErrors ? 'warning' : 'success';
+      const toastTitle = hasErrors ? 'Limpeza concluída com avisos' : 'Limpeza concluída com sucesso!';
+      const toastDescription = `${formatBytes(totalSpaceCleaned)} liberados • ${totalFilesDeleted} arquivos removidos • ${formatDuration(duration)}`;
+      
+      toast[toastType](toastTitle, {
+        id: cleanToast,
+        description: toastDescription,
+        duration: 7000
+      });
+      
+      // Se houver erros, mostrar detalhes
+      if (hasErrors) {
+        setTimeout(() => {
+          toast.error('Alguns erros ocorreram durante a limpeza', {
+            description: `${errors.length} erro(s) encontrado(s). Verifique o console para detalhes.`,
+            duration: 5000
+          });
+        }, 1000);
+      }
       
       // Salvar resultado no banco de dados
       const cleaningRecord: Omit<CleaningHistory, 'id' | 'created_at'> = {
@@ -409,11 +592,19 @@ export default function Dashboard() {
       
     } catch (error) {
       console.error('Cleaning failed:', error);
+      setLastError(`Cleaning failed: ${error}`);
+      
+      // Toast de erro geral
+      toast.error('Falha na limpeza do sistema', {
+        id: cleanToast,
+        description: `${error}`,
+        duration: 5000
+      });
     } finally {
       setIsCleaning(false);
       setCurrentTask(null);
     }
-  }, [tasks, isCleaning, isScanning, cleanButtonControls]);
+  }, [tasks, isCleaning, isScanning, cleanButtonControls, loadRecentHistory, loadStats]);
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -487,10 +678,18 @@ export default function Dashboard() {
         <div className="relative z-10 flex items-center justify-between">
           <div>
             <motion.h1 
-              className="text-3xl font-bold gradient-text mb-2"
+              className="text-3xl font-bold gradient-text mb-2 cursor-pointer select-none"
               initial={{ x: -30, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: 0.3 }}
+              onDoubleClick={() => {
+                toast.info('🎭 Iniciando Demo das Notificações', {
+                  description: 'Duplo clique detectado! Preparando demonstração...',
+                  duration: 2000
+                });
+                setTimeout(() => runToastDemo(), 2000);
+              }}
+              title="Duplo clique para ver demo das notificações"
             >
               Clean RN
             </motion.h1>
@@ -899,6 +1098,33 @@ export default function Dashboard() {
           </div>
         </motion.div>
       )}
+
+      {/* Debug Button - Fixed position */}
+      <motion.button
+        className="fixed bottom-6 right-6 p-3 bg-purple-600/20 hover:bg-purple-600/30 rounded-full transition-colors border border-purple-600/50 z-40"
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        onClick={() => setShowDebugPanel(true)}
+        title="Open Debug Panel"
+      >
+        <Bug className="w-6 h-6 text-purple-400" />
+      </motion.button>
+
+      {/* Debug Panel */}
+      <DebugPanel
+        isVisible={showDebugPanel}
+        onClose={() => setShowDebugPanel(false)}
+        debugInfo={{
+          isScanning,
+          isCleaning,
+          totalSpaceFound,
+          tasksCount: tasks.length,
+          cleanableTasks: tasks.filter(task => task.status === 'found' && task.items.length > 0).length,
+          lastError,
+          tauriConnectionStatus: 'testing',
+          databaseStatus: 'testing'
+        }}
+      />
     </motion.div>
   );
 } 

@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router';
+import { Toaster } from 'sonner';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: Home },
@@ -22,6 +23,24 @@ function App() {
 
   return (
     <div className="h-screen bg-gradient-to-br from-dark-bg to-[#1a1a2e] text-white overflow-hidden">
+      {/* Sonner Toaster */}
+      <Toaster
+        theme="dark"
+        richColors
+        position="top-right"
+        expand={true}
+        closeButton
+        toastOptions={{
+          style: {
+            background: 'rgba(16, 19, 32, 0.9)',
+            backdropFilter: 'blur(16px)',
+            border: '1px solid rgba(99, 102, 241, 0.3)',
+            color: 'white',
+          },
+          className: 'sonner-toast',
+        }}
+      />
+      
       <div className="flex h-full">
         {/* Sidebar */}
         <AnimatePresence>
