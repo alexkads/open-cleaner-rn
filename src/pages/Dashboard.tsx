@@ -1,17 +1,17 @@
 import { clsx } from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-    Activity,
-    AlertCircle,
-    CheckCircle,
-    Clock,
-    HardDrive,
-    Loader2,
-    RefreshCw,
-    Settings,
-    Smartphone,
-    Trash2,
-    X
+  Activity,
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  HardDrive,
+  Loader2,
+  RefreshCw,
+  Settings,
+  Smartphone,
+  Trash2,
+  X
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { CleaningResult, formatBytes, formatDuration, ScanResult, TauriService } from '../services/tauri';
@@ -129,7 +129,7 @@ export default function Dashboard() {
   const [totalSpaceFound, setTotalSpaceFound] = useState(0);
   const [totalSpaceCleaned, setTotalSpaceCleaned] = useState(0);
   const [lastCleanResult, setLastCleanResult] = useState<CleaningResult | null>(null);
-  const [showResults, setShowResults] = useState(false);
+
   const [currentTask, setCurrentTask] = useState<string | null>(null);
 
   // Initialize tasks
@@ -328,7 +328,6 @@ export default function Dashboard() {
       };
 
       setLastCleanResult(result);
-      setShowResults(true);
 
     } catch (error) {
       console.error('Cleaning failed:', error);

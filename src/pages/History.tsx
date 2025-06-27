@@ -85,7 +85,7 @@ const chartData = [
 
 export default function History() {
   const [filter, setFilter] = useState<'all' | 'quick' | 'deep' | 'custom'>('all');
-  const [records, setRecords] = useState<CleaningRecord[]>(mockHistory);
+  const [records, _setRecords] = useState<CleaningRecord[]>(mockHistory);
 
   const filteredRecords = filter === 'all' 
     ? records 
