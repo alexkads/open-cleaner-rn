@@ -1,6 +1,8 @@
-import { motion, useAnimation } from 'framer-motion';
+import { AnimatePresence, motion, useAnimation } from 'framer-motion';
 import {
+  AlertTriangle,
   Bell,
+  Check,
   Database,
   FolderOpen,
   Monitor,
@@ -9,9 +11,11 @@ import {
   Settings as SettingsIcon,
   Shield,
   Smartphone,
+  X,
   Zap
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { DatabaseService } from '../services/database';
 
 // Variantes de animação
 const containerVariants = {
@@ -62,28 +66,210 @@ const pulseVariants = {
   }
 };
 
+interface Notification {
+  id: string;
+  type: 'success' | 'error' | 'warning';
+  message: string;
+}
+
 export default function Settings() {
+  // Settings state
   const [autoClean, setAutoClean] = useState(true);
   const [notifications, setNotifications] = useState(true);
   const [systemTray, setSystemTray] = useState(true);
   const [deepScan, setDeepScan] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
   const [soundEffects, setSoundEffects] = useState(true);
+  
+  // UI state
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [customFolders, setCustomFolders] = useState<string[]>([]);
+  const [notification, setNotification] = useState<Notification | null>(null);
 
   const saveControls = useAnimation();
 
-  const handleSave = async () => {
-    await saveControls.start({
-      scale: [1, 1.2, 1],
-      rotate: [0, 360, 0],
-      transition: { duration: 0.6 }
-    });
+  // Carregar configurações do banco
+  useEffect(() => {
+    loadSettings();
+  }, []);
+
+  const loadSettings = async () => {
+    try {
+      setLoading(true);
+      await DatabaseService.init();
+      
+      // Carregar todas as configurações
+      const settings = await Promise.all([
+        DatabaseService.getSetting('auto_clean'),
+        DatabaseService.getSetting('notifications'),
+        DatabaseService.getSetting('system_tray'),
+        DatabaseService.getSetting('deep_scan'),
+        DatabaseService.getSetting('dark_mode'),
+        DatabaseService.getSetting('sound_effects'),
+        DatabaseService.getSetting('custom_folders')
+      ]);
+
+      setAutoClean(settings[0] === 'true');
+      setNotifications(settings[1] !== 'false'); // Default true
+      setSystemTray(settings[2] !== 'false'); // Default true
+      setDeepScan(settings[3] === 'true');
+      setDarkMode(settings[4] !== 'false'); // Default true
+      setSoundEffects(settings[5] !== 'false'); // Default true
+      
+      if (settings[6]) {
+        setCustomFolders(JSON.parse(settings[6]));
+      }
+    } catch (error) {
+      console.error('Failed to load settings:', error);
+      showNotification('error', 'Failed to load settings');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const AnimatedToggle = ({ enabled, onChange, label }: { 
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      await saveControls.start({
+        scale: [1, 1.2, 1],
+        rotate: [0, 360, 0],
+        transition: { duration: 0.6 }
+      });
+
+      // Salvar todas as configurações
+      await Promise.all([
+        DatabaseService.setSetting('auto_clean', autoClean.toString()),
+        DatabaseService.setSetting('notifications', notifications.toString()),
+        DatabaseService.setSetting('system_tray', systemTray.toString()),
+        DatabaseService.setSetting('deep_scan', deepScan.toString()),
+        DatabaseService.setSetting('dark_mode', darkMode.toString()),
+        DatabaseService.setSetting('sound_effects', soundEffects.toString()),
+        DatabaseService.setSetting('custom_folders', JSON.stringify(customFolders))
+      ]);
+
+      showNotification('success', 'Settings saved successfully!');
+    } catch (error) {
+      console.error('Failed to save settings:', error);
+      showNotification('error', 'Failed to save settings');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleExportHistory = async () => {
+    try {
+      const allHistory = await DatabaseService.exportHistory();
+      
+      if (allHistory.length === 0) {
+        showNotification('warning', 'No history data to export');
+        return;
+      }
+
+      const dataStr = JSON.stringify(allHistory, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `clean-rn-history-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      URL.revokeObjectURL(url);
+      showNotification('success', `Exported ${allHistory.length} records successfully!`);
+    } catch (error) {
+      console.error('Failed to export history:', error);
+      showNotification('error', 'Failed to export history');
+    }
+  };
+
+  const handleClearHistory = async () => {
+    const confirmed = window.confirm(
+      'Are you sure you want to delete all cleaning history? This action cannot be undone.'
+    );
+    
+    if (confirmed) {
+      try {
+        await DatabaseService.clearAllHistory();
+        showNotification('success', 'History cleared successfully!');
+      } catch (error) {
+        console.error('Failed to clear history:', error);
+        showNotification('error', 'Failed to clear history');
+      }
+    }
+  };
+
+  const handleAddCustomFolder = () => {
+    const folderPath = window.prompt('Enter the full path to the folder you want to add:');
+    
+    if (folderPath && folderPath.trim()) {
+      const trimmedPath = folderPath.trim();
+      if (!customFolders.includes(trimmedPath)) {
+        setCustomFolders(prev => [...prev, trimmedPath]);
+        showNotification('success', `Added folder: ${trimmedPath}`);
+      } else {
+        showNotification('warning', 'Folder already added');
+      }
+    }
+  };
+
+  const handleRemoveCustomFolder = (folderPath: string) => {
+    setCustomFolders(prev => prev.filter(folder => folder !== folderPath));
+    showNotification('success', 'Folder removed');
+  };
+
+  const handleResetSettings = async () => {
+    const confirmed = window.confirm(
+      'Are you sure you want to reset all settings to default values?'
+    );
+    
+    if (confirmed) {
+      try {
+        // Reset to defaults
+        setAutoClean(true);
+        setNotifications(true);
+        setSystemTray(true);
+        setDeepScan(false);
+        setDarkMode(true);
+        setSoundEffects(true);
+        setCustomFolders([]);
+        
+        // Clear from database
+        await Promise.all([
+          DatabaseService.setSetting('auto_clean', 'true'),
+          DatabaseService.setSetting('notifications', 'true'),
+          DatabaseService.setSetting('system_tray', 'true'),
+          DatabaseService.setSetting('deep_scan', 'false'),
+          DatabaseService.setSetting('dark_mode', 'true'),
+          DatabaseService.setSetting('sound_effects', 'true'),
+          DatabaseService.setSetting('custom_folders', '[]')
+        ]);
+        
+        showNotification('success', 'Settings reset to defaults');
+      } catch (error) {
+        console.error('Failed to reset settings:', error);
+        showNotification('error', 'Failed to reset settings');
+      }
+    }
+  };
+
+  const showNotification = (type: 'success' | 'error' | 'warning', message: string) => {
+    const id = Date.now().toString();
+    setNotification({ id, type, message });
+    
+    // Auto-hide after 3 seconds
+    setTimeout(() => {
+      setNotification(null);
+    }, 3000);
+  };
+
+  const AnimatedToggle = ({ enabled, onChange, label, description }: { 
     enabled: boolean; 
     onChange: () => void;
     label: string;
+    description: string;
   }) => (
     <motion.div
       className="flex items-center justify-between p-4 rounded-xl bg-dark-surface-2/50 border border-dark-border hover:border-primary/30 transition-all duration-300"
@@ -95,7 +281,7 @@ export default function Settings() {
     >
       <div>
         <h3 className="font-medium">{label}</h3>
-        <p className="text-sm text-gray-400">Configure this setting</p>
+        <p className="text-sm text-gray-400">{description}</p>
       </div>
       
       <motion.button
@@ -168,6 +354,21 @@ export default function Settings() {
     }
   ];
 
+  if (loading) {
+    return (
+      <div className="p-6 flex items-center justify-center min-h-screen">
+        <motion.div
+          className="flex items-center space-x-3"
+          animate={{ opacity: [0.5, 1, 0.5] }}
+          transition={{ duration: 1.5, repeat: Infinity }}
+        >
+          <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          <span className="text-gray-400">Loading settings...</span>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
     <motion.div
       className="p-6 space-y-6"
@@ -175,6 +376,28 @@ export default function Settings() {
       animate="visible"
       variants={containerVariants}
     >
+      {/* Notification */}
+      <AnimatePresence>
+        {notification && (
+          <motion.div
+            className={`fixed top-4 right-4 z-50 p-4 rounded-xl border flex items-center space-x-3 ${
+              notification.type === 'success' ? 'bg-success/20 border-success/30 text-success' :
+              notification.type === 'error' ? 'bg-danger/20 border-danger/30 text-danger' :
+              'bg-warning/20 border-warning/30 text-warning'
+            }`}
+            initial={{ x: 400, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: 400, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 500, damping: 30 }}
+          >
+            {notification.type === 'success' && <Check className="w-5 h-5" />}
+            {notification.type === 'error' && <X className="w-5 h-5" />}
+            {notification.type === 'warning' && <AlertTriangle className="w-5 h-5" />}
+            <span className="font-medium">{notification.message}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Header aprimorado */}
       <motion.div 
         className="glass-effect rounded-2xl p-6 relative overflow-hidden"
@@ -184,7 +407,6 @@ export default function Settings() {
           boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)"
         }}
       >
-        {/* Background gradient animado */}
         <motion.div
           className="absolute inset-0 bg-gradient-to-r from-accent/10 via-primary/10 to-secondary/10"
           animate={{
@@ -228,23 +450,32 @@ export default function Settings() {
             </motion.div>
             
             <motion.button 
-              className="p-3 rounded-xl bg-success/20 hover:bg-success/30 border border-success/30 flex items-center space-x-2"
+              className={`p-3 rounded-xl bg-success/20 hover:bg-success/30 border border-success/30 flex items-center space-x-2 ${
+                saving ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
               onClick={handleSave}
+              disabled={saving}
               animate={saveControls}
-              whileHover={{ 
+              whileHover={ saving ? {} : { 
                 scale: 1.05,
                 boxShadow: "0 10px 30px rgba(34, 197, 94, 0.3)" 
               }}
-              whileTap={{ scale: 0.95 }}
+              whileTap={ saving ? {} : { scale: 0.95 }}
             >
-              <Save className="w-5 h-5 text-success" />
-              <span className="text-success font-medium">Save</span>
+              {saving ? (
+                <div className="w-5 h-5 border-2 border-success border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <Save className="w-5 h-5 text-success" />
+              )}
+              <span className="text-success font-medium">
+                {saving ? 'Saving...' : 'Save'}
+              </span>
             </motion.button>
           </div>
         </div>
       </motion.div>
 
-      {/* Setting Sections com animações aprimoradas */}
+      {/* Setting Sections com funcionalidade real */}
       {settingSections.map((section, sectionIndex) => (
         <motion.div 
           key={section.title}
@@ -252,7 +483,6 @@ export default function Settings() {
           variants={itemVariants}
           whileHover={{ scale: 1.01 }}
         >
-          {/* Background decorativo */}
           <motion.div
             className={`absolute -top-10 -right-10 w-32 h-32 rounded-full ${
               section.color === 'primary' ? 'bg-primary/5' : 
@@ -308,6 +538,7 @@ export default function Settings() {
                     enabled={setting.enabled}
                     onChange={setting.onChange}
                     label={setting.title}
+                    description={setting.description}
                   />
                 </motion.div>
               ))}
@@ -316,7 +547,7 @@ export default function Settings() {
         </motion.div>
       ))}
 
-      {/* Folder Selection com animações */}
+      {/* Folder Selection com funcionalidade real */}
       <motion.div 
         className="glass-effect rounded-2xl p-6 relative overflow-hidden"
         variants={itemVariants}
@@ -359,57 +590,67 @@ export default function Settings() {
             className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"
             variants={containerVariants}
           >
-            <motion.button 
-              className="p-4 rounded-xl bg-dark-surface-2/50 border border-dark-border hover:border-primary/50 transition-all duration-300 text-left"
+            <motion.div 
+              className="p-4 rounded-xl bg-dark-surface-2/50 border border-dark-border text-left"
               variants={itemVariants}
-              whileHover={{ 
-                scale: 1.02,
-                x: 5,
-                boxShadow: "0 10px 25px rgba(99, 102, 241, 0.2)"
-              }}
-              whileTap={{ scale: 0.98 }}
             >
               <div className="flex items-center space-x-3">
-                <motion.div
-                  whileHover={{ rotate: 360 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <Monitor className="w-5 h-5 text-primary" />
-                </motion.div>
+                <Monitor className="w-5 h-5 text-primary" />
                 <div>
                   <h3 className="font-medium">Development Folder</h3>
                   <p className="text-sm text-gray-400">~/Documents/Projects</p>
                 </div>
               </div>
-            </motion.button>
+            </motion.div>
 
-            <motion.button 
-              className="p-4 rounded-xl bg-dark-surface-2/50 border border-dark-border hover:border-accent/50 transition-all duration-300 text-left"
+            <motion.div 
+              className="p-4 rounded-xl bg-dark-surface-2/50 border border-dark-border text-left"
               variants={itemVariants}
-              whileHover={{ 
-                scale: 1.02,
-                x: 5,
-                boxShadow: "0 10px 25px rgba(245, 158, 11, 0.2)"
-              }}
-              whileTap={{ scale: 0.98 }}
             >
               <div className="flex items-center space-x-3">
-                <motion.div
-                  whileHover={{ rotate: -360 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <Smartphone className="w-5 h-5 text-accent" />
-                </motion.div>
+                <Smartphone className="w-5 h-5 text-accent" />
                 <div>
                   <h3 className="font-medium">Expo Cache</h3>
                   <p className="text-sm text-gray-400">~/.expo</p>
                 </div>
               </div>
-            </motion.button>
+            </motion.div>
           </motion.div>
+
+          {/* Custom folders */}
+          {customFolders.length > 0 && (
+            <motion.div
+              className="mb-4 space-y-2"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              transition={{ duration: 0.3 }}
+            >
+              <h4 className="text-sm font-medium text-gray-400 mb-2">Custom Folders:</h4>
+              {customFolders.map((folder, index) => (
+                <motion.div
+                  key={folder}
+                  className="flex items-center justify-between p-3 rounded-lg bg-dark-surface-2/30 border border-dark-border"
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <span className="text-sm text-gray-300 font-mono">{folder}</span>
+                  <motion.button
+                    onClick={() => handleRemoveCustomFolder(folder)}
+                    className="p-1 rounded bg-danger/20 hover:bg-danger/30 transition-colors"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                  >
+                    <X className="w-4 h-4 text-danger" />
+                  </motion.button>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
 
           <motion.button 
             className="w-full p-4 rounded-xl bg-primary/20 hover:bg-primary/30 neon-border flex items-center justify-center space-x-2 transition-all duration-300"
+            onClick={handleAddCustomFolder}
             variants={itemVariants}
             whileHover={{ 
               scale: 1.02,
@@ -428,7 +669,7 @@ export default function Settings() {
         </div>
       </motion.div>
 
-      {/* Database Settings com animações */}
+      {/* Database Settings com funcionalidade real */}
       <motion.div 
         className="glass-effect rounded-2xl p-6 relative overflow-hidden"
         variants={itemVariants}
@@ -472,6 +713,7 @@ export default function Settings() {
           >
             <motion.button 
               className="p-4 rounded-xl bg-dark-surface-2/50 border border-dark-border hover:border-success/50 transition-all duration-300"
+              onClick={handleExportHistory}
               variants={itemVariants}
               whileHover={{ 
                 scale: 1.02,
@@ -495,6 +737,7 @@ export default function Settings() {
 
             <motion.button 
               className="p-4 rounded-xl bg-dark-surface-2/50 border border-dark-border hover:border-danger/50 transition-all duration-300"
+              onClick={handleClearHistory}
               variants={itemVariants}
               whileHover={{ 
                 scale: 1.02,
@@ -519,7 +762,7 @@ export default function Settings() {
         </div>
       </motion.div>
 
-      {/* Botão de reset geral */}
+      {/* Botão de reset geral com funcionalidade real */}
       <motion.div
         className="glass-effect rounded-2xl p-6 border border-warning/30"
         variants={itemVariants}
@@ -552,6 +795,7 @@ export default function Settings() {
           
           <motion.button
             className="px-4 py-2 rounded-lg bg-warning/20 hover:bg-warning/30 border border-warning/30 text-warning font-medium"
+            onClick={handleResetSettings}
             whileHover={{ 
               scale: 1.05,
               boxShadow: "0 10px 25px rgba(245, 158, 11, 0.3)"

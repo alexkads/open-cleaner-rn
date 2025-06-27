@@ -1,124 +1,123 @@
 import { clsx } from 'clsx';
 import { AnimatePresence, motion, useAnimation } from 'framer-motion';
 import {
-  Activity,
-  AlertCircle,
+  AlertTriangle,
   CheckCircle,
   Clock,
+  Cpu,
+  Download,
   HardDrive,
+  Layers,
   Loader2,
-  RefreshCw,
+  RotateCcw,
+  Search,
+  Shield,
   Smartphone,
   Trash2,
-  X
+  Zap
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { CleaningHistory, DatabaseService } from '../services/database';
 import { CleaningResult, formatBytes, formatDuration, ScanResult, TauriService } from '../services/tauri';
 
+// Tipos de tarefa de limpeza
 interface CleaningTask {
   id: string;
   name: string;
   description: string;
-  path: string;
-  size: number;
+  category: 'cache' | 'logs' | 'temp' | 'build' | 'docker';
+  icon: React.ComponentType<{ className?: string }>;
+  scanFunction: () => Promise<ScanResult[]>;
+  color: string;
   status: 'pending' | 'scanning' | 'found' | 'cleaning' | 'completed' | 'error';
-  type: 'expo' | 'metro' | 'ios' | 'android' | 'npm' | 'watchman' | 'cocoapods' | 'flipper' | 'temp' | 'docker_containers' | 'docker_images' | 'docker_volumes' | 'docker_cache' | 'node_modules';
-  items?: ScanResult[];
-  error?: string;
+  size: number;
+  items: ScanResult[];
+  lastUpdated?: Date;
 }
 
-const CLEANING_TASKS: Omit<CleaningTask, 'size' | 'status' | 'items'>[] = [
-  { 
-    id: 'expo', 
-    name: 'Expo Cache', 
-    description: 'Cache de builds e assets do Expo',
-    path: '~/.expo', 
-    type: 'expo' 
+// Definição das tarefas de limpeza disponíveis
+const CLEANING_TASKS: Omit<CleaningTask, 'status' | 'size' | 'items'>[] = [
+  {
+    id: 'expo-cache',
+    name: 'Expo Cache',
+    description: 'Clean Expo development cache and temporary files',
+    category: 'cache',
+    icon: Smartphone,
+    scanFunction: TauriService.scanExpoCache,
+    color: 'text-blue-400'
   },
-  { 
-    id: 'metro', 
-    name: 'Metro Bundler Cache', 
-    description: 'Cache do Metro bundler (React Native)',
-    path: '~/.metro', 
-    type: 'metro' 
+  {
+    id: 'metro-cache',
+    name: 'Metro Cache',
+    description: 'Clean Metro bundler cache files',
+    category: 'cache',
+    icon: Layers,
+    scanFunction: TauriService.scanMetroCache,
+    color: 'text-green-400'
   },
-  { 
-    id: 'ios', 
-    name: 'iOS Development Cache', 
-    description: 'Xcode DerivedData, Simulador e logs iOS',
-    path: '~/Library/Developer/Xcode/DerivedData', 
-    type: 'ios' 
+  {
+    id: 'npm-cache',
+    name: 'NPM Cache',
+    description: 'Clean Node.js package manager cache',
+    category: 'cache',
+    icon: Download,
+    scanFunction: TauriService.scanNpmCache,
+    color: 'text-red-400'
   },
-  { 
-    id: 'android', 
-    name: 'Android Development Cache', 
-    description: 'Gradle cache, emulador e builds Android',
-    path: '~/.gradle/caches', 
-    type: 'android' 
+  {
+    id: 'ios-cache',
+    name: 'iOS Build Cache',
+    description: 'Clean iOS simulator and build artifacts',
+    category: 'build',
+    icon: Cpu,
+    scanFunction: TauriService.scanIosCache,
+    color: 'text-purple-400'
   },
-  { 
-    id: 'npm', 
-    name: 'NPM/Yarn Cache', 
-    description: 'Cache de pacotes npm e yarn',
-    path: '~/.npm/_cacache', 
-    type: 'npm' 
+  {
+    id: 'android-cache',
+    name: 'Android Cache',
+    description: 'Clean Android build cache and temporary files',
+    category: 'build',
+    icon: Shield,
+    scanFunction: TauriService.scanAndroidCache,
+    color: 'text-yellow-400'
   },
-  { 
-    id: 'watchman', 
-    name: 'Watchman Cache', 
-    description: 'Cache e logs do Watchman (file watcher)',
-    path: '~/.watchman', 
-    type: 'watchman' 
+  {
+    id: 'watchman-cache',
+    name: 'Watchman Logs',
+    description: 'Clean Watchman file watching service logs',
+    category: 'logs',
+    icon: Clock,
+    scanFunction: TauriService.scanWatchmanCache,
+    color: 'text-orange-400'
   },
-  { 
-    id: 'cocoapods', 
-    name: 'CocoaPods Cache', 
-    description: 'Cache de pods e repositórios CocoaPods',
-    path: '~/Library/Caches/CocoaPods', 
-    type: 'cocoapods' 
+  {
+    id: 'cocoapods-cache',
+    name: 'CocoaPods Cache',
+    description: 'Clean CocoaPods dependency cache',
+    category: 'cache',
+    icon: HardDrive,
+    scanFunction: TauriService.scanCocoaPodsCache,
+    color: 'text-pink-400'
   },
-  { 
-    id: 'flipper', 
-    name: 'Flipper Logs', 
-    description: 'Logs e cache do Flipper debugger',
-    path: '~/.flipper', 
-    type: 'flipper' 
+  {
+    id: 'flipper-logs',
+    name: 'Flipper Logs',
+    description: 'Clean Flipper debugging tool logs',
+    category: 'logs',
+    icon: AlertTriangle,
+    scanFunction: TauriService.scanFlipperLogs,
+    color: 'text-cyan-400'
   },
-  { 
-    id: 'temp', 
-    name: 'Temporary Files', 
-    description: 'Arquivos temporários de desenvolvimento',
-    path: '/tmp/react-native-*', 
-    type: 'temp' 
-  },
-  { 
-    id: 'docker_containers', 
-    name: 'Docker Containers', 
-    description: 'Containers Docker parados e não utilizados',
-    path: 'docker://containers', 
-    type: 'docker_containers' 
-  },
-  { 
-    id: 'docker_images', 
-    name: 'Docker Images', 
-    description: 'Imagens Docker órfãs e não utilizadas',
-    path: 'docker://images', 
-    type: 'docker_images' 
-  },
-  { 
-    id: 'docker_volumes', 
-    name: 'Docker Volumes', 
-    description: 'Volumes Docker órfãos sem containers ativos',
-    path: 'docker://volumes', 
-    type: 'docker_volumes' 
-  },
-  { 
-    id: 'docker_cache', 
-    name: 'Docker Build Cache', 
-    description: 'Cache de builds Docker e camadas intermediárias',
-    path: 'docker://cache', 
-    type: 'docker_cache' 
-  },
+  {
+    id: 'temp-files',
+    name: 'Temp Files',
+    description: 'Clean system temporary files',
+    category: 'temp',
+    icon: Trash2,
+    scanFunction: TauriService.scanTempFiles,
+    color: 'text-gray-400'
+  }
 ];
 
 // Variantes de animação para containers
@@ -145,7 +144,7 @@ const itemVariants = {
   }
 };
 
-const pulseVariants = {
+const pulseAnimation = {
   scale: [1, 1.02, 1],
   transition: {
     duration: 2,
@@ -154,7 +153,7 @@ const pulseVariants = {
   }
 };
 
-const glowVariants = {
+const glowAnimation = {
   boxShadow: [
     "0 0 20px rgba(99, 102, 241, 0.3)",
     "0 0 40px rgba(99, 102, 241, 0.5)",
@@ -175,12 +174,43 @@ export default function Dashboard() {
   const [totalSpaceCleaned, setTotalSpaceCleaned] = useState(0);
   const [lastCleanResult, setLastCleanResult] = useState<CleaningResult | null>(null);
   const [currentTask, setCurrentTask] = useState<string | null>(null);
+  const [systemStatus, setSystemStatus] = useState({
+    reactNative: 'checking',
+    metroBundle: 'checking'
+  });
+  const [recentHistory, setRecentHistory] = useState<CleaningHistory[]>([]);
+  const [stats, setStats] = useState({
+    total_space_cleaned: 0,
+    total_sessions: 0,
+    avg_duration: 0
+  });
 
   const scanButtonControls = useAnimation();
   const cleanButtonControls = useAnimation();
 
-  // Initialize tasks
+  // Inicializar componente
   useEffect(() => {
+    initializeDashboard();
+  }, []);
+
+  const initializeDashboard = async () => {
+    try {
+      // Inicializar banco de dados
+      await DatabaseService.init();
+      
+      // Carregar dados paralelos
+      await Promise.all([
+        loadTasks(),
+        loadRecentHistory(),
+        loadStats(),
+        checkSystemStatus()
+      ]);
+    } catch (error) {
+      console.error('Failed to initialize dashboard:', error);
+    }
+  };
+
+  const loadTasks = () => {
     const initialTasks: CleaningTask[] = CLEANING_TASKS.map(task => ({
       ...task,
       size: 0,
@@ -188,496 +218,563 @@ export default function Dashboard() {
       items: []
     }));
     setTasks(initialTasks);
-  }, []);
+  };
+
+  const loadRecentHistory = async () => {
+    try {
+      const history = await DatabaseService.getCleaningHistory(5);
+      setRecentHistory(history);
+    } catch (error) {
+      console.error('Failed to load recent history:', error);
+    }
+  };
+
+  const loadStats = async () => {
+    try {
+      const statsData = await DatabaseService.getCleaningStats();
+      setStats(statsData);
+    } catch (error) {
+      console.error('Failed to load stats:', error);
+    }
+  };
+
+  const checkSystemStatus = async () => {
+    try {
+      // Simular verificação de status do sistema
+      // Em uma implementação real, isso verificaria se os serviços estão rodando
+      setSystemStatus({
+        reactNative: Math.random() > 0.5 ? 'active' : 'idle',
+        metroBundle: Math.random() > 0.3 ? 'active' : 'idle'
+      });
+    } catch (error) {
+      console.error('Failed to check system status:', error);
+      setSystemStatus({
+        reactNative: 'error',
+        metroBundle: 'error'
+      });
+    }
+  };
 
   const updateTaskStatus = (taskId: string, updates: Partial<CleaningTask>) => {
     setTasks(prev => prev.map(task => 
-      task.id === taskId ? { ...task, ...updates } : task
+      task.id === taskId ? { ...task, ...updates, lastUpdated: new Date() } : task
     ));
   };
 
-  const handleQuickScan = async () => {
-    setIsScanning(true);
-    setTotalSpaceFound(0);
-    setCurrentTask(null);
-
-    // Reset all tasks to pending
-    setTasks(prev => prev.map(task => ({ 
-      ...task, 
-      status: 'pending' as const, 
-      size: 0, 
-      items: [] 
-    })));
-
-    const scanTasks = [
-      { 
-        id: 'expo', 
-        name: 'Expo Cache', 
-        scanner: TauriService.scanExpoCache 
-      },
-      { 
-        id: 'metro', 
-        name: 'Metro Bundler Cache', 
-        scanner: TauriService.scanMetroCache 
-      },
-      { 
-        id: 'ios', 
-        name: 'iOS Development Cache', 
-        scanner: TauriService.scanIosCache 
-      },
-      { 
-        id: 'android', 
-        name: 'Android Development Cache', 
-        scanner: TauriService.scanAndroidCache 
-      },
-      { 
-        id: 'npm', 
-        name: 'NPM/Yarn Cache', 
-        scanner: TauriService.scanNpmCache 
-      },
-      { 
-        id: 'watchman', 
-        name: 'Watchman Cache', 
-        scanner: TauriService.scanWatchmanCache 
-      },
-      { 
-        id: 'cocoapods', 
-        name: 'CocoaPods Cache', 
-        scanner: TauriService.scanCocoaPodsCache 
-      },
-      { 
-        id: 'flipper', 
-        name: 'Flipper Logs', 
-        scanner: TauriService.scanFlipperLogs 
-      },
-      { 
-        id: 'temp', 
-        name: 'Temporary Files', 
-        scanner: TauriService.scanTempFiles 
-      },
-      { 
-        id: 'docker_containers', 
-        name: 'Docker Containers', 
-        scanner: TauriService.scanDockerContainers 
-      },
-      { 
-        id: 'docker_images', 
-        name: 'Docker Images', 
-        scanner: TauriService.scanDockerImages 
-      },
-      { 
-        id: 'docker_volumes', 
-        name: 'Docker Volumes', 
-        scanner: TauriService.scanDockerVolumes 
-      },
-      { 
-        id: 'docker_cache', 
-        name: 'Docker Build Cache', 
-        scanner: TauriService.scanDockerCache 
-      },
-    ];
-
+  const handleScan = useCallback(async () => {
+    if (isScanning || isCleaning) return;
+    
     try {
-      for (const scanTask of scanTasks) {
-        setCurrentTask(`Scanning ${scanTask.name}...`);
-        updateTaskStatus(scanTask.id, { status: 'scanning' });
-        
-        try {
-          const results = await scanTask.scanner();
-          const totalSize = results.reduce((sum, item) => sum + item.size, 0);
-          
-          updateTaskStatus(scanTask.id, { 
-            status: totalSize > 0 ? 'found' : 'completed', 
-            size: totalSize,
-            items: results 
-          });
-          
-          setTotalSpaceFound(prev => prev + totalSize);
-        } catch (error) {
-          updateTaskStatus(scanTask.id, { 
-            status: 'error', 
-            error: error instanceof Error ? error.message : `Failed to scan ${scanTask.name}` 
-          });
-        }
+      setIsScanning(true);
+      setTotalSpaceFound(0);
+      
+      await scanButtonControls.start({
+        scale: [1, 1.1, 1],
+        rotate: [0, 360],
+        transition: { duration: 0.8 }
+      });
 
-        // Add small delay for better UX
+      // Reset task status
+      setTasks(prev => prev.map(task => ({ 
+        ...task, 
+        status: 'pending', 
+        size: 0, 
+        items: [] 
+      })));
+
+      let totalFound = 0;
+      
+      // Scan each task
+      for (const task of CLEANING_TASKS) {
+        try {
+          setCurrentTask(task.name);
+          updateTaskStatus(task.id, { status: 'scanning' });
+          
+          const results = await task.scanFunction();
+          const taskSize = results.reduce((sum, item) => sum + item.size, 0);
+          
+          updateTaskStatus(task.id, {
+            status: taskSize > 0 ? 'found' : 'completed',
+            size: taskSize,
+            items: results
+          });
+          
+          totalFound += taskSize;
+          setTotalSpaceFound(totalFound);
+          
+        } catch (error) {
+          console.error(`Failed to scan ${task.name}:`, error);
+          updateTaskStatus(task.id, { status: 'error' });
+        }
+        
+        // Pequena pausa para UX
         await new Promise(resolve => setTimeout(resolve, 300));
       }
-
+      
     } catch (error) {
       console.error('Scan failed:', error);
     } finally {
       setIsScanning(false);
       setCurrentTask(null);
     }
-  };
+  }, [isScanning, isCleaning, scanButtonControls]);
 
-  const handleCleanSelected = async () => {
-    const tasksToClean = tasks.filter(task => task.status === 'found' && task.items && task.items.length > 0);
+  const handleClean = useCallback(async () => {
+    if (isScanning || isCleaning) return;
     
-    if (tasksToClean.length === 0) {
+    const cleanableTasks = tasks.filter(task => 
+      task.status === 'found' && task.items.length > 0
+    );
+    
+    if (cleanableTasks.length === 0) {
+      alert('No items found to clean. Please scan first.');
       return;
     }
-
-    setIsCleaning(true);
-    setTotalSpaceCleaned(0);
-
-    const startTime = Date.now();
-    let totalFiles = 0;
-    let totalErrors: string[] = [];
-
+    
     try {
-      for (const task of tasksToClean) {
-        setCurrentTask(`Cleaning ${task.name}...`);
-        updateTaskStatus(task.id, { status: 'cleaning' });
+      setIsCleaning(true);
+      const startTime = Date.now();
+      let totalSpaceCleaned = 0;
+      let totalFilesDeleted = 0;
+      const errors: string[] = [];
+      
+      await cleanButtonControls.start({
+        scale: [1, 1.2, 1],
+        rotate: [0, -360],
+        transition: { duration: 0.8 }
+      });
 
+      for (const task of cleanableTasks) {
         try {
-          if (task.items && task.items.length > 0) {
-            let result: CleaningResult;
-            
-            // Use different cleaning method for Docker resources
-            if (task.type.startsWith('docker_')) {
-              const dockerPaths = task.items.map(item => item.path);
-              result = await TauriService.cleanDockerResources(dockerPaths);
-            } else {
-              const filePaths = task.items.map(item => item.path);
-              result = await TauriService.cleanFiles(filePaths);
-            }
-            
-            totalFiles += result.files_deleted;
-            totalErrors = [...totalErrors, ...result.errors];
-            setTotalSpaceCleaned(prev => prev + result.space_freed);
-            
-            updateTaskStatus(task.id, { 
-              status: 'completed',
-              size: 0,
-              items: []
-            });
+          setCurrentTask(`Cleaning ${task.name}`);
+          updateTaskStatus(task.id, { status: 'cleaning' });
+          
+          const filePaths = task.items
+            .filter(item => item.can_delete)
+            .map(item => item.path);
+          
+          if (filePaths.length > 0) {
+            const result = await TauriService.cleanFiles(filePaths);
+            totalSpaceCleaned += result.space_freed;
+            totalFilesDeleted += result.files_deleted;
+            errors.push(...result.errors);
           }
-        } catch (error) {
+          
           updateTaskStatus(task.id, { 
-            status: 'error',
-            error: error instanceof Error ? error.message : 'Failed to clean'
+            status: 'completed',
+            size: 0,
+            items: []
           });
-          totalErrors.push(`Failed to clean ${task.name}: ${error}`);
+          
+        } catch (error) {
+          console.error(`Failed to clean ${task.name}:`, error);
+          updateTaskStatus(task.id, { status: 'error' });
+          errors.push(`Failed to clean ${task.name}: ${error}`);
         }
-
-        // Add delay for visual feedback
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        await new Promise(resolve => setTimeout(resolve, 500));
       }
-
+      
       const duration = Date.now() - startTime;
-      const result: CleaningResult = {
-        files_deleted: totalFiles,
-        space_freed: totalSpaceCleaned,
-        duration,
-        errors: totalErrors
+      
+      // Salvar resultado no banco de dados
+      const cleaningRecord: Omit<CleaningHistory, 'id' | 'created_at'> = {
+        date: new Date().toISOString().split('T')[0],
+        time: new Date().toTimeString().split(' ')[0],
+        space_cleaned: totalSpaceCleaned,
+        files_deleted: totalFilesDeleted,
+        duration: duration,
+        type: cleanableTasks.length > 5 ? 'deep' : 'quick',
+        status: errors.length > 0 ? 'warning' : 'success',
+        errors: errors.length > 0 ? errors.join('; ') : undefined
       };
-
-      setLastCleanResult(result);
-
+      
+      await DatabaseService.addCleaningRecord(cleaningRecord);
+      
+      // Atualizar resultado para exibição
+      setLastCleanResult({
+        files_deleted: totalFilesDeleted,
+        space_freed: totalSpaceCleaned,
+        duration: duration,
+        errors: errors
+      });
+      
+      // Recarregar dados
+      await Promise.all([
+        loadRecentHistory(),
+        loadStats()
+      ]);
+      
+      setTotalSpaceFound(0);
+      
     } catch (error) {
       console.error('Cleaning failed:', error);
     } finally {
       setIsCleaning(false);
       setCurrentTask(null);
     }
-  };
+  }, [tasks, isCleaning, isScanning, cleanButtonControls]);
 
-  const getStatusIcon = (status: CleaningTask['status']) => {
+  const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'pending':
-        return <Clock className="w-4 h-4 text-gray-400" />;
       case 'scanning':
-        return <Loader2 className="w-4 h-4 text-primary animate-spin" />;
+        return <Loader2 className="w-5 h-5 animate-spin text-warning" />;
       case 'found':
-        return <AlertCircle className="w-4 h-4 text-warning" />;
+        return <AlertTriangle className="w-5 h-5 text-primary" />;
       case 'cleaning':
-        return <Loader2 className="w-4 h-4 text-accent animate-spin" />;
+        return <Loader2 className="w-5 h-5 animate-spin text-accent" />;
       case 'completed':
-        return <CheckCircle className="w-4 h-4 text-success" />;
+        return <CheckCircle className="w-5 h-5 text-success" />;
       case 'error':
-        return <X className="w-4 h-4 text-danger" />;
+        return <AlertTriangle className="w-5 h-5 text-danger" />;
       default:
-        return <Clock className="w-4 h-4 text-gray-400" />;
+        return <Clock className="w-5 h-5 text-gray-500" />;
     }
   };
 
-  const getStatusColor = (status: CleaningTask['status']) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
-      case 'scanning':
-      case 'cleaning':
-        return 'border-primary bg-primary/10';
-      case 'found':
-        return 'border-warning bg-warning/10';
-      case 'completed':
-        return 'border-success bg-success/10';
+      case 'active':
+        return 'text-success';
+      case 'idle':
+        return 'text-warning';
       case 'error':
-        return 'border-danger bg-danger/10';
+        return 'text-danger';
       default:
-        return 'border-gray-600 bg-gray-600/10';
+        return 'text-gray-400';
     }
   };
 
-  const foundTasks = tasks.filter(task => task.status === 'found');
-  const hasItemsToClean = foundTasks.length > 0;
-
-  // Função para animar botões durante o scan
-  const animateScanButton = async () => {
-    await scanButtonControls.start({
-      scale: [1, 1.05, 1],
-      rotate: [0, 5, -5, 0],
-      transition: { duration: 0.5 }
-    });
-  };
-
-  const animateCleanButton = async () => {
-    await cleanButtonControls.start({
-      scale: [1, 1.1, 1],
-      y: [0, -5, 0],
-      transition: { duration: 0.6, ease: "easeOut" as const }
-    });
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'active':
+        return 'Active';
+      case 'idle':
+        return 'Idle';
+      case 'error':
+        return 'Error';
+      default:
+        return 'Checking...';
+    }
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <motion.div
-        className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
+    <motion.div
+      className="p-6 space-y-6"
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+    >
+      {/* Header com stats reais */}
+      <motion.div 
+        className="glass-effect rounded-2xl p-6 relative overflow-hidden"
+        variants={itemVariants}
+        whileHover={{ scale: 1.02 }}
       >
-        {/* Space Available Card */}
         <motion.div
-          className="glass-effect rounded-2xl p-6 relative overflow-hidden"
-          variants={itemVariants}
-          whileHover={{ 
-            scale: 1.02,
-            boxShadow: "0 10px 40px rgba(59, 130, 246, 0.2)"
+          className="absolute inset-0 bg-gradient-to-r from-primary/10 via-accent/10 to-secondary/10"
+          animate={{
+            x: [-100, 100, -100],
+            opacity: [0.3, 0.7, 0.3]
           }}
-          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut" as const
+          }}
+        />
+        
+        <div className="relative z-10 flex items-center justify-between">
+          <div>
+            <motion.h1 
+              className="text-3xl font-bold gradient-text mb-2"
+              initial={{ x: -30, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              Clean RN
+            </motion.h1>
+            <motion.p 
+              className="text-gray-400"
+              initial={{ x: -30, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.4 }}
+            >
+              Keep your React Native development environment clean and fast
+            </motion.p>
+          </div>
+          
+          <div className="text-right">
+            <motion.p 
+              className="text-sm text-gray-400"
+              initial={{ x: 30, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.5 }}
+            >
+              Total Cleaned
+            </motion.p>
+            <motion.p 
+              className="text-2xl font-bold gradient-text"
+              initial={{ x: 30, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.6 }}
+            >
+              {formatBytes(stats.total_space_cleaned)}
+            </motion.p>
+            <motion.p 
+              className="text-xs text-gray-500"
+              initial={{ x: 30, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.7 }}
+            >
+              {stats.total_sessions} sessions
+            </motion.p>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Action Buttons */}
+      <motion.div 
+        className="grid grid-cols-1 md:grid-cols-2 gap-4"
+        variants={containerVariants}
+      >
+        <motion.button
+          className={clsx(
+            "glass-effect rounded-2xl p-6 text-left transition-all duration-300 relative overflow-hidden",
+            !isScanning && !isCleaning 
+              ? "hover:scale-105 neon-border cursor-pointer" 
+              : "opacity-75 cursor-not-allowed"
+          )}
+          variants={itemVariants}
+          onClick={handleScan}
+          disabled={isScanning || isCleaning}
+          animate={scanButtonControls}
+                     whileHover={!isScanning && !isCleaning ? glowAnimation : {}}
         >
           <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10"
+            className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20"
             animate={{
-              x: [-100, 100],
-              opacity: [0.3, 0.6, 0.3]
+              opacity: isScanning ? [0.5, 0.8, 0.5] : 0.5,
+              scale: isScanning ? [1, 1.05, 1] : 1
             }}
             transition={{
-              duration: 3,
-              repeat: Infinity,
+              duration: 2,
+              repeat: isScanning ? Infinity : 0,
               ease: "easeInOut" as const
             }}
           />
-          <div className="relative z-10">
-            <div className="flex items-center justify-between mb-4">
-              <motion.div
-                className="p-3 rounded-full bg-primary/20"
-                animate={pulseVariants}
-              >
-                <HardDrive className="w-6 h-6 text-primary" />
-              </motion.div>
-              <motion.div
-                className="text-right"
-                initial={{ x: 20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.2 }}
-              >
-                <p className="text-sm text-gray-400">Espaço Liberável</p>
-                <motion.p
-                  className="text-2xl font-bold gradient-text"
-                  animate={{
-                    scale: totalSpaceFound > 0 ? [1, 1.1, 1] : 1
-                  }}
-                  transition={{ duration: 0.5 }}
+          
+          <div className="relative z-10 flex items-center space-x-4">
+            <motion.div
+              className="p-4 rounded-full bg-primary/30"
+              animate={isScanning ? { rotate: 360 } : {}}
+              transition={{ duration: 2, repeat: isScanning ? Infinity : 0, ease: "linear" as const }}
+            >
+              <Search className="w-8 h-8 text-primary" />
+            </motion.div>
+            
+            <div>
+              <h3 className="text-xl font-bold mb-2">
+                {isScanning ? 'Scanning...' : 'Quick Scan'}
+              </h3>
+              <p className="text-gray-400 text-sm">
+                {isScanning 
+                  ? `Scanning ${currentTask || 'system'}...`
+                  : 'Scan for React Native cache and temporary files'
+                }
+              </p>
+              {totalSpaceFound > 0 && (
+                <motion.p 
+                  className="text-primary font-bold mt-2"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
                 >
-                  {formatBytes(totalSpaceFound)}
+                  Found: {formatBytes(totalSpaceFound)}
                 </motion.p>
-              </motion.div>
+              )}
             </div>
-            
-            <motion.div
-              className="w-full bg-dark-surface rounded-full h-2 overflow-hidden"
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ delay: 0.3, duration: 0.8 }}
-            >
-              <motion.div
-                className="h-full bg-gradient-to-r from-primary to-accent"
-                initial={{ width: "0%" }}
-                animate={{ width: totalSpaceFound > 0 ? "75%" : "0%" }}
-                transition={{ duration: 1, ease: "easeOut" as const }}
-              />
-            </motion.div>
           </div>
-        </motion.div>
+        </motion.button>
 
-        {/* Quick Actions */}
-        <motion.div
-          className="glass-effect rounded-2xl p-6"
+        <motion.button
+          className={clsx(
+            "glass-effect rounded-2xl p-6 text-left transition-all duration-300 relative overflow-hidden",
+            !isScanning && !isCleaning && totalSpaceFound > 0
+              ? "hover:scale-105 neon-border cursor-pointer" 
+              : "opacity-75 cursor-not-allowed"
+          )}
           variants={itemVariants}
-          whileHover={{ scale: 1.02 }}
+          onClick={handleClean}
+          disabled={isScanning || isCleaning || totalSpaceFound === 0}
+          animate={cleanButtonControls}
+                     whileHover={!isScanning && !isCleaning && totalSpaceFound > 0 ? glowAnimation : {}}
         >
-          <h3 className="text-lg font-semibold gradient-text mb-4">Ações Rápidas</h3>
-          <div className="space-y-3">
-            <motion.button
-              className="w-full p-3 rounded-xl bg-primary/20 hover:bg-primary/30 neon-border flex items-center space-x-3 transition-all duration-300"
-              onClick={() => {
-                handleQuickScan();
-                animateScanButton();
-              }}
-              disabled={isScanning}
-              animate={scanButtonControls}
-              whileHover={{ 
-                scale: 1.05,
-                x: 5
-              }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <motion.div
-                animate={isScanning ? { rotate: 360 } : {}}
-                                 transition={{
-                   duration: 1,
-                   repeat: isScanning ? Infinity : 0,
-                   ease: "linear" as const
-                 }}
-              >
-                {isScanning ? (
-                  <Loader2 className="w-5 h-5 text-primary" />
-                ) : (
-                  <RefreshCw className="w-5 h-5 text-primary" />
-                )}
-              </motion.div>
-              <span className="font-medium">
-                {isScanning ? 'Escaneando...' : 'Scan Rápido'}
-              </span>
-            </motion.button>
-
-            <motion.button
-              className="w-full p-3 rounded-xl bg-success/20 hover:bg-success/30 border border-success/30 flex items-center space-x-3 transition-all duration-300"
-              onClick={() => {
-                handleCleanSelected();
-                animateCleanButton();
-              }}
-              disabled={isCleaning || tasks.filter(t => t.status === 'found').length === 0}
-              animate={cleanButtonControls}
-              whileHover={{ 
-                scale: 1.05,
-                x: 5,
-                boxShadow: "0 5px 20px rgba(34, 197, 94, 0.3)"
-              }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <motion.div
-                animate={isCleaning ? { scale: [1, 1.2, 1] } : {}}
-                transition={{
-                  duration: 0.8,
-                  repeat: isCleaning ? Infinity : 0
-                }}
-              >
-                <Trash2 className="w-5 h-5 text-success" />
-              </motion.div>
-              <span className="font-medium">
-                {isCleaning ? 'Limpando...' : 'Limpar Selecionados'}
-              </span>
-            </motion.button>
-          </div>
-        </motion.div>
-
-        {/* System Status */}
-        <motion.div
-          className="glass-effect rounded-2xl p-6"
-          variants={itemVariants}
-          whileHover={{ scale: 1.02 }}
-        >
-          <h3 className="text-lg font-semibold gradient-text mb-4">Status do Sistema</h3>
-          <div className="space-y-3">
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-br from-success/20 to-accent/20"
+            animate={{
+              opacity: isCleaning ? [0.5, 0.8, 0.5] : 0.5,
+              scale: isCleaning ? [1, 1.05, 1] : 1
+            }}
+            transition={{
+              duration: 2,
+              repeat: isCleaning ? Infinity : 0,
+              ease: "easeInOut" as const
+            }}
+          />
+          
+          <div className="relative z-10 flex items-center space-x-4">
             <motion.div
-              className="flex items-center justify-between"
-              initial={{ x: -20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.1 }}
+              className="p-4 rounded-full bg-success/30"
+              animate={isCleaning ? { scale: [1, 1.2, 1] } : {}}
+              transition={{ duration: 1, repeat: isCleaning ? Infinity : 0 }}
             >
-              <span className="text-gray-400">React Native</span>
-              <motion.div
-                className="flex items-center space-x-2"
-                animate={{ x: [0, 3, 0] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              >
-                <div className="w-2 h-2 rounded-full bg-success animate-pulse"></div>
-                <span className="text-success text-sm">Ativo</span>
-              </motion.div>
+              <Zap className="w-8 h-8 text-success" />
             </motion.div>
             
-            <motion.div
-              className="flex items-center justify-between"
-              initial={{ x: -20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-            >
-              <span className="text-gray-400">Metro Bundler</span>
-              <motion.div
-                className="flex items-center space-x-2"
-                animate={{ x: [0, -3, 0] }}
-                transition={{ duration: 2, repeat: Infinity, delay: 1 }}
-              >
-                <div className="w-2 h-2 rounded-full bg-warning animate-pulse"></div>
-                <span className="text-warning text-sm">Idle</span>
-              </motion.div>
-            </motion.div>
+            <div>
+              <h3 className="text-xl font-bold mb-2">
+                {isCleaning ? 'Cleaning...' : 'Clean Now'}
+              </h3>
+              <p className="text-gray-400 text-sm">
+                {isCleaning 
+                  ? currentTask || 'Cleaning files...'
+                  : totalSpaceFound > 0 
+                    ? `Ready to clean ${formatBytes(totalSpaceFound)}`
+                    : 'Scan first to find cleanable files'
+                }
+              </p>
+            </div>
           </div>
-        </motion.div>
+        </motion.button>
+      </motion.div>
+
+      {/* Last Clean Result */}
+      <AnimatePresence>
+        {lastCleanResult && (
+          <motion.div
+            className="glass-effect rounded-2xl p-6 border border-success/30"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            variants={itemVariants}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <CheckCircle className="w-6 h-6 text-success" />
+                <div>
+                  <h3 className="font-bold text-success">Cleaning Completed!</h3>
+                  <p className="text-sm text-gray-400">
+                    Freed {formatBytes(lastCleanResult.space_freed)} • 
+                    Deleted {lastCleanResult.files_deleted} files • 
+                    Took {formatDuration(lastCleanResult.duration)}
+                  </p>
+                  {lastCleanResult.errors.length > 0 && (
+                    <p className="text-xs text-warning mt-1">
+                      {lastCleanResult.errors.length} warnings occurred
+                    </p>
+                  )}
+                </div>
+              </div>
+              
+              <motion.button
+                onClick={() => setLastCleanResult(null)}
+                className="p-2 rounded-lg hover:bg-white/10"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <RotateCcw className="w-5 h-5 text-gray-400" />
+              </motion.button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* System Status com dados reais */}
+      <motion.div
+        className="glass-effect rounded-2xl p-6"
+        variants={itemVariants}
+        whileHover={{ scale: 1.02 }}
+      >
+        <h3 className="text-lg font-semibold gradient-text mb-4">System Status</h3>
+        <div className="space-y-3">
+          <motion.div
+            className="flex items-center justify-between"
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.1 }}
+          >
+            <span className="text-gray-400">React Native</span>
+            <motion.div
+              className="flex items-center space-x-2"
+              animate={{ x: [0, 3, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              <div className={`w-2 h-2 rounded-full animate-pulse ${
+                systemStatus.reactNative === 'active' ? 'bg-success' :
+                systemStatus.reactNative === 'idle' ? 'bg-warning' : 'bg-danger'
+              }`}></div>
+              <span className={`text-sm ${getStatusColor(systemStatus.reactNative)}`}>
+                {getStatusLabel(systemStatus.reactNative)}
+              </span>
+            </motion.div>
+          </motion.div>
+          
+          <motion.div
+            className="flex items-center justify-between"
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            <span className="text-gray-400">Metro Bundler</span>
+            <motion.div
+              className="flex items-center space-x-2"
+              animate={{ x: [0, -3, 0] }}
+              transition={{ duration: 2, repeat: Infinity, delay: 1 }}
+            >
+              <div className={`w-2 h-2 rounded-full animate-pulse ${
+                systemStatus.metroBundle === 'active' ? 'bg-success' :
+                systemStatus.metroBundle === 'idle' ? 'bg-warning' : 'bg-danger'
+              }`}></div>
+              <span className={`text-sm ${getStatusColor(systemStatus.metroBundle)}`}>
+                {getStatusLabel(systemStatus.metroBundle)}
+              </span>
+            </motion.div>
+          </motion.div>
+        </div>
       </motion.div>
 
       {/* Current Activity */}
       <AnimatePresence>
-        {(isScanning || isCleaning) && currentTask && (
+        {(isScanning || isCleaning) && (
           <motion.div
-            className="glass-effect rounded-2xl p-6 mb-6"
-            initial={{ y: -50, opacity: 0, scale: 0.9 }}
-            animate={{ y: 0, opacity: 1, scale: 1 }}
-            exit={{ y: -50, opacity: 0, scale: 0.9 }}
-            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            className="glass-effect rounded-2xl p-6 border border-primary/30"
+                         initial={{ opacity: 0, scale: 0.9 }}
+             animate={{ 
+               opacity: 1,
+               ...pulseAnimation
+             }}
+             exit={{ opacity: 0, scale: 0.9 }}
           >
             <div className="flex items-center space-x-4">
               <motion.div
-                className="p-3 rounded-full bg-primary/20"
                 animate={{ rotate: 360 }}
                 transition={{ duration: 2, repeat: Infinity, ease: "linear" as const }}
               >
-                <Activity className="w-6 h-6 text-primary" />
+                <Loader2 className="w-6 h-6 text-primary" />
               </motion.div>
-              <div className="flex-1">
-                <motion.p
-                  className="font-semibold"
-                  animate={{ opacity: [0.5, 1, 0.5] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                >
-                  {isScanning ? 'Escaneando' : 'Limpando'}: {currentTask}
-                </motion.p>
-                <motion.div
-                  className="w-full bg-dark-surface rounded-full h-1 mt-2 overflow-hidden"
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <motion.div
-                    className="h-full bg-gradient-to-r from-primary to-accent"
-                    animate={{ x: ["-100%", "100%"] }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: "easeInOut" as const
-                    }}
-                  />
-                </motion.div>
+              
+              <div>
+                <h3 className="font-bold text-primary">
+                  {isScanning ? 'Scanning in Progress' : 'Cleaning in Progress'}
+                </h3>
+                <p className="text-sm text-gray-400">{currentTask}</p>
               </div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Cleaning Tasks Grid */}
+      {/* Tasks Grid */}
       <motion.div
         className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"
         variants={containerVariants}
@@ -707,156 +804,101 @@ export default function Dashboard() {
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center space-x-3">
                 <motion.div
-                  className={clsx(
-                    "p-2 rounded-lg",
-                    task.type === 'expo' && "bg-purple-500/20",
-                    task.type === 'metro' && "bg-blue-500/20",
-                    task.type === 'ios' && "bg-gray-500/20",
-                    task.type === 'android' && "bg-green-500/20",
-                    task.type === 'npm' && "bg-red-500/20",
-                    task.type === 'docker_containers' && "bg-cyan-500/20"
-                  )}
-                  animate={task.status === 'scanning' ? { scale: [1, 1.1, 1] } : {}}
-                  transition={{ duration: 1, repeat: Infinity }}
+                  className="p-2 rounded-lg bg-dark-surface-2"
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ duration: 0.2 }}
                 >
-                  <Smartphone className="w-4 h-4" />
+                  <task.icon className={clsx("w-5 h-5", task.color)} />
                 </motion.div>
                 <div>
-                  <motion.h3
-                    className="font-medium"
-                    animate={task.status === 'found' ? { color: ["#ffffff", "#6366f1", "#ffffff"] } : {}}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  >
-                    {task.name}
-                  </motion.h3>
+                  <h3 className="font-medium">{task.name}</h3>
                   <p className="text-xs text-gray-400">{task.description}</p>
                 </div>
               </div>
               
               <motion.div
-                animate={task.status === 'scanning' ? { rotate: 360 } : {}}
-                transition={{ duration: 2, repeat: Infinity, ease: "linear" as const }}
+                whileHover={{ scale: 1.2 }}
+                transition={{ duration: 0.2 }}
               >
                 {getStatusIcon(task.status)}
               </motion.div>
             </div>
-
-            <div className="flex items-center justify-between text-sm">
-              <motion.span
-                className={clsx(
-                  "px-2 py-1 rounded-full text-xs font-medium",
-                  getStatusColor(task.status)
-                )}
-                animate={task.status === 'found' ? pulseVariants : {}}
-              >
-                {task.status === 'pending' && 'Pendente'}
-                {task.status === 'scanning' && 'Escaneando...'}
-                {task.status === 'found' && `${task.items?.length || 0} items`}
-                {task.status === 'cleaning' && 'Limpando...'}
-                {task.status === 'completed' && 'Concluído'}
-                {task.status === 'error' && 'Erro'}
-              </motion.span>
-              
+            
+            <div className="space-y-2">
               {task.size > 0 && (
-                <motion.span
-                  className="font-mono text-primary"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.2, type: "spring" }}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex justify-between text-sm"
                 >
-                  {formatBytes(task.size)}
-                </motion.span>
+                  <span className="text-gray-400">Size:</span>
+                  <span className="font-medium text-primary">{formatBytes(task.size)}</span>
+                </motion.div>
+              )}
+              
+              {task.items.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex justify-between text-sm"
+                >
+                  <span className="text-gray-400">Items:</span>
+                  <span className="font-medium">{task.items.length}</span>
+                </motion.div>
+              )}
+              
+              {task.lastUpdated && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-xs text-gray-500"
+                >
+                  Last scan: {task.lastUpdated.toLocaleTimeString()}
+                </motion.div>
               )}
             </div>
-
-            {task.error && (
-              <motion.div
-                className="mt-2 p-2 rounded bg-danger/10 border border-danger/20"
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                transition={{ duration: 0.3 }}
-              >
-                <p className="text-xs text-danger">{task.error}</p>
-              </motion.div>
-            )}
           </motion.div>
         ))}
       </motion.div>
 
-      {/* Last Clean Result */}
-      <AnimatePresence>
-        {lastCleanResult && (
-          <motion.div
-            className="glass-effect rounded-2xl p-6"
-            initial={{ y: 50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 50, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 200, damping: 25 }}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold gradient-text">Última Limpeza</h3>
-              <motion.button
-                onClick={() => setLastCleanResult(null)}
-                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <X className="w-4 h-4" />
-              </motion.button>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Recent History Preview */}
+      {recentHistory.length > 0 && (
+        <motion.div
+          className="glass-effect rounded-2xl p-6"
+          variants={itemVariants}
+        >
+          <h3 className="text-lg font-semibold gradient-text mb-4">Recent Activity</h3>
+          <div className="space-y-3">
+            {recentHistory.slice(0, 3).map((record, index) => (
               <motion.div
-                className="text-center"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.1, type: "spring" }}
+                key={record.id}
+                className="flex items-center justify-between p-3 rounded-lg bg-dark-surface-2/50"
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: index * 0.1 }}
               >
-                <motion.p
-                  className="text-2xl font-bold text-success"
-                  animate={{ scale: [1, 1.1, 1] }}
-                  transition={{ duration: 0.5 }}
-                >
-                  {formatBytes(lastCleanResult.space_freed)}
-                </motion.p>
-                <p className="text-gray-400 text-sm">Espaço Liberado</p>
+                <div className="flex items-center space-x-3">
+                  {getStatusIcon(record.status)}
+                  <div>
+                    <p className="text-sm font-medium">{record.date} {record.time}</p>
+                    <p className="text-xs text-gray-400">
+                      {formatBytes(record.space_cleaned)} • {record.files_deleted} files
+                    </p>
+                  </div>
+                </div>
+                <span className={clsx(
+                  "px-2 py-1 rounded-full text-xs font-medium",
+                  record.type === 'quick' && "bg-primary/20 text-primary",
+                  record.type === 'deep' && "bg-accent/20 text-accent",
+                  record.type === 'custom' && "bg-secondary/20 text-secondary"
+                )}>
+                  {record.type}
+                </span>
               </motion.div>
-              
-              <motion.div
-                className="text-center"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.2, type: "spring" }}
-              >
-                <motion.p
-                  className="text-2xl font-bold text-primary"
-                  animate={{ scale: [1, 1.1, 1] }}
-                  transition={{ duration: 0.5, delay: 0.1 }}
-                >
-                  {lastCleanResult.files_deleted}
-                </motion.p>
-                <p className="text-gray-400 text-sm">Itens Removidos</p>
-              </motion.div>
-              
-              <motion.div
-                className="text-center"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.3, type: "spring" }}
-              >
-                <motion.p
-                  className="text-2xl font-bold text-accent"
-                  animate={{ scale: [1, 1.1, 1] }}
-                  transition={{ duration: 0.5, delay: 0.2 }}
-                >
-                  {formatDuration(lastCleanResult.duration)}
-                </motion.p>
-                <p className="text-gray-400 text-sm">Tempo Gasto</p>
-              </motion.div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
+    </motion.div>
   );
 } 
