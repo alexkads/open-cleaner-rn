@@ -177,9 +177,10 @@ fn get_dir_size(path: &std::path::Path) -> Result<u64, std::io::Error> {
 }
 
 fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
+    let show_i = MenuItem::with_id(app, "show", "Show Window", true, None::<&str>)?;
+    let hide_i = MenuItem::with_id(app, "hide", "Hide to Tray", true, None::<&str>)?;
     let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
-    let show_i = MenuItem::with_id(app, "show", "Show", true, None::<&str>)?;
-    let menu = Menu::with_items(app, &[&show_i, &quit_i])?;
+    let menu = Menu::with_items(app, &[&show_i, &hide_i, &quit_i])?;
 
     let _ = TrayIconBuilder::with_id("main-tray")
         .tooltip("Clean RN Dev")
@@ -194,6 +195,11 @@ fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
                 if let Some(window) = app.get_webview_window("main") {
                     let _ = window.show();
                     let _ = window.set_focus();
+                }
+            }
+            "hide" => {
+                if let Some(window) = app.get_webview_window("main") {
+                    let _ = window.hide();
                 }
             }
             _ => {}
@@ -233,6 +239,18 @@ pub fn run() {
         ])
         .setup(|app| {
             create_tray(app.handle())?;
+            
+            // Set up window close handler to hide to tray instead of close
+            if let Some(window) = app.get_webview_window("main") {
+                window.on_window_event(move |event| {
+                    if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                        // Prevent the window from closing and hide it instead
+                        api.prevent_close();
+                        let _ = window.hide();
+                    }
+                });
+            }
+            
             Ok(())
         })
         .run(tauri::generate_context!())

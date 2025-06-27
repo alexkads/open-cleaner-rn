@@ -1,3 +1,4 @@
+import { getCurrentWindow } from '@tauri-apps/api/window';
 import { clsx } from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
@@ -22,14 +23,22 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const location = useLocation();
 
-  const handleMinimize = () => {
-    // Tauri API to minimize to system tray
-    console.log('Minimize to system tray');
+  const handleMinimize = async () => {
+    try {
+      const appWindow = getCurrentWindow();
+      await appWindow.hide(); // Hide to system tray instead of minimize
+    } catch (error) {
+      console.error('Failed to hide window:', error);
+    }
   };
 
-  const handleClose = () => {
-    // Tauri API to close application
-    console.log('Close application');
+  const handleClose = async () => {
+    try {
+      const appWindow = getCurrentWindow();
+      await appWindow.hide(); // Hide to system tray instead of close
+    } catch (error) {
+      console.error('Failed to hide window:', error);
+    }
   };
 
   return (

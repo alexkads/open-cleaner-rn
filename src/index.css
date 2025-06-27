@@ -7,7 +7,6 @@
   --color-success: #00ff88;
   --color-warning: #ffaa00;
   --color-danger: #ff3366;
-  
   --color-dark-bg: #0a0a0f;
   --color-dark-surface: #1a1a24;
   --color-dark-surface-2: #2a2a38;
@@ -18,12 +17,21 @@
   --animate-float: float 6s ease-in-out infinite;
 }
 
+/* Tauri drag region for custom title bar */
+.drag-region {
+  -webkit-app-region: drag;
+}
+
+.drag-region button {
+  -webkit-app-region: no-drag;
+}
+
 @keyframes glow {
   from {
-    box-shadow: 0 0 20px -10px theme(colors.primary);
+    box-shadow: 0 0 20px -10px #00d2ff;
   }
   to {
-    box-shadow: 0 0 40px -10px theme(colors.primary);
+    box-shadow: 0 0 40px -10px #00d2ff;
   }
 }
 
@@ -43,7 +51,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(135deg, theme(colors.dark.bg) 0%, #1a1a2e 100%);
+  background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%);
   color: white;
   overflow-x: hidden;
 }
@@ -55,12 +63,12 @@ body {
 }
 
 .neon-border {
-  border: 1px solid theme(colors.primary);
-  box-shadow: 0 0 10px theme(colors.primary);
+  border: 1px solid #00d2ff;
+  box-shadow: 0 0 10px #00d2ff;
 }
 
 .gradient-text {
-  background: linear-gradient(45deg, theme(colors.primary), theme(colors.accent));
+  background: linear-gradient(45deg, #00d2ff, #ff0080);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
