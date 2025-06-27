@@ -6,6 +6,7 @@ import {
     Download,
     Filter,
     HardDrive,
+    Sparkles,
     Trash2
 } from 'lucide-react';
 import { useState } from 'react';
@@ -83,9 +84,49 @@ const chartData = [
   { date: '15/01', space: 2300 },
 ];
 
+// Variantes de animação
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { y: 30, opacity: 0, scale: 0.95 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    scale: 1,
+    transition: {
+      type: "spring" as const,
+      stiffness: 200,
+      damping: 20
+    }
+  }
+};
+
+const sparkleVariants = {
+  animate: {
+    rotate: [0, 180, 360],
+    scale: [1, 1.2, 1],
+    opacity: [0.7, 1, 0.7],
+    transition: {
+      duration: 3,
+      repeat: Infinity,
+      ease: "easeInOut" as const
+    }
+  }
+};
+
 export default function History() {
   const [filter, setFilter] = useState<'all' | 'quick' | 'deep' | 'custom'>('all');
   const [records, _setRecords] = useState<CleaningRecord[]>(mockHistory);
+  const [selectedRecord, setSelectedRecord] = useState<CleaningRecord | null>(null);
 
   const filteredRecords = filter === 'all' 
     ? records 
@@ -124,45 +165,143 @@ export default function History() {
   };
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
+    <motion.div 
+      className="p-6 space-y-6"
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+    >
+      {/* Header com animação aprimorada */}
       <motion.div 
-        className="glass-effect rounded-2xl p-6"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
+        className="glass-effect rounded-2xl p-6 relative overflow-hidden"
+        variants={itemVariants}
+        whileHover={{ 
+          scale: 1.02,
+          boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)"
+        }}
+        transition={{ type: "spring" as const, stiffness: 300, damping: 25 }}
       >
-        <div className="flex items-center justify-between">
+        {/* Background gradient animado */}
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-r from-primary/10 via-accent/10 to-secondary/10"
+          animate={{
+            x: [-100, 100, -100],
+            opacity: [0.3, 0.7, 0.3]
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut" as const
+          }}
+        />
+        
+        <div className="relative z-10 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold gradient-text mb-2">Cleaning History</h1>
-            <p className="text-gray-400">Track your React Native environment cleanup activities</p>
+            <motion.h1 
+              className="text-3xl font-bold gradient-text mb-2"
+              initial={{ x: -30, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              Cleaning History
+            </motion.h1>
+            <motion.p 
+              className="text-gray-400"
+              initial={{ x: -30, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.4 }}
+            >
+              Track your React Native environment cleanup activities
+            </motion.p>
           </div>
-          <motion.button 
-            className="p-3 rounded-xl bg-primary/20 hover:bg-primary/30 neon-border"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Download className="w-6 h-6 text-primary" />
-          </motion.button>
+          
+          <div className="flex items-center space-x-3">
+            <motion.div
+              variants={sparkleVariants}
+              animate="animate"
+              className="p-2"
+            >
+              <Sparkles className="w-6 h-6 text-accent" />
+            </motion.div>
+            
+            <motion.button 
+              className="p-3 rounded-xl bg-primary/20 hover:bg-primary/30 neon-border"
+              whileHover={{ 
+                scale: 1.05,
+                rotate: 5,
+                boxShadow: "0 10px 30px rgba(99, 102, 241, 0.3)"
+              }}
+              whileTap={{ scale: 0.95, rotate: -5 }}
+              transition={{ type: "spring" as const, stiffness: 400, damping: 15 }}
+            >
+              <Download className="w-6 h-6 text-primary" />
+            </motion.button>
+          </div>
         </div>
       </motion.div>
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Stats Overview com animações melhoradas */}
+      <motion.div 
+        className="grid grid-cols-1 md:grid-cols-3 gap-4"
+        variants={containerVariants}
+      >
         <motion.div 
-          className="glass-effect rounded-2xl p-6"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.1 }}
+          className="glass-effect rounded-2xl p-6 relative overflow-hidden"
+          variants={itemVariants}
+          whileHover={{
+            scale: 1.03,
+            boxShadow: "0 15px 35px rgba(99, 102, 241, 0.2)"
+          }}
+          transition={{ type: "spring" as const, stiffness: 300, damping: 25 }}
         >
-          <div className="flex items-center space-x-3">
-            <div className="p-3 rounded-full bg-primary/20">
+          <motion.div
+            className="absolute -top-10 -right-10 w-20 h-20 rounded-full bg-primary/10"
+            animate={{
+              scale: [1, 1.2, 1],
+              rotate: [0, 180, 360]
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut" as const
+            }}
+          />
+          
+          <div className="relative z-10 flex items-center space-x-3">
+            <motion.div 
+              className="p-3 rounded-full bg-primary/20"
+              whileHover={{ scale: 1.1, rotate: 360 }}
+              transition={{ duration: 0.3 }}
+            >
               <HardDrive className="w-6 h-6 text-primary" />
-            </div>
+            </motion.div>
             <div>
               <p className="text-gray-400 text-sm">Total Cleaned</p>
-              <p className="text-2xl font-bold gradient-text">{(totalSpaceCleaned / 1024).toFixed(1)} GB</p>
+              <motion.p 
+                className="text-2xl font-bold gradient-text"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.6, type: "spring" as const }}
+              >
+                {(totalSpaceCleaned / 1024).toFixed(1)} GB
+              </motion.p>
             </div>
           </div>
+          
+          {/* Barra de progresso animada */}
+          <motion.div
+            className="mt-4 w-full bg-dark-surface rounded-full h-2 overflow-hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+          >
+            <motion.div
+              className="h-full bg-gradient-to-r from-primary to-accent"
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: 1.5, ease: "easeOut" as const }}
+            />
+          </motion.div>
         </motion.div>
 
         <motion.div 
@@ -198,7 +337,7 @@ export default function History() {
             </div>
           </div>
         </motion.div>
-      </div>
+      </motion.div>
 
       {/* Chart */}
       <motion.div 
@@ -293,6 +432,6 @@ export default function History() {
           ))}
         </div>
       </motion.div>
-    </div>
+    </motion.div>
   );
 } 
