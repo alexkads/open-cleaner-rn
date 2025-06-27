@@ -20,6 +20,10 @@ Uma aplicação Tauri para limpeza completa de ambientes de desenvolvimento Reac
 - **CocoaPods Cache** - Cache de pods e repositórios CocoaPods
 - **Flipper Logs** - Logs e cache do Flipper debugger
 - **Temporary Files** - Arquivos temporários de desenvolvimento
+- **Docker Containers** - Containers Docker parados e não utilizados
+- **Docker Images** - Imagens Docker órfãs e não utilizadas
+- **Docker Volumes** - Volumes Docker órfãos sem containers ativos
+- **Docker Build Cache** - Cache de builds Docker e camadas intermediárias
 - **Node Modules** - Diretórios node_modules de projetos
 
 ### 🎨 Interface Futurística
@@ -70,6 +74,12 @@ Uma aplicação Tauri para limpeza completa de ambientes de desenvolvimento Reac
 - `~/Library/Caches/CocoaPods` - Cache do CocoaPods
 - `~/.flipper` - Logs do Flipper
 - `/tmp/react-native-*` - Arquivos temporários
+
+#### Docker (Multiplataforma)
+- `docker container ls -a --filter status=exited` - Containers parados
+- `docker images -f dangling=true` - Imagens órfãs
+- `docker volume ls -f dangling=true` - Volumes não utilizados
+- `docker system df` - Cache de builds e dados do sistema
 
 ### Windows
 - `%APPDATA%\Local\Expo` - Cache do Expo

@@ -56,6 +56,26 @@ export class TauriService {
     return await invoke('scan_temp_files');
   }
 
+  static async scanDockerContainers(): Promise<ScanResult[]> {
+    return await invoke('scan_docker_containers');
+  }
+
+  static async scanDockerImages(): Promise<ScanResult[]> {
+    return await invoke('scan_docker_images');
+  }
+
+  static async scanDockerVolumes(): Promise<ScanResult[]> {
+    return await invoke('scan_docker_volumes');
+  }
+
+  static async scanDockerCache(): Promise<ScanResult[]> {
+    return await invoke('scan_docker_cache');
+  }
+
+  static async cleanDockerResources(resourcePaths: string[]): Promise<CleaningResult> {
+    return await invoke('clean_docker_resources', { resourcePaths });
+  }
+
   static async scanNodeModules(projectPath: string): Promise<ScanResult[]> {
     return await invoke('scan_node_modules', { projectPath });
   }

@@ -23,7 +23,7 @@ interface CleaningTask {
   path: string;
   size: number;
   status: 'pending' | 'scanning' | 'found' | 'cleaning' | 'completed' | 'error';
-  type: 'expo' | 'metro' | 'ios' | 'android' | 'npm' | 'watchman' | 'cocoapods' | 'flipper' | 'temp' | 'node_modules';
+  type: 'expo' | 'metro' | 'ios' | 'android' | 'npm' | 'watchman' | 'cocoapods' | 'flipper' | 'temp' | 'docker_containers' | 'docker_images' | 'docker_volumes' | 'docker_cache' | 'node_modules';
   items?: ScanResult[];
   error?: string;
 }
@@ -91,6 +91,34 @@ const CLEANING_TASKS: Omit<CleaningTask, 'size' | 'status' | 'items'>[] = [
     description: 'Arquivos temporários de desenvolvimento',
     path: '/tmp/react-native-*', 
     type: 'temp' 
+  },
+  { 
+    id: 'docker_containers', 
+    name: 'Docker Containers', 
+    description: 'Containers Docker parados e não utilizados',
+    path: 'docker://containers', 
+    type: 'docker_containers' 
+  },
+  { 
+    id: 'docker_images', 
+    name: 'Docker Images', 
+    description: 'Imagens Docker órfãs e não utilizadas',
+    path: 'docker://images', 
+    type: 'docker_images' 
+  },
+  { 
+    id: 'docker_volumes', 
+    name: 'Docker Volumes', 
+    description: 'Volumes Docker órfãos sem containers ativos',
+    path: 'docker://volumes', 
+    type: 'docker_volumes' 
+  },
+  { 
+    id: 'docker_cache', 
+    name: 'Docker Build Cache', 
+    description: 'Cache de builds Docker e camadas intermediárias',
+    path: 'docker://cache', 
+    type: 'docker_cache' 
   },
 ];
 
@@ -180,6 +208,26 @@ export default function Dashboard() {
         name: 'Temporary Files', 
         scanner: TauriService.scanTempFiles 
       },
+      { 
+        id: 'docker_containers', 
+        name: 'Docker Containers', 
+        scanner: TauriService.scanDockerContainers 
+      },
+      { 
+        id: 'docker_images', 
+        name: 'Docker Images', 
+        scanner: TauriService.scanDockerImages 
+      },
+      { 
+        id: 'docker_volumes', 
+        name: 'Docker Volumes', 
+        scanner: TauriService.scanDockerVolumes 
+      },
+      { 
+        id: 'docker_cache', 
+        name: 'Docker Build Cache', 
+        scanner: TauriService.scanDockerCache 
+      },
     ];
 
     try {
@@ -238,8 +286,16 @@ export default function Dashboard() {
 
         try {
           if (task.items && task.items.length > 0) {
-            const filePaths = task.items.map(item => item.path);
-            const result = await TauriService.cleanFiles(filePaths);
+            let result: CleaningResult;
+            
+            // Use different cleaning method for Docker resources
+            if (task.type.startsWith('docker_')) {
+              const dockerPaths = task.items.map(item => item.path);
+              result = await TauriService.cleanDockerResources(dockerPaths);
+            } else {
+              const filePaths = task.items.map(item => item.path);
+              result = await TauriService.cleanFiles(filePaths);
+            }
             
             totalFiles += result.files_deleted;
             totalErrors = [...totalErrors, ...result.errors];

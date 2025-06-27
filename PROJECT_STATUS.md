@@ -285,17 +285,23 @@ pnpm tauri build        # Create production executable
   - metro-* temp files
   - expo-* temp files
   - haste-map-* temp files
+- ✅ `scan_docker_containers()` - Containers Docker parados
+- ✅ `scan_docker_images()` - Imagens Docker órfãs e não utilizadas
+- ✅ `scan_docker_volumes()` - Volumes Docker órfãos
+- ✅ `scan_docker_cache()` - Cache de builds Docker
+- ✅ `clean_docker_resources()` - Limpeza específica de recursos Docker
 - ✅ `scan_node_modules()` - Scan de node_modules em projetos
 - ✅ `clean_files()` - Limpeza efetiva dos arquivos
 
 #### Frontend (React/TypeScript) - Interface Expandida
-- ✅ **9 tipos diferentes de limpeza** com descrições detalhadas
+- ✅ **13 tipos diferentes de limpeza** com descrições detalhadas (incluindo 4 tipos Docker)
 - ✅ **Scan inteligente** - Detecta automaticamente todos os tipos de cache
 - ✅ **Progresso em tempo real** - Indicadores visuais para cada tarefa de limpeza
 - ✅ **Status tracking** - pending → scanning → found → cleaning → completed → error
 - ✅ **Feedback visual detalhado** - Cores, ícones e animações específicas por status
 - ✅ **Estatísticas em tempo real** - Espaço encontrado, limpo, itens encontrados
 - ✅ **Resultados detalhados** - Arquivos deletados, espaço liberado, duração, erros
+- ✅ **Docker Integration** - Detecção automática se Docker está instalado
 
 ### 🎨 Interface Futurística
 - ✅ **Design neon** - Cores ciano (#00d2ff) e magenta (#ff0080) 
@@ -340,8 +346,14 @@ pnpm tauri build        # Create production executable
 8. **CocoaPods Cache** - Pods e repositórios iOS
 9. **Flipper Logs** - React Native debugger
 
+### 🐳 Docker Resources
+10. **Docker Containers** - Containers parados e não utilizados
+11. **Docker Images** - Imagens órfãs e dangling images
+12. **Docker Volumes** - Volumes órfãos sem containers ativos
+13. **Docker Build Cache** - Cache de builds e camadas intermediárias
+
 ### 📁 Project Files
-10. **Node Modules** - Dependências de projetos
+14. **Node Modules** - Dependências de projetos
 
 ## 🎯 Funcionalidades em Desenvolvimento
 
@@ -377,10 +389,11 @@ pnpm tauri build        # Create production executable
 ## 📊 Métricas do Projeto
 
 ### 📈 Cobertura de Limpeza
-- **10 tipos diferentes** de cache suportados
-- **Multiplataforma** - macOS, Windows, Linux paths
-- **30+ diretórios** específicos mapeados
+- **14 tipos diferentes** de cache suportados (incluindo Docker)
+- **Multiplataforma** - macOS, Windows, Linux paths + Docker universal
+- **35+ diretórios** específicos mapeados + comandos Docker
 - **Detecção inteligente** - Só limpa o que existe
+- **Docker Smart Detection** - Verifica se Docker está instalado
 
 ### 🎨 Interface e UX
 - **Real-time feedback** - Progresso visual durante operações
