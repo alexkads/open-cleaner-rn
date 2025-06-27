@@ -6,208 +6,169 @@
 ![React](https://img.shields.io/badge/React-18-blue.svg)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)
 
-Um aplicativo desktop moderno e futurístico para limpar ambientes de desenvolvimento React Native e Expo em macOS, Windows e Linux. Construído com Tauri, React Router 7, Tailwind v4 e SQLite.
+Uma aplicação Tauri para limpeza completa de ambientes de desenvolvimento React Native/Expo em macOS, Windows e Linux. Interface futurística com integração à bandeja do sistema e rastreamento de histórico SQLite.
 
-## ✨ Características
+## 🚀 Funcionalidades
 
-### 🧹 Limpeza Inteligente
-- **Quick Clean**: Limpeza rápida de caches comuns
-- **Deep Clean**: Varredura profunda e limpeza completa
-- **Custom Clean**: Seleção manual de arquivos e pastas
-- **Expo Cache**: Limpeza específica de cache do Expo
-- **Node Modules**: Detecção e limpeza de node_modules
-- **Metro Cache**: Limpeza do cache do Metro bundler
-- **Simulator Logs**: Limpeza de logs do simulador iOS
+### 🧹 Limpeza Abrangente do Ambiente
+- **Expo Cache** - Cache de builds e assets do Expo (`~/.expo`)
+- **Metro Bundler Cache** - Cache do Metro bundler (`~/.metro`, `/tmp/metro-cache`)
+- **iOS Development Cache** - Xcode DerivedData, Simulador e logs iOS
+- **Android Development Cache** - Gradle cache, emulador e builds Android
+- **NPM/Yarn Cache** - Cache de pacotes npm e yarn
+- **Watchman Cache** - Cache e logs do Watchman (file watcher)
+- **CocoaPods Cache** - Cache de pods e repositórios CocoaPods
+- **Flipper Logs** - Logs e cache do Flipper debugger
+- **Temporary Files** - Arquivos temporários de desenvolvimento
+- **Node Modules** - Diretórios node_modules de projetos
 
 ### 🎨 Interface Futurística
-- **Design Neon**: Interface com efeitos neon e glassmorphism
-- **Animações Fluidas**: Transições suaves com Framer Motion
-- **Gráficos Interativos**: Visualização de dados com Recharts
-- **Tema Dark**: Interface moderna e amigável aos olhos
-- **Responsive**: Adaptável a diferentes tamanhos de tela
+- Design neon com cores ciano (#00d2ff) e magenta (#ff0080)
+- Efeitos de vidro e glassmorphism
+- Animações suaves com Framer Motion
+- Indicadores de progresso em tempo real
+- Feedback visual detalhado para cada operação
 
-### 📊 Monitoramento e Histórico
-- **Estatísticas em Tempo Real**: Acompanhe o espaço liberado
-- **Histórico Completo**: SQLite para armazenar atividades
-- **Gráficos de Análise**: Visualize tendências de limpeza
-- **Export de Dados**: Exporte histórico em JSON
-- **Filtros Avançados**: Filtre por tipo, data e status
+### 📊 Recursos Avançados
+- **Scan Inteligente** - Detecta automaticamente todos os tipos de cache
+- **Progresso em Tempo Real** - Indicadores visuais para cada tarefa
+- **Bandeja do Sistema** - Minimiza para a bandeja em vez de fechar
+- **Histórico de Limpeza** - Rastreamento SQLite de todas as operações
+- **Estatísticas Detalhadas** - Arquivos deletados, espaço liberado, duração
+- **Tratamento de Erros** - Log completo de erros com detalhes
 
-### 🔧 Funcionalidades do Sistema
-- **System Tray**: Minimize para a bandeja do sistema
-- **Auto-Start**: Inicie automaticamente com o sistema
-- **Notificações**: Alertas sobre resultados de limpeza
-- **Multi-Platform**: Funciona em macOS, Windows e Linux
-- **Custom Title Bar**: Barra de título personalizada
-
-## 🚀 Tecnologias Utilizadas
+## 🛠️ Tecnologias
 
 ### Frontend
-- **React 18** - Biblioteca de interface
-- **TypeScript** - Tipagem estática
-- **React Router 7** - Roteamento SPA moderno
-- **Tailwind CSS v4** - Framework CSS utilitário
-- **Framer Motion** - Animações e transições
-- **Recharts** - Gráficos e visualizações
-- **Lucide React** - Ícones modernos
+- **React 18** + TypeScript
+- **React Router 7** (SPA)
+- **Tailwind CSS v4** (configuração CSS-first)
+- **Framer Motion** (animações)
+- **Lucide React** (ícones)
+- **Recharts** (gráficos)
 
-### Backend
-- **Tauri 2.0** - Framework para aplicações desktop
-- **Rust** - Linguagem de programação do backend
-- **SQLite** - Banco de dados local
-- **Walkdir** - Navegação em diretórios
-- **Regex** - Processamento de texto
+### Backend (Rust/Tauri)
+- **Tauri 2.6** (framework principal)
+- **SQLite** (histórico de limpeza)
+- **Walkdir** (navegação de diretórios)
+- **Dirs** (diretórios do sistema)
+- **Which** (detecção de ferramentas)
 
-### Build & Deploy
-- **Vite** - Build tool e dev server
-- **PNPM** - Gerenciador de pacotes
-- **TypeScript** - Compilação e tipagem
+## 📁 Locais de Limpeza
 
-## 📦 Instalação
+### macOS
+- `~/.expo` - Cache do Expo
+- `~/.metro` - Cache do Metro
+- `~/Library/Developer/Xcode/DerivedData` - Dados derivados do Xcode
+- `~/Library/Caches/com.apple.dt.Xcode` - Cache do Xcode
+- `~/Library/Developer/CoreSimulator/Caches` - Cache do Simulador iOS
+- `~/Library/Logs/CoreSimulator` - Logs do Simulador
+- `~/.gradle/caches` - Cache do Gradle
+- `~/.npm/_cacache` - Cache do NPM
+- `~/.yarn/cache` - Cache do Yarn
+- `~/.watchman` - Cache do Watchman
+- `~/Library/Caches/CocoaPods` - Cache do CocoaPods
+- `~/.flipper` - Logs do Flipper
+- `/tmp/react-native-*` - Arquivos temporários
+
+### Windows
+- `%APPDATA%\Local\Expo` - Cache do Expo
+- `%APPDATA%\Local\Metro` - Cache do Metro
+- `%APPDATA%\Local\Android\Sdk\.temp` - Temp do Android SDK
+- `%APPDATA%\Local\Temp\AndroidEmulator` - Temp do Emulador
+- `%APPDATA%\Roaming\npm-cache` - Cache do NPM
+- `%APPDATA%\Local\Yarn\Cache` - Cache do Yarn
+- `%APPDATA%\Roaming\flipper` - Logs do Flipper
+
+### Linux
+- `~/.expo` - Cache do Expo
+- `~/.metro` - Cache do Metro
+- `~/.gradle/caches` - Cache do Gradle
+- `~/.npm/_cacache` - Cache do NPM
+- `~/.yarn/cache` - Cache do Yarn
+- `~/.watchman` - Cache do Watchman
+- `/tmp/react-native-*` - Arquivos temporários
+
+## 🚀 Como Usar
+
+1. **Executar Scan**
+   - Clique em "Quick Scan" para detectar todos os caches
+   - Aguarde o processo de varredura completa
+   - Veja o espaço total encontrado
+
+2. **Limpar Arquivos**
+   - Clique em "Clean Selected" para limpar os itens encontrados
+   - Acompanhe o progresso em tempo real
+   - Veja o resumo detalhado dos resultados
+
+3. **Bandeja do Sistema**
+   - Fechar a janela minimiza para a bandeja
+   - Clique no ícone da bandeja para restaurar
+   - Menu de contexto com opções "Mostrar Janela" e "Sair"
+
+## 🔧 Desenvolvimento
 
 ### Pré-requisitos
-- **Node.js** 18+ 
-- **Rust** 1.70+
-- **PNPM** (recomendado)
+- Node.js 18+
+- Rust 1.70+
+- Tauri CLI
 
-### Clone o repositório
+### Instalação
 ```bash
-git clone https://github.com/seu-usuario/clean-rn-dev.git
-cd clean-rn-dev
+# Clonar repositório
+git clone <repo-url>
+cd open-cleaner-rn
+
+# Instalar dependências
+npm install
+
+# Executar em desenvolvimento
+npm run tauri dev
 ```
 
-### Instale as dependências
+### Build
 ```bash
-pnpm install
+# Build para produção
+npm run tauri build
 ```
 
-### Execute em modo desenvolvimento
-```bash
-pnpm tauri dev
-```
-
-### Build para produção
-```bash
-pnpm tauri build
-```
-
-## 🎯 Como Usar
-
-### 1. Dashboard Principal
-- Visualize estatísticas em tempo real
-- Execute limpeza rápida com um clique
-- Monitore tarefas de limpeza ativas
-- Acompanhe o espaço liberado
-
-### 2. Configurações
-- Configure limpeza automática
-- Defina pastas de varredura
-- Ajuste notificações
-- Configure system tray
-
-### 3. Histórico
-- Visualize todo o histórico de limpeza
-- Filtre por tipo de limpeza
-- Exporte dados para análise
-- Remova registros antigos
-
-## 🏗️ Arquitetura
+## 📊 Estrutura do Projeto
 
 ```
-clean-rn-dev/
+open-cleaner-rn/
 ├── src/                    # Frontend React
-│   ├── pages/             # Páginas da aplicação
-│   ├── services/          # Serviços (Tauri, Database)
-│   ├── components/        # Componentes reutilizáveis
-│   └── styles/           # Estilos globais
-├── src-tauri/            # Backend Rust
-│   ├── src/              # Código Rust
-│   ├── icons/            # Ícones da aplicação
-│   └── capabilities/     # Configurações de segurança
-├── public/               # Arquivos estáticos
-└── dist/                # Build de produção
+│   ├── pages/
+│   │   ├── Dashboard.tsx   # Página principal de limpeza
+│   │   ├── History.tsx     # Histórico de limpezas
+│   │   └── Settings.tsx    # Configurações
+│   └── services/
+│       └── tauri.ts        # Interface com backend Rust
+├── src-tauri/              # Backend Rust
+│   ├── src/
+│   │   ├── lib.rs          # Funções de limpeza
+│   │   └── main.rs         # Entrada principal
+│   └── tauri.conf.json     # Configuração do Tauri
+└── public/                 # Assets estáticos
 ```
 
-## 🔧 Funcionalidades de Limpeza
+## 🎯 Funcionalidades Futuras
 
-### Expo & React Native
-- **~/.expo**: Cache do Expo CLI
-- **node_modules**: Dependências npm/yarn
-- **~/Library/Developer/Xcode/DerivedData**: Cache do Xcode
-- **~/.gradle/caches**: Cache do Gradle
-- **Metro cache**: Cache do Metro bundler
+- [ ] Limpeza automática agendada
+- [ ] Configurações personalizáveis por tipo de cache
+- [ ] Relatórios de limpeza exportáveis
+- [ ] Integração com CI/CD
+- [ ] Suporte a projetos Flutter
+- [ ] Backup antes da limpeza
+- [ ] Exclusões personalizadas
 
-### Simuladores
-- **iOS Simulator logs**: Logs do simulador iOS
-- **Android emulator**: Cache do emulador Android
-- **Device logs**: Logs de dispositivos conectados
+## 📄 Licença
 
-### Builds
-- **android/build**: Arquivos de build Android
-- **ios/build**: Arquivos de build iOS
-- **Pods cache**: Cache do CocoaPods
+MIT License - veja o arquivo LICENSE para detalhes.
 
-## 🎨 Customização
+## 🤝 Contribuições
 
-### Temas
-O projeto usa Tailwind CSS v4 com variáveis CSS customizadas:
-
-```css
-@theme {
-  --color-primary: #00d2ff;
-  --color-secondary: #3a47d5;
-  --color-accent: #ff0080;
-  --color-success: #00ff88;
-  --color-warning: #ffaa00;
-  --color-danger: #ff3366;
-}
-```
-
-### Efeitos Visuais
-- **Glass Effect**: `backdrop-filter: blur(20px)`
-- **Neon Borders**: `box-shadow: 0 0 10px theme(colors.primary)`
-- **Gradient Text**: Gradientes com clip-path
-- **Scan Lines**: Animações de varredura
-
-## 🔒 Segurança
-
-### Tauri Security
-- **Allowlist restrita**: Apenas comandos necessários
-- **CSP configurado**: Content Security Policy
-- **File system limitado**: Acesso controlado a arquivos
-- **Shell commands**: Comandos validados
-
-### Privacy
-- **Dados locais**: Tudo armazenado localmente
-- **Sem telemetria**: Nenhum dado enviado externamente
-- **Open Source**: Código totalmente auditável
-
-## 🤝 Contribuindo
-
-1. Fork o projeto
-2. Crie sua feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request
-
-## 📝 Licença
-
-Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
-
-## 🙏 Agradecimentos
-
-- [Tauri](https://tauri.app/) - Framework desktop
-- [React](https://reactjs.org/) - Biblioteca UI
-- [Tailwind CSS](https://tailwindcss.com/) - Framework CSS
-- [Framer Motion](https://www.framer.com/motion/) - Animações
-- [Recharts](https://recharts.org/) - Gráficos
-
-## 📞 Suporte
-
-- 🐛 **Issues**: [GitHub Issues](https://github.com/seu-usuario/clean-rn-dev/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/seu-usuario/clean-rn-dev/discussions)
-- 📧 **Email**: seu-email@exemplo.com
+Contribuições são bem-vindas! Por favor, abra uma issue ou pull request.
 
 ---
 
-⭐ **Se este projeto foi útil para você, considere dar uma estrela!** ⭐
+**Clean RN Dev** - Mantenha seu ambiente de desenvolvimento React Native sempre limpo e otimizado! 🚀

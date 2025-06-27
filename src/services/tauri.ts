@@ -24,6 +24,38 @@ export class TauriService {
     return await invoke('scan_expo_cache');
   }
 
+  static async scanMetroCache(): Promise<ScanResult[]> {
+    return await invoke('scan_metro_cache');
+  }
+
+  static async scanIosCache(): Promise<ScanResult[]> {
+    return await invoke('scan_ios_cache');
+  }
+
+  static async scanAndroidCache(): Promise<ScanResult[]> {
+    return await invoke('scan_android_cache');
+  }
+
+  static async scanNpmCache(): Promise<ScanResult[]> {
+    return await invoke('scan_npm_cache');
+  }
+
+  static async scanWatchmanCache(): Promise<ScanResult[]> {
+    return await invoke('scan_watchman_cache');
+  }
+
+  static async scanCocoaPodsCache(): Promise<ScanResult[]> {
+    return await invoke('scan_cocoapods_cache');
+  }
+
+  static async scanFlipperLogs(): Promise<ScanResult[]> {
+    return await invoke('scan_flipper_logs');
+  }
+
+  static async scanTempFiles(): Promise<ScanResult[]> {
+    return await invoke('scan_temp_files');
+  }
+
   static async scanNodeModules(projectPath: string): Promise<ScanResult[]> {
     return await invoke('scan_node_modules', { projectPath });
   }
