@@ -1,13 +1,10 @@
-import { getCurrentWindow } from '@tauri-apps/api/window';
 import { clsx } from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
     History,
     Home,
     Menu,
-    Minimize2,
     Settings,
-    X,
     Zap
 } from 'lucide-react';
 import { useState } from 'react';
@@ -23,57 +20,9 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const location = useLocation();
 
-  const handleMinimize = async () => {
-    try {
-      const appWindow = getCurrentWindow();
-      await appWindow.hide(); // Hide to system tray instead of minimize
-    } catch (error) {
-      console.error('Failed to hide window:', error);
-    }
-  };
-
-  const handleClose = async () => {
-    try {
-      const appWindow = getCurrentWindow();
-      await appWindow.hide(); // Hide to system tray instead of close
-    } catch (error) {
-      console.error('Failed to hide window:', error);
-    }
-  };
-
   return (
     <div className="h-screen bg-gradient-to-br from-dark-bg to-[#1a1a2e] text-white overflow-hidden">
-      {/* Custom Title Bar */}
-      <div className="h-8 bg-dark-surface/80 backdrop-blur-lg border-b border-dark-border flex items-center justify-between px-4 drag-region">
-        <div className="flex items-center space-x-2">
-          <div className="w-3 h-3 rounded-full bg-danger"></div>
-          <div className="w-3 h-3 rounded-full bg-warning"></div>
-          <div className="w-3 h-3 rounded-full bg-success"></div>
-        </div>
-        <div className="flex items-center space-x-2 text-gray-400">
-          <span className="text-sm font-medium">Clean RN Dev</span>
-        </div>
-        <div className="flex items-center space-x-1">
-          <button 
-            onClick={handleMinimize}
-            className="p-1 hover:bg-white/10 rounded transition-colors"
-            title="Minimize to system tray"
-            aria-label="Minimize to system tray"
-          >
-            <Minimize2 className="w-3 h-3" />
-          </button>
-          <button 
-            onClick={handleClose}
-            className="p-1 hover:bg-danger/20 rounded transition-colors"
-            title="Close application"
-            aria-label="Close application"
-          >
-            <X className="w-3 h-3" />
-          </button>
-        </div>
-      </div>
-
-      <div className="flex h-[calc(100vh-2rem)]">
+      <div className="flex h-full">
         {/* Sidebar */}
         <AnimatePresence>
           {sidebarOpen && (

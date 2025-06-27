@@ -18,7 +18,7 @@
         "height": 800,
         "minWidth": 800,
         "minHeight": 600,
-        "decorations": false,
+        "decorations": true,
         "transparent": false,
         "shadow": true,
         "resizable": true,
@@ -30,11 +30,6 @@
     ],
     "security": {
       "csp": null
-    },
-    "trayIcon": {
-      "iconPath": "icons/icon.png",
-      "iconAsTemplate": true,
-      "menuOnLeftClick": false
     }
   },
   "plugins": {

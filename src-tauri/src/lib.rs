@@ -177,13 +177,13 @@ fn get_dir_size(path: &std::path::Path) -> Result<u64, std::io::Error> {
 }
 
 fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
-    let show_i = MenuItem::with_id(app, "show", "Show Window", true, None::<&str>)?;
-    let hide_i = MenuItem::with_id(app, "hide", "Hide to Tray", true, None::<&str>)?;
-    let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
-    let menu = Menu::with_items(app, &[&show_i, &hide_i, &quit_i])?;
+    let show_i = MenuItem::with_id(app, "show", "Mostrar Janela", true, None::<&str>)?;
+    let separator = MenuItem::new(app, "---", false, None::<&str>)?;
+    let quit_i = MenuItem::with_id(app, "quit", "Sair", true, None::<&str>)?;
+    let menu = Menu::with_items(app, &[&show_i, &separator, &quit_i])?;
 
     let _ = TrayIconBuilder::with_id("main-tray")
-        .tooltip("Clean RN Dev")
+        .tooltip("Clean RN Dev - React Native Environment Cleaner")
         .icon(app.default_window_icon().unwrap().clone())
         .menu(&menu)
         .show_menu_on_left_click(false)
@@ -195,11 +195,7 @@ fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
                 if let Some(window) = app.get_webview_window("main") {
                     let _ = window.show();
                     let _ = window.set_focus();
-                }
-            }
-            "hide" => {
-                if let Some(window) = app.get_webview_window("main") {
-                    let _ = window.hide();
+                    let _ = window.unminimize();
                 }
             }
             _ => {}
@@ -239,19 +235,14 @@ pub fn run() {
         ])
         .setup(|app| {
             create_tray(app.handle())?;
-            
-            // Set up window close handler to hide to tray instead of close
-            if let Some(window) = app.get_webview_window("main") {
-                window.on_window_event(move |event| {
-                    if let tauri::WindowEvent::CloseRequested { api, .. } = event {
-                        // Prevent the window from closing and hide it instead
-                        api.prevent_close();
-                        let _ = window.hide();
-                    }
-                });
-            }
-            
             Ok(())
+        })
+        .on_window_event(|window, event| {
+            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                // Prevent the window from closing and hide it instead
+                api.prevent_close();
+                let _ = window.hide();
+            }
         })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
