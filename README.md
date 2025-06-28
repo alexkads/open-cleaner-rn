@@ -1,243 +1,226 @@
-# 🚀 Clean RN Dev - React Native Environment Cleaner
+# Open Cleaner RN
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey.svg)
-![Tauri](https://img.shields.io/badge/Tauri-2.0-orange.svg)
-![React](https://img.shields.io/badge/React-18-blue.svg)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)
+<div align="center">
 
-Uma aplicação Tauri para limpeza completa de ambientes de desenvolvimento React Native/Expo em macOS, Windows e Linux. Interface futurística com integração à bandeja do sistema e rastreamento de histórico SQLite.
+![Open Cleaner RN Logo](https://via.placeholder.com/128x128/0ea5e9/ffffff?text=OCR)
 
-## 🚀 Funcionalidades
+**Professional development environment cleaner for React Native and cross-platform projects**
 
-### 🧹 Limpeza Abrangente do Ambiente
-- **Expo Cache** - Cache de builds e assets do Expo (`~/.expo`)
-- **Metro Bundler Cache** - Cache do Metro bundler (`~/.metro`, `/tmp/metro-cache`)
-- **iOS Development Cache** - Xcode DerivedData, Simulador e logs iOS
-- **Android Development Cache** - Gradle cache, emulador e builds Android
-- **NPM/Yarn Cache** - Cache de pacotes npm e yarn
-- **Watchman Cache** - Cache e logs do Watchman (file watcher)
-- **CocoaPods Cache** - Cache de pods e repositórios CocoaPods
-- **Flipper Logs** - Logs e cache do Flipper debugger
-- **Temporary Files** - Arquivos temporários de desenvolvimento
-- **Docker Containers** - Containers Docker parados e não utilizados
-- **Docker Images** - Imagens Docker órfãs e não utilizadas
-- **Docker Volumes** - Volumes Docker órfãos sem containers ativos
-- **Docker Build Cache** - Cache de builds Docker e camadas intermediárias
-- **Node Modules** - Diretórios node_modules de projetos
+[![Build Status](https://github.com/alexkads/open-cleaner-rn/workflows/Build%20Documentation%20and%20Release/badge.svg)](https://github.com/alexkads/open-cleaner-rn/actions)
+[![Release](https://img.shields.io/github/v/release/alexkads/open-cleaner-rn?color=blue)](https://github.com/alexkads/open-cleaner-rn/releases)
+[![Downloads](https://img.shields.io/github/downloads/alexkads/open-cleaner-rn/total?color=green)](https://github.com/alexkads/open-cleaner-rn/releases)
+[![License](https://img.shields.io/github/license/alexkads/open-cleaner-rn?color=purple)](https://github.com/alexkads/open-cleaner-rn/blob/main/LICENSE)
+[![Platform Support](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey)](https://github.com/alexkads/open-cleaner-rn/releases)
 
-### 🎨 Interface Futurística
-- Design neon com cores ciano (#00d2ff) e magenta (#ff0080)
-- Efeitos de vidro e glassmorphism
-- Animações suaves com Framer Motion
-- Indicadores de progresso em tempo real
-- Feedback visual detalhado para cada operação
+[📚 Documentation](https://alexkads.github.io/open-cleaner-rn/) • [⬇️ Download](https://github.com/alexkads/open-cleaner-rn/releases) • [🐛 Report Bug](https://github.com/alexkads/open-cleaner-rn/issues) • [💡 Request Feature](https://github.com/alexkads/open-cleaner-rn/issues)
 
-### 📊 Recursos Avançados
-- **Scan Inteligente** - Detecta automaticamente todos os tipos de cache
-- **Progresso em Tempo Real** - Indicadores visuais para cada tarefa
-- **Bandeja do Sistema** - Minimiza para a bandeja em vez de fechar
-- **Histórico de Limpeza** - Rastreamento SQLite de todas as operações
-- **Estatísticas Detalhadas** - Arquivos deletados, espaço liberado, duração
-- **Tratamento de Erros** - Log completo de erros com detalhes
+</div>
 
-## 🛠️ Tecnologias
+## ✨ Features
 
-### Frontend
-- **React 18** + TypeScript
-- **React Router 7** (SPA)
-- **Tailwind CSS v4** (configuração CSS-first)
-- **Framer Motion** (animações)
-- **Lucide React** (ícones)
-- **Recharts** (gráficos)
+- **⚡ Lightning Fast**: Built with Rust for maximum performance
+- **🛡️ Safe & Reliable**: Only removes cache files and temporary data
+- **🎯 Smart Detection**: Automatically finds cache directories across platforms
+- **🌍 Cross Platform**: Native performance on macOS, Windows, and Linux
+- **📊 Detailed Analytics**: Track cleaning history and space freed
+- **🎨 Beautiful UI**: Modern, intuitive interface
 
-### Backend (Rust/Tauri)
-- **Tauri 2.6** (framework principal)
-- **SQLite** (histórico de limpeza)
-- **Walkdir** (navegação de diretórios)
-- **Dirs** (diretórios do sistema)
-- **Which** (detecção de ferramentas)
+## 🧹 What Gets Cleaned
 
-## 📁 Locais de Limpeza
+<table>
+<tr>
+<td>
 
-### macOS
-- `~/.expo` - Cache do Expo
-- `~/.metro` - Cache do Metro
-- `~/Library/Developer/Xcode/DerivedData` - Dados derivados do Xcode
-- `~/Library/Caches/com.apple.dt.Xcode` - Cache do Xcode
-- `~/Library/Developer/CoreSimulator/Caches` - Cache do Simulador iOS
-- `~/Library/Logs/CoreSimulator` - Logs do Simulador
-- `~/.gradle/caches` - Cache do Gradle
-- `~/.npm/_cacache` - Cache do NPM
-- `~/.yarn/cache` - Cache do Yarn
-- `~/.watchman` - Cache do Watchman
-- `~/Library/Caches/CocoaPods` - Cache do CocoaPods
-- `~/.flipper` - Logs do Flipper
-- `/tmp/react-native-*` - Arquivos temporários
+### 📱 **React Native & Mobile**
+- React Native Metro Cache
+- Expo Cache & Build Artifacts  
+- Hermes Engine Cache
+- React Native CLI Cache
 
-#### Docker (Multiplataforma)
-- `docker container ls -a --filter status=exited` - Containers parados
-- `docker images -f dangling=true` - Imagens órfãs
-- `docker volume ls -f dangling=true` - Volumes não utilizados
-- `docker system df` - Cache de builds e dados do sistema
+</td>
+<td>
 
-### Windows
-- `%APPDATA%\Local\Expo` - Cache do Expo
-- `%APPDATA%\Local\Metro` - Cache do Metro
-- `%APPDATA%\Local\Android\Sdk\.temp` - Temp do Android SDK
-- `%APPDATA%\Local\Temp\AndroidEmulator` - Temp do Emulador
-- `%APPDATA%\Roaming\npm-cache` - Cache do NPM
-- `%APPDATA%\Local\Yarn\Cache` - Cache do Yarn
-- `%APPDATA%\Roaming\flipper` - Logs do Flipper
+### 🛠️ **Development IDEs**
+- Xcode DerivedData & Caches
+- Android Studio System Files
+- VS Code Extensions & Logs
+- IntelliJ IDEA Caches
 
-### Linux
-- `~/.expo` - Cache do Expo
-- `~/.metro` - Cache do Metro
-- `~/.gradle/caches` - Cache do Gradle
-- `~/.npm/_cacache` - Cache do NPM
-- `~/.yarn/cache` - Cache do Yarn
-- `~/.watchman` - Cache do Watchman
-- `/tmp/react-native-*` - Arquivos temporários
+</td>
+</tr>
+<tr>
+<td>
 
-## 🚀 Como Usar
+### 📦 **Package Managers**
+- npm Cache Directories
+- Yarn Cache & Temp Files
+- pnpm Store & Cache
+- CocoaPods Repos & Cache
 
-1. **Executar Scan**
-   - Clique em "Quick Scan" para detectar todos os caches
-   - Aguarde o processo de varredura completa
-   - Veja o espaço total encontrado
+</td>
+<td>
 
-2. **Limpar Arquivos**
-   - Clique em "Clean Selected" para limpar os itens encontrados
-   - Acompanhe o progresso em tempo real
-   - Veja o resumo detalhado dos resultados
+### 🐳 **Build Tools & More**
+- Docker Images & Containers
+- Gradle Build Cache
+- Browser Cache Files
+- System Temporary Files
 
-3. **Bandeja do Sistema**
-   - Fechar a janela minimiza para a bandeja
-   - Clique no ícone da bandeja para restaurar
-   - Menu de contexto com opções "Mostrar Janela" e "Sair"
+</td>
+</tr>
+</table>
 
-## 🔧 Desenvolvimento
+## 🚀 Quick Start
 
-### Pré-requisitos
-- Node.js 18+
-- Rust 1.70+
-- Tauri CLI
+### Download and Install
 
-### Configuração de Ambiente
+1. **Download** the latest release for your platform:
+   - [macOS (Universal)](https://github.com/alexkads/open-cleaner-rn/releases/latest)
+   - [Windows (x64)](https://github.com/alexkads/open-cleaner-rn/releases/latest)
+   - [Linux (x64)](https://github.com/alexkads/open-cleaner-rn/releases/latest)
 
-#### Opção 1: Script Automático
+2. **Install** the application:
+   - **macOS**: Open the `.dmg` file and drag to Applications
+   - **Windows**: Run the `.msi` installer
+   - **Linux**: Install the `.deb` or `.AppImage` file
+
+3. **Launch** Open Cleaner RN and start cleaning!
+
+### Build from Source
+
 ```bash
-# Executar script de configuração
-./setup-env.sh
-```
-
-#### Opção 2: Configuração Manual
-```bash
-# Copiar arquivo de exemplo
-cp env.example .env
-
-# Editar configurações (opcional)
-# VITE_USE_MOCK=1  # Usar serviços mock para desenvolvimento
-```
-
-#### Variáveis de Ambiente Disponíveis
-- `VITE_USE_MOCK=1` - Usar serviços mock (desenvolvimento)
-- `VITE_USE_MOCK=0` - Usar serviços Tauri reais (produção)
-
-Para mais detalhes, consulte [ENV_SETUP.md](ENV_SETUP.md).
-
-### Instalação
-```bash
-# Clonar repositório
-git clone <repo-url>
+# Clone the repository
+git clone https://github.com/alexkads/open-cleaner-rn.git
 cd open-cleaner-rn
 
-# Instalar dependências
-npm install
+# Install dependencies
+pnpm install
 
-# Configurar ambiente (recomendado)
-./setup-env.sh
+# Start development server
+pnpm dev
 
-# Executar em desenvolvimento
-npm run dev
+# Build for production
+pnpm build:all
 ```
 
-### Build e Instaladores
+## 📊 Project Stats
+
+<div align="center">
+
+![GitHub stars](https://img.shields.io/github/stars/alexkads/open-cleaner-rn?style=social)
+![GitHub forks](https://img.shields.io/github/forks/alexkads/open-cleaner-rn?style=social)
+![GitHub watchers](https://img.shields.io/github/watchers/alexkads/open-cleaner-rn?style=social)
+
+</div>
+
+## 🏗️ Built With
+
+- **Frontend**: React + TypeScript + Vite
+- **Backend**: Rust + Tauri
+- **UI Framework**: Modern CSS with custom design system
+- **Build System**: Cross-platform compilation
+- **Documentation**: Astro static site generator
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+### Quick Contribution Steps
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📋 Development
+
+### Prerequisites
+
+- Node.js 20+ and pnpm 8+
+- Rust 1.70+ and Cargo
+- Platform-specific development tools
+
+### Development Commands
 
 ```bash
-# Desenvolvimento
-npm run dev
-
-# Build para plataforma atual
-make build
-
-# Build para todas as plataformas
-make build-all
-
-# Build específico por plataforma
-make build-mac         # macOS Universal Binary
-make build-windows     # Windows x64
-make build-linux       # Linux x64
-
-# Build de produção otimizado
-make release
+pnpm dev              # Start development server
+pnpm test             # Run tests
+pnpm build            # Build for production
+pnpm release          # Build optimized release
 ```
 
-**📦 Instaladores Gerados:**
-- **macOS**: `.dmg`, `.app` (Universal Binary - Intel + Apple Silicon)
-- **Windows**: `.msi`, `.exe` (NSIS)  
-- **Linux**: `.deb`, `.rpm`, `.AppImage`
+### Platform Builds
 
-Para instruções detalhadas de build, consulte [BUILD.md](BUILD.md).
-
-### 📚 Documentação Online
-
-Acesse a documentação completa em: **https://seu-usuario.github.io/clean-rn-dev/**
-
-- 🚀 **Getting Started** - Guia de instalação e primeiros passos
-- ⚙️ **Features** - Visão completa das funcionalidades  
-- 🔨 **Build Guide** - Instruções detalhadas de build
-- 📡 **API Reference** - Documentação para desenvolvedores
-
-A documentação é atualizada automaticamente com cada release.
-
-## 📊 Estrutura do Projeto
-
-```
-open-cleaner-rn/
-├── src/                    # Frontend React
-│   ├── pages/
-│   │   ├── Dashboard.tsx   # Página principal de limpeza
-│   │   ├── History.tsx     # Histórico de limpezas
-│   │   └── Settings.tsx    # Configurações
-│   └── services/
-│       └── tauri.ts        # Interface com backend Rust
-├── src-tauri/              # Backend Rust
-│   ├── src/
-│   │   ├── lib.rs          # Funções de limpeza
-│   │   └── main.rs         # Entrada principal
-│   └── tauri.conf.json     # Configuração do Tauri
-└── public/                 # Assets estáticos
+```bash
+pnpm build:mac        # macOS Universal Binary
+pnpm build:windows    # Windows x64
+pnpm build:linux      # Linux x64
 ```
 
-## 🎯 Funcionalidades Futuras
+## 🐛 Troubleshooting
 
-- [ ] Limpeza automática agendada
-- [ ] Configurações personalizáveis por tipo de cache
-- [ ] Relatórios de limpeza exportáveis
-- [ ] Integração com CI/CD
-- [ ] Suporte a projetos Flutter
-- [ ] Backup antes da limpeza
-- [ ] Exclusões personalizadas
+### Common Issues
 
-## 📄 Licença
+<details>
+<summary><strong>App won't start on macOS</strong></summary>
 
-MIT License - veja o arquivo LICENSE para detalhes.
+If you see "App can't be opened because it is from an unidentified developer":
+1. Right-click the app and select "Open"
+2. Click "Open" in the dialog
+3. Or run: `sudo spctl --master-disable` (temporarily disable Gatekeeper)
 
-## 🤝 Contribuições
+</details>
 
-Contribuições são bem-vindas! Por favor, abra uma issue ou pull request.
+<details>
+<summary><strong>Antivirus flags the Windows build</strong></summary>
+
+Some antivirus software may flag the app as suspicious:
+1. This is a false positive due to the app's system access requirements
+2. Add an exception for the installation directory
+3. Download from official GitHub releases only
+
+</details>
+
+<details>
+<summary><strong>Permission errors on Linux</strong></summary>
+
+If you encounter permission errors:
+1. Make sure the AppImage is executable: `chmod +x Open-Cleaner-RN.AppImage`
+2. For system cache cleaning, run with appropriate permissions
+3. Check that required dependencies are installed
+
+</details>
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Built with [Tauri](https://tauri.app/) for cross-platform desktop apps
+- Inspired by the need for efficient development environment management
+- Thanks to all contributors and the open-source community
+
+## 📈 Roadmap
+
+- [ ] Plugin system for custom cache scanners
+- [ ] Cloud backup of cleaning history
+- [ ] Team collaboration features
+- [ ] Advanced scheduling and automation
+- [ ] Integration with popular IDEs
+- [ ] Mobile companion app
+
+## 🌟 Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=alexkads/open-cleaner-rn&type=Date)](https://star-history.com/#alexkads/open-cleaner-rn&Date)
 
 ---
 
-**Clean RN Dev** - Mantenha seu ambiente de desenvolvimento React Native sempre limpo e otimizado! 🚀
+<div align="center">
+
+**Made with ❤️ by [alexkads](https://github.com/alexkads)**
+
+[⭐ Star this repo](https://github.com/alexkads/open-cleaner-rn) • [🐛 Report bugs](https://github.com/alexkads/open-cleaner-rn/issues) • [💬 Join discussions](https://github.com/alexkads/open-cleaner-rn/discussions)
+
+</div>
