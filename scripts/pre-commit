@@ -42,7 +42,6 @@ if grep -r "npm \|yarn " .github/workflows/ --exclude-dir=.git 2>/dev/null; then
 fi
 
 echo "✅ Verificação pnpm OK - apenas pnpm sendo usado"
-
 # Verificar se há conflitos não resolvidos
 if grep -r "<<<<<<< HEAD" . --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=target; then
     echo "❌ Encontrados marcadores de conflito não resolvidos!"

@@ -1,0 +1,91 @@
+name: 🔄 Continuous Integration
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main, dev ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '8'
+
+jobs:
+  test:
+    name: 🧪 Test and Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 🏗️ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 📦 Install dependencies
+        run: pnpm install
+
+      - name: 🔍 Lint check
+        run: pnpm lint || echo "Lint warnings found"
+
+      - name: 🎨 Format check
+        run: pnpm format:check || echo "Format issues found"
+
+      - name: 🏗️ Type check
+        run: pnpm type-check
+
+      - name: 🧪 Run tests
+        run: pnpm test:once
+
+      - name: 🏗️ Build check
+        run: pnpm build
+
+  rust-check:
+    name: 🦀 Rust Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🦀 Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: 💾 Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+          key: rust-cache-${{ hashFiles('src-tauri/Cargo.lock') }}
+
+      - name: 🔧 Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libgtk-3-dev \
+            libwebkit2gtk-4.1-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            libdbus-1-dev \
+            pkg-config
+
+      - name: 🧪 Rust check
+        working-directory: src-tauri
+        run: cargo check --release
+
+      - name: 🏗️ Rust build (release)
+        working-directory: src-tauri
+        run: cargo build --release
+        env:
+          CARGO_INCREMENTAL: 0

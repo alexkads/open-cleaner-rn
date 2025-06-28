@@ -41,6 +41,30 @@ const MOCK_SCAN_RESULTS: Record<string, ScanResult[]> = {
     { path: 'container_123', size: 1024 * 1024 * 500, file_type: 'docker_container', can_delete: true },
     { path: 'image_456', size: 1024 * 1024 * 300, file_type: 'docker_image', can_delete: true },
   ],
+  reactNative: [
+    { path: '~/.rncache/metro-cache', size: 1024 * 1024 * 120, file_type: 'cache', can_delete: true },
+    { path: '/tmp/react-native-packager-cache', size: 1024 * 1024 * 80, file_type: 'cache', can_delete: true },
+  ],
+  hermes: [
+    { path: '~/Library/Caches/com.facebook.react.native/hermes', size: 1024 * 1024 * 90, file_type: 'cache', can_delete: true },
+    { path: '/tmp/hermes-compile-cache', size: 1024 * 1024 * 45, file_type: 'cache', can_delete: true },
+  ],
+  vscode: [
+    { path: '~/Library/Application Support/Code/logs', size: 1024 * 1024 * 25, file_type: 'log', can_delete: true },
+    { path: '~/Library/Application Support/Code/CachedExtensions', size: 1024 * 1024 * 150, file_type: 'cache', can_delete: true },
+  ],
+  androidStudio: [
+    { path: '~/Library/Caches/AndroidStudio', size: 1024 * 1024 * 200, file_type: 'cache', can_delete: true },
+    { path: '~/Library/Logs/AndroidStudio', size: 1024 * 1024 * 35, file_type: 'log', can_delete: true },
+  ],
+  buildArtifacts: [
+    { path: '~/Desktop/app-release.apk', size: 1024 * 1024 * 45, file_type: 'build', can_delete: true },
+    { path: '~/Documents/app.ipa', size: 1024 * 1024 * 68, file_type: 'build', can_delete: true },
+  ],
+  homebrew: [
+    { path: '~/Library/Caches/Homebrew', size: 1024 * 1024 * 300, file_type: 'cache', can_delete: true },
+    { path: '/usr/local/var/homebrew/locks', size: 1024 * 1024 * 5, file_type: 'temp', can_delete: true },
+  ],
 };
 
 export class MockTauriService {
@@ -109,6 +133,36 @@ export class MockTauriService {
     return [];
   }
 
+  static async scanReactNativeCache(): Promise<ScanResult[]> {
+    await delay(700);
+    return MOCK_SCAN_RESULTS.reactNative;
+  }
+
+  static async scanHermesCache(): Promise<ScanResult[]> {
+    await delay(500);
+    return MOCK_SCAN_RESULTS.hermes;
+  }
+
+  static async scanVsCodeCache(): Promise<ScanResult[]> {
+    await delay(600);
+    return MOCK_SCAN_RESULTS.vscode;
+  }
+
+  static async scanAndroidStudioCache(): Promise<ScanResult[]> {
+    await delay(900);
+    return MOCK_SCAN_RESULTS.androidStudio;
+  }
+
+  static async scanBuildArtifacts(): Promise<ScanResult[]> {
+    await delay(400);
+    return MOCK_SCAN_RESULTS.buildArtifacts;
+  }
+
+  static async scanHomebrewCache(): Promise<ScanResult[]> {
+    await delay(800);
+    return MOCK_SCAN_RESULTS.homebrew;
+  }
+
   static async cleanDockerResources(resourcePaths: string[]): Promise<CleaningResult> {
     await delay(2000);
     const totalSize = resourcePaths.length * 1024 * 1024 * 100; // Mock 100MB per resource
@@ -141,7 +195,7 @@ export class MockTauriService {
     
     const totalSize = filePaths.reduce((sum, path) => {
       // Simular tamanho baseado no path mock
-      for (const [key, results] of Object.entries(MOCK_SCAN_RESULTS)) {
+      for (const [, results] of Object.entries(MOCK_SCAN_RESULTS)) {
         const found = results.find(r => r.path === path);
         if (found) return sum + found.size;
       }

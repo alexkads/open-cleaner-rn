@@ -33,7 +33,7 @@ interface CleaningTask {
   id: string;
   name: string;
   description: string;
-  category: 'cache' | 'logs' | 'temp' | 'build' | 'docker';
+  category: 'cache' | 'logs' | 'temp' | 'build' | 'docker' | 'tools';
   icon: React.ComponentType<{ className?: string }>;
   scanFunction: () => Promise<ScanResult[]>;
   color: string;
