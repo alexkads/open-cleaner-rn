@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* CSS Variables */
 :root {
@@ -12,7 +12,7 @@
   --dark-surface: #16213e;
   --dark-surface-2: #1a2332;
   --dark-border: #2a3441;
-  
+
   --animate-glow: glow 2s ease-in-out infinite alternate;
   --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   --animate-float: float 6s ease-in-out infinite;
@@ -38,7 +38,8 @@
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px);
   }
   50% {
@@ -47,8 +48,12 @@
 }
 
 @keyframes scan {
-  0% { left: -100%; }
-  100% { left: 100%; }
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
 }
 
 /* Global Styles */
@@ -58,8 +63,18 @@
 
 body {
   margin: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    'Roboto',
+    'Oxygen',
+    'Ubuntu',
+    'Cantarell',
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -125,29 +140,66 @@ body {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(0, 210, 255, 0.4), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 210, 255, 0.4),
+    transparent
+  );
   animation: scan 2s infinite;
 }
 
 /* Theme Colors */
-.text-primary { color: var(--primary); }
-.text-secondary { color: var(--secondary); }
-.text-accent { color: var(--accent); }
-.text-success { color: var(--success); }
-.text-warning { color: var(--warning); }
-.text-danger { color: var(--danger); }
+.text-primary {
+  color: var(--primary);
+}
+.text-secondary {
+  color: var(--secondary);
+}
+.text-accent {
+  color: var(--accent);
+}
+.text-success {
+  color: var(--success);
+}
+.text-warning {
+  color: var(--warning);
+}
+.text-danger {
+  color: var(--danger);
+}
 
-.bg-primary { background-color: var(--primary); }
-.bg-secondary { background-color: var(--secondary); }
-.bg-accent { background-color: var(--accent); }
-.bg-success { background-color: var(--success); }
-.bg-warning { background-color: var(--warning); }
-.bg-danger { background-color: var(--danger); }
+.bg-primary {
+  background-color: var(--primary);
+}
+.bg-secondary {
+  background-color: var(--secondary);
+}
+.bg-accent {
+  background-color: var(--accent);
+}
+.bg-success {
+  background-color: var(--success);
+}
+.bg-warning {
+  background-color: var(--warning);
+}
+.bg-danger {
+  background-color: var(--danger);
+}
 
-.bg-dark-bg { background-color: var(--dark-bg); }
-.bg-dark-surface { background-color: var(--dark-surface); }
-.bg-dark-surface-2 { background-color: var(--dark-surface-2); }
-.border-dark-border { border-color: var(--dark-border); }
+.bg-dark-bg {
+  background-color: var(--dark-bg);
+}
+.bg-dark-surface {
+  background-color: var(--dark-surface);
+}
+.bg-dark-surface-2 {
+  background-color: var(--dark-surface-2);
+}
+.border-dark-border {
+  border-color: var(--dark-border);
+}
 
 /* Sonner Toast Customization */
 .sonner-toast {
@@ -161,23 +213,23 @@ body {
   color: white !important;
 }
 
-[data-sonner-toast][data-type="success"] {
+[data-sonner-toast][data-type='success'] {
   border-left: 4px solid var(--success) !important;
 }
 
-[data-sonner-toast][data-type="error"] {
+[data-sonner-toast][data-type='error'] {
   border-left: 4px solid var(--danger) !important;
 }
 
-[data-sonner-toast][data-type="warning"] {
+[data-sonner-toast][data-type='warning'] {
   border-left: 4px solid var(--warning) !important;
 }
 
-[data-sonner-toast][data-type="info"] {
+[data-sonner-toast][data-type='info'] {
   border-left: 4px solid var(--accent) !important;
 }
 
-[data-sonner-toast][data-type="loading"] {
+[data-sonner-toast][data-type='loading'] {
   border-left: 4px solid var(--primary) !important;
 }
 
@@ -233,6 +285,6 @@ body {
   animation: sonner-fade-in 0.3s ease-out;
 }
 
-[data-sonner-toast][data-removed="true"] {
+[data-sonner-toast][data-removed='true'] {
   animation: sonner-fade-out 0.3s ease-in;
-} 
+}

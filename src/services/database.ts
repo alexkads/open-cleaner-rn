@@ -1,49 +1,54 @@
-import Database from '@tauri-apps/plugin-sql';
+import Database from '@tauri-apps/plugin-sql'
 
 export interface CleaningHistory {
-  id?: number;
-  date: string;
-  time: string;
-  space_cleaned: number;
-  files_deleted: number;
-  duration: number;
-  type: 'quick' | 'deep' | 'custom';
-  status: 'success' | 'warning' | 'error';
-  errors?: string;
-  created_at?: string;
+  id?: number
+  date: string
+  time: string
+  space_cleaned: number
+  files_deleted: number
+  duration: number
+  type: 'quick' | 'deep' | 'custom'
+  status: 'success' | 'warning' | 'error'
+  errors?: string
+  created_at?: string
 }
 
 // Mock data for development
-const mockHistory: CleaningHistory[] = [];
-let mockIdCounter = 1;
+const mockHistory: CleaningHistory[] = []
+let mockIdCounter = 1
 
 // Detectar mock via .env
-const useMockEnv = import.meta.env.VITE_USE_MOCK === '1' || import.meta.env.VITE_USE_MOCK === 'true';
+const useMockEnv =
+  import.meta.env.VITE_USE_MOCK === '1' ||
+  import.meta.env.VITE_USE_MOCK === 'true'
 
 export class DatabaseService {
-  private static db: Database | null = null;
-  private static useMock = useMockEnv;
+  private static db: Database | null = null
+  private static useMock = useMockEnv
 
   static async init(): Promise<void> {
     if (this.useMock) {
-      console.log('Using mock database for development');
-      return;
+      console.log('Using mock database for development')
+      return
     }
-    
+
     if (!this.db) {
       try {
-        this.db = await Database.load('sqlite:clean_rn_dev.db');
-        await this.createTables();
+        this.db = await Database.load('sqlite:clean_rn_dev.db')
+        await this.createTables()
       } catch (error) {
-        console.error('Failed to initialize database, falling back to mock:', error);
-        this.useMock = true;
+        console.error(
+          'Failed to initialize database, falling back to mock:',
+          error
+        )
+        this.useMock = true
       }
     }
   }
 
   private static async createTables(): Promise<void> {
-    if (this.useMock) return;
-    if (!this.db) throw new Error('Database not initialized');
+    if (this.useMock) return
+    if (!this.db) throw new Error('Database not initialized')
 
     await this.db.execute(`
       CREATE TABLE IF NOT EXISTS cleaning_history (
@@ -58,7 +63,7 @@ export class DatabaseService {
         errors TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
-    `);
+    `)
 
     await this.db.execute(`
       CREATE TABLE IF NOT EXISTS settings (
@@ -67,23 +72,25 @@ export class DatabaseService {
         value TEXT NOT NULL,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
-    `);
+    `)
   }
 
-  static async addCleaningRecord(record: Omit<CleaningHistory, 'id' | 'created_at'>): Promise<number> {
+  static async addCleaningRecord(
+    record: Omit<CleaningHistory, 'id' | 'created_at'>
+  ): Promise<number> {
     if (this.useMock) {
       const newRecord: CleaningHistory = {
         ...record,
         id: mockIdCounter++,
-        created_at: new Date().toISOString()
-      };
-      mockHistory.unshift(newRecord);
-      console.log('Mock: Added cleaning record:', newRecord);
-      return newRecord.id!;
+        created_at: new Date().toISOString(),
+      }
+      mockHistory.unshift(newRecord)
+      console.log('Mock: Added cleaning record:', newRecord)
+      return newRecord.id!
     }
-    
-    if (!this.db) await this.init();
-    
+
+    if (!this.db) await this.init()
+
     try {
       const result = await this.db!.execute(
         `INSERT INTO cleaning_history 
@@ -97,66 +104,74 @@ export class DatabaseService {
           record.duration,
           record.type,
           record.status,
-          record.errors || null
+          record.errors || null,
         ]
-      );
+      )
 
-      return result.lastInsertId as number;
+      return result.lastInsertId as number
     } catch (error) {
-      console.error('Failed to add cleaning record:', error);
-      throw error;
+      console.error('Failed to add cleaning record:', error)
+      throw error
     }
   }
 
-  static async getCleaningHistory(limit: number = 50): Promise<CleaningHistory[]> {
+  static async getCleaningHistory(
+    limit: number = 50
+  ): Promise<CleaningHistory[]> {
     if (this.useMock) {
-      console.log('Mock: Getting cleaning history, limit:', limit);
-      return mockHistory.slice(0, limit);
+      console.log('Mock: Getting cleaning history, limit:', limit)
+      return mockHistory.slice(0, limit)
     }
-    
-    if (!this.db) await this.init();
-    
+
+    if (!this.db) await this.init()
+
     try {
       const result = await this.db!.select<CleaningHistory[]>(
         `SELECT * FROM cleaning_history 
          ORDER BY created_at DESC 
          LIMIT ?`,
         [limit]
-      );
+      )
 
-      return result;
+      return result
     } catch (error) {
-      console.error('Failed to get cleaning history:', error);
-      return [];
+      console.error('Failed to get cleaning history:', error)
+      return []
     }
   }
 
   static async getCleaningStats(): Promise<{
-    total_space_cleaned: number;
-    total_files_deleted: number;
-    total_sessions: number;
-    avg_duration: number;
+    total_space_cleaned: number
+    total_files_deleted: number
+    total_sessions: number
+    avg_duration: number
   }> {
     if (this.useMock) {
-      const stats = mockHistory.reduce((acc, record) => ({
-        total_space_cleaned: acc.total_space_cleaned + record.space_cleaned,
-        total_files_deleted: acc.total_files_deleted + record.files_deleted,
-        total_sessions: acc.total_sessions + 1,
-        avg_duration: 0 // Will calculate below
-      }), {
-        total_space_cleaned: 0,
-        total_files_deleted: 0,
-        total_sessions: 0,
-        avg_duration: 0
-      });
-      
-      stats.avg_duration = stats.total_sessions > 0 ? stats.total_space_cleaned / stats.total_sessions : 0;
-      console.log('Mock: Getting cleaning stats:', stats);
-      return stats;
+      const stats = mockHistory.reduce(
+        (acc, record) => ({
+          total_space_cleaned: acc.total_space_cleaned + record.space_cleaned,
+          total_files_deleted: acc.total_files_deleted + record.files_deleted,
+          total_sessions: acc.total_sessions + 1,
+          avg_duration: 0, // Will calculate below
+        }),
+        {
+          total_space_cleaned: 0,
+          total_files_deleted: 0,
+          total_sessions: 0,
+          avg_duration: 0,
+        }
+      )
+
+      stats.avg_duration =
+        stats.total_sessions > 0
+          ? stats.total_space_cleaned / stats.total_sessions
+          : 0
+      console.log('Mock: Getting cleaning stats:', stats)
+      return stats
     }
-    
-    if (!this.db) await this.init();
-    
+
+    if (!this.db) await this.init()
+
     try {
       const result = await this.db!.select<any[]>(
         `SELECT 
@@ -165,107 +180,106 @@ export class DatabaseService {
           COUNT(*) as total_sessions,
           AVG(duration) as avg_duration
          FROM cleaning_history`
-      );
+      )
 
-      return result[0] || {
-        total_space_cleaned: 0,
-        total_files_deleted: 0,
-        total_sessions: 0,
-        avg_duration: 0
-      };
+      return (
+        result[0] || {
+          total_space_cleaned: 0,
+          total_files_deleted: 0,
+          total_sessions: 0,
+          avg_duration: 0,
+        }
+      )
     } catch (error) {
-      console.error('Failed to get cleaning stats:', error);
+      console.error('Failed to get cleaning stats:', error)
       return {
         total_space_cleaned: 0,
         total_files_deleted: 0,
         total_sessions: 0,
-        avg_duration: 0
-      };
+        avg_duration: 0,
+      }
     }
   }
 
   static async deleteCleaningRecord(id: number): Promise<void> {
     if (this.useMock) {
-      const index = mockHistory.findIndex(record => record.id === id);
+      const index = mockHistory.findIndex(record => record.id === id)
       if (index !== -1) {
-        mockHistory.splice(index, 1);
-        console.log('Mock: Deleted cleaning record with id:', id);
+        mockHistory.splice(index, 1)
+        console.log('Mock: Deleted cleaning record with id:', id)
       }
-      return;
+      return
     }
-    
-    if (!this.db) await this.init();
-    
+
+    if (!this.db) await this.init()
+
     try {
-      await this.db!.execute(
-        'DELETE FROM cleaning_history WHERE id = ?',
-        [id]
-      );
+      await this.db!.execute('DELETE FROM cleaning_history WHERE id = ?', [id])
     } catch (error) {
-      console.error('Failed to delete cleaning record:', error);
-      throw error;
+      console.error('Failed to delete cleaning record:', error)
+      throw error
     }
   }
 
   static async clearAllHistory(): Promise<void> {
     if (this.useMock) {
-      mockHistory.length = 0;
-      console.log('Mock: Cleared all history');
-      return;
+      mockHistory.length = 0
+      console.log('Mock: Cleared all history')
+      return
     }
-    
-    if (!this.db) await this.init();
-    
+
+    if (!this.db) await this.init()
+
     try {
-      await this.db!.execute('DELETE FROM cleaning_history');
+      await this.db!.execute('DELETE FROM cleaning_history')
     } catch (error) {
-      console.error('Failed to clear history:', error);
-      throw error;
+      console.error('Failed to clear history:', error)
+      throw error
     }
   }
 
   static async getSetting(key: string): Promise<string | null> {
     if (this.useMock) {
-      console.log('Mock: Getting setting:', key);
-      return null; // Mock always returns null for settings
+      console.log('Mock: Getting setting:', key)
+      return null // Mock always returns null for settings
     }
-    
-    if (!this.db) await this.init();
-    
+
+    if (!this.db) await this.init()
+
     try {
-      const result = await this.db!.select<{value: string}[]>(
+      const result = await this.db!.select<{ value: string }[]>(
         'SELECT value FROM settings WHERE key = ?',
         [key]
-      );
+      )
 
-      return result.length > 0 ? result[0].value : null;
+      return result.length > 0 ? result[0].value : null
     } catch (error) {
-      console.error('Failed to get setting:', error);
-      return null;
+      console.error('Failed to get setting:', error)
+      return null
     }
   }
 
   static async setSetting(key: string, value: string): Promise<void> {
     if (this.useMock) {
-      console.log('Mock: Setting:', key, '=', value);
-      return;
+      console.log('Mock: Setting:', key, '=', value)
+      return
     }
-    
-    if (!this.db) await this.init();
-    
+
+    if (!this.db) await this.init()
+
     try {
       await this.db!.execute(
         `INSERT OR REPLACE INTO settings (key, value, updated_at) 
          VALUES (?, ?, CURRENT_TIMESTAMP)`,
         [key, value]
-      );
+      )
     } catch (error) {
-      console.error('Failed to set setting:', error);
-      throw error;
+      console.error('Failed to set setting:', error)
+      throw error
     }
   }
 
   static async exportHistory(): Promise<CleaningHistory[]> {
-    return await this.getCleaningHistory(1000);
+    return await this.getCleaningHistory(1000)
   }
-} 
+}

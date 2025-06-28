@@ -1,142 +1,144 @@
-import { invoke } from '@tauri-apps/api/core';
+import { invoke } from '@tauri-apps/api/core'
 
 export interface ScanResult {
-  path: string;
-  size: number;
-  file_type: string;
-  can_delete: boolean;
+  path: string
+  size: number
+  file_type: string
+  can_delete: boolean
 }
 
 export interface CleaningResult {
-  files_deleted: number;
-  space_freed: number;
-  duration: number;
-  errors: string[];
+  files_deleted: number
+  space_freed: number
+  duration: number
+  errors: string[]
 }
 
 export interface SystemInfo {
-  home_dir: string;
-  installed_tools: string[];
+  home_dir: string
+  installed_tools: string[]
 }
 
 export class TauriService {
   static async scanExpoCache(): Promise<ScanResult[]> {
-    return await invoke('scan_expo_cache');
+    return await invoke('scan_expo_cache')
   }
 
   static async scanMetroCache(): Promise<ScanResult[]> {
-    return await invoke('scan_metro_cache');
+    return await invoke('scan_metro_cache')
   }
 
   static async scanIosCache(): Promise<ScanResult[]> {
-    return await invoke('scan_ios_cache');
+    return await invoke('scan_ios_cache')
   }
 
   static async scanAndroidCache(): Promise<ScanResult[]> {
-    return await invoke('scan_android_cache');
+    return await invoke('scan_android_cache')
   }
 
   static async scanNpmCache(): Promise<ScanResult[]> {
-    return await invoke('scan_npm_cache');
+    return await invoke('scan_npm_cache')
   }
 
   static async scanWatchmanCache(): Promise<ScanResult[]> {
-    return await invoke('scan_watchman_cache');
+    return await invoke('scan_watchman_cache')
   }
 
   static async scanCocoaPodsCache(): Promise<ScanResult[]> {
-    return await invoke('scan_cocoapods_cache');
+    return await invoke('scan_cocoapods_cache')
   }
 
   static async scanFlipperLogs(): Promise<ScanResult[]> {
-    return await invoke('scan_flipper_logs');
+    return await invoke('scan_flipper_logs')
   }
 
   static async scanTempFiles(): Promise<ScanResult[]> {
-    return await invoke('scan_temp_files');
+    return await invoke('scan_temp_files')
   }
 
   static async scanDockerContainers(): Promise<ScanResult[]> {
-    return await invoke('scan_docker_containers');
+    return await invoke('scan_docker_containers')
   }
 
   static async scanDockerImages(): Promise<ScanResult[]> {
-    return await invoke('scan_docker_images');
+    return await invoke('scan_docker_images')
   }
 
   static async scanDockerVolumes(): Promise<ScanResult[]> {
-    return await invoke('scan_docker_volumes');
+    return await invoke('scan_docker_volumes')
   }
 
   static async scanDockerCache(): Promise<ScanResult[]> {
-    return await invoke('scan_docker_cache');
+    return await invoke('scan_docker_cache')
   }
 
-  static async cleanDockerResources(resourcePaths: string[]): Promise<CleaningResult> {
-    return await invoke('clean_docker_resources', { resourcePaths });
+  static async cleanDockerResources(
+    resourcePaths: string[]
+  ): Promise<CleaningResult> {
+    return await invoke('clean_docker_resources', { resourcePaths })
   }
 
   static async scanNodeModules(projectPath: string): Promise<ScanResult[]> {
-    return await invoke('scan_node_modules', { projectPath });
+    return await invoke('scan_node_modules', { projectPath })
   }
 
   static async cleanFiles(filePaths: string[]): Promise<CleaningResult> {
-    return await invoke('clean_files', { filePaths });
+    return await invoke('clean_files', { filePaths })
   }
 
   static async getSystemInfo(): Promise<SystemInfo> {
-    return await invoke('get_system_info');
+    return await invoke('get_system_info')
   }
 
   static async greet(name: string): Promise<string> {
-    return await invoke('greet', { name });
+    return await invoke('greet', { name })
   }
 
   static async scanReactNativeCache(): Promise<ScanResult[]> {
-    return await invoke('scan_react_native_cache');
+    return await invoke('scan_react_native_cache')
   }
 
   static async scanHermesCache(): Promise<ScanResult[]> {
-    return await invoke('scan_hermes_cache');
+    return await invoke('scan_hermes_cache')
   }
 
   static async scanVsCodeCache(): Promise<ScanResult[]> {
-    return await invoke('scan_vscode_cache');
+    return await invoke('scan_vscode_cache')
   }
 
   static async scanAndroidStudioCache(): Promise<ScanResult[]> {
-    return await invoke('scan_android_studio_cache');
+    return await invoke('scan_android_studio_cache')
   }
 
   static async scanBuildArtifacts(): Promise<ScanResult[]> {
-    return await invoke('scan_build_artifacts');
+    return await invoke('scan_build_artifacts')
   }
 
   static async scanHomebrewCache(): Promise<ScanResult[]> {
-    return await invoke('scan_homebrew_cache');
+    return await invoke('scan_homebrew_cache')
   }
 }
 
 export const formatBytes = (bytes: number): string => {
-  if (bytes === 0) return '0 Bytes';
-  
-  const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-};
+  if (bytes === 0) return '0 Bytes'
+
+  const k = 1024
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+}
 
 export const formatDuration = (milliseconds: number): string => {
-  const seconds = Math.floor(milliseconds / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-  
+  const seconds = Math.floor(milliseconds / 1000)
+  const minutes = Math.floor(seconds / 60)
+  const hours = Math.floor(minutes / 60)
+
   if (hours > 0) {
-    return `${hours}h ${minutes % 60}m ${seconds % 60}s`;
+    return `${hours}h ${minutes % 60}m ${seconds % 60}s`
   } else if (minutes > 0) {
-    return `${minutes}m ${seconds % 60}s`;
+    return `${minutes}m ${seconds % 60}s`
   } else {
-    return `${seconds}s`;
+    return `${seconds}s`
   }
-}; 
+}
