@@ -21,18 +21,22 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Cache node modules
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+      - name: Cache pnpm store
         uses: actions/cache@v4
         with:
-          path: docs-astro/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('docs-astro/package-lock.json') }}
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('docs-astro/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-node-
+            ${{ runner.os }}-pnpm-
       - name: Install and build docs
         working-directory: docs-astro
         run: |
-          npm ci
-          npx astro build
+          pnpm install --frozen-lockfile
+          pnpm build
       - name: Validate build output
         run: |
           if [ ! -d "docs-astro/dist" ]; then
