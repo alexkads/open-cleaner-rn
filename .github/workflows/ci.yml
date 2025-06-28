@@ -13,6 +13,9 @@ concurrency:
 env:
   NODE_VERSION: '20'
   PNPM_VERSION: '8'
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: 1
+  RUST_BACKTRACE: 1
 
 jobs:
   test:
@@ -51,9 +54,10 @@ jobs:
       - name: 🏗️ Build check
         run: pnpm build
 
-  rust-check:
-    name: 🦀 Rust Check
+  rust-quick-check:
+    name: 🦀 Rust Quick Check
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
@@ -62,30 +66,77 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
+          components: clippy, rustfmt
 
       - name: 💾 Cache Rust dependencies
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: src-tauri
-          key: rust-cache-${{ hashFiles('src-tauri/Cargo.lock') }}
+          cache-on-failure: true
+          shared-key: rust-quick-cache
+
+      - name: 🧪 Rust check (lib only)
+        working-directory: src-tauri
+        run: cargo check --lib
+
+      - name: 🎨 Rust format check
+        working-directory: src-tauri
+        run: cargo fmt --all -- --check
+
+  rust-full-check:
+    name: 🦀 Rust Full Check
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 💾 Cache system dependencies
+        uses: actions/cache@v4
+        with:
+          path: /var/cache/apt
+          key: apt-cache-${{ runner.os }}-tauri
+          restore-keys: |
+            apt-cache-${{ runner.os }}-
 
       - name: 🔧 Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y \
+          sudo apt-get install -y --no-install-recommends \
             libgtk-3-dev \
             libwebkit2gtk-4.1-dev \
             libappindicator3-dev \
             librsvg2-dev \
             libdbus-1-dev \
-            pkg-config
+            pkg-config \
+            lld
 
-      - name: 🧪 Rust check
+      - name: 🦀 Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: clippy, rustfmt
+
+      - name: 💾 Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+          cache-on-failure: true
+          shared-key: rust-full-cache
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+
+      - name: 🧪 Rust check (all targets)
         working-directory: src-tauri
-        run: cargo check --release
+        run: cargo check --workspace --all-targets --all-features
+
+      - name: 🎨 Rust format check
+        working-directory: src-tauri
+        run: cargo fmt --all -- --check
+
+      - name: 📎 Rust clippy
+        working-directory: src-tauri
+        run: cargo clippy --workspace --all-targets --all-features -- -D warnings
 
       - name: 🏗️ Rust build (release)
         working-directory: src-tauri
         run: cargo build --release
-        env:
-          CARGO_INCREMENTAL: 0
