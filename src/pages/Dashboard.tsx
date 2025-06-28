@@ -22,11 +22,11 @@ import { toast } from 'sonner';
 import DebugPanel from '../components/DebugPanel';
 import { CleaningHistory, DatabaseService } from '../services/database';
 import { MockTauriService } from '../services/mock-tauri';
-import { formatBytes, formatDuration, ScanResult } from '../services/tauri';
+import { formatBytes, formatDuration, ScanResult, TauriService } from '../services/tauri';
 import { runToastDemo } from '../utils/toast-demo';
 
-// Use MockTauriService temporariamente para testes
-const TestTauriService = MockTauriService;
+const useMockEnv = import.meta.env.VITE_USE_MOCK === '1' || import.meta.env.VITE_USE_MOCK === 'true';
+const TestTauriService = useMockEnv ? MockTauriService : TauriService;
 
 // Tipos de tarefa de limpeza
 interface CleaningTask {

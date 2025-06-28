@@ -123,6 +123,29 @@ Uma aplicação Tauri para limpeza completa de ambientes de desenvolvimento Reac
 - Rust 1.70+
 - Tauri CLI
 
+### Configuração de Ambiente
+
+#### Opção 1: Script Automático
+```bash
+# Executar script de configuração
+./setup-env.sh
+```
+
+#### Opção 2: Configuração Manual
+```bash
+# Copiar arquivo de exemplo
+cp env.example .env
+
+# Editar configurações (opcional)
+# VITE_USE_MOCK=1  # Usar serviços mock para desenvolvimento
+```
+
+#### Variáveis de Ambiente Disponíveis
+- `VITE_USE_MOCK=1` - Usar serviços mock (desenvolvimento)
+- `VITE_USE_MOCK=0` - Usar serviços Tauri reais (produção)
+
+Para mais detalhes, consulte [ENV_SETUP.md](ENV_SETUP.md).
+
 ### Instalação
 ```bash
 # Clonar repositório
@@ -132,8 +155,11 @@ cd open-cleaner-rn
 # Instalar dependências
 npm install
 
+# Configurar ambiente (recomendado)
+./setup-env.sh
+
 # Executar em desenvolvimento
-npm run tauri dev
+npm run dev
 ```
 
 ### Build

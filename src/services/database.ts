@@ -17,9 +17,12 @@ export interface CleaningHistory {
 const mockHistory: CleaningHistory[] = [];
 let mockIdCounter = 1;
 
+// Detectar mock via .env
+const useMockEnv = import.meta.env.VITE_USE_MOCK === '1' || import.meta.env.VITE_USE_MOCK === 'true';
+
 export class DatabaseService {
   private static db: Database | null = null;
-  private static useMock = process.env.NODE_ENV === 'development' && !(window as any).__TAURI__;
+  private static useMock = useMockEnv;
 
   static async init(): Promise<void> {
     if (this.useMock) {
