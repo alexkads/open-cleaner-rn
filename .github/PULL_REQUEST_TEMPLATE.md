@@ -1,11 +1,24 @@
 # Pull Request
 
-## 📋 Description
-Brief description of the changes in this pull request.
+<!-- 
+🎯 ESCOLHA O TEMPLATE ESPECÍFICO PARA SEU TIPO DE PR:
 
-## 🔗 Related Issues
-Fixes #(issue number)
-Relates to #(issue number)
+Para uma experiência melhor, use um dos templates específicos:
+- 🐛 Bug Fix: .github/pull_request_template/bugfix.md
+- ✨ Feature: .github/pull_request_template/feature.md  
+- 📚 Documentation: .github/pull_request_template/documentation.md
+- ♻️ Refactoring: .github/pull_request_template/refactoring.md
+
+Para usar um template específico, adicione ?template=nome_do_template.md na URL
+Exemplo: ?template=feature.md
+-->
+
+## 📋 Descrição
+Breve descrição das mudanças neste pull request.
+
+## 🔗 Issues Relacionadas
+Fixes #(número da issue)
+Relates to #(número da issue)
 
 ## 🔄 Type of Change
 - [ ] 🐛 Bug fix (non-breaking change which fixes an issue)
