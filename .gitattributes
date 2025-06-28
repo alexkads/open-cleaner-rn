@@ -1,0 +1,31 @@
+# Git attributes for better merge handling
+
+# Treat these files as binary to avoid conflicts
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.svg binary
+
+# Better merge strategies for specific files
+package-lock.json merge=ours
+pnpm-lock.yaml merge=ours
+Cargo.lock merge=ours
+
+# Line ending normalization
+* text=auto
+*.sh text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.js text eol=lf
+*.jsx text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+
+# Rust specific
+*.rs text eol=lf
+Cargo.toml text eol=lf

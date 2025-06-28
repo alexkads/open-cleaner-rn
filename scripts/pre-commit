@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# Pre-commit hook para prevenir conflitos
+# Instalar: cp scripts/pre-commit .git/hooks/ && chmod +x .git/hooks/pre-commit
+
+set -e
+
+echo "🔍 Verificando antes do commit..."
+
+# Verificar se há conflitos não resolvidos
+if grep -r "<<<<<<< HEAD" . --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=target; then
+    echo "❌ Encontrados marcadores de conflito não resolvidos!"
+    echo "🛠️  Resolva os conflitos antes de fazer commit"
+    exit 1
+fi
+
+# Verificar se package-lock.json e pnpm-lock.yaml estão sincronizados
+if [ -f "package-lock.json" ] && [ -f "pnpm-lock.yaml" ]; then
+    echo "⚠️  Aviso: package-lock.json e pnpm-lock.yaml presentes"
+    echo "💡 Considere usar apenas um gerenciador de pacotes"
+fi
+
+# Verificar formatação de arquivos importantes
+echo "📝 Verificando formatação..."
+
+# Verificar YAML syntax nos workflows
+for file in .github/workflows/*.yml .github/workflows/*.yaml; do
+    if [ -f "$file" ]; then
+        if ! python -c "import yaml; yaml.safe_load(open('$file'))" 2>/dev/null; then
+            echo "❌ Erro de sintaxe YAML em: $file"
+            exit 1
+        fi
+    fi
+done
+
+# Verificar JSON syntax
+for file in *.json src/**/*.json docs-astro/**/*.json; do
+    if [ -f "$file" ]; then
+        if ! python -c "import json; json.load(open('$file'))" 2>/dev/null; then
+            echo "❌ Erro de sintaxe JSON em: $file"
+            exit 1
+        fi
+    fi
+done
+
+echo "✅ Verificações OK - prosseguindo com commit"
