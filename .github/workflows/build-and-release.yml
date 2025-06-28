@@ -122,8 +122,8 @@ jobs:
       matrix:
         include:
           - platform: 'macos-latest'
-            target: 'universal-apple-darwin'
-            arch: 'universal'
+            target: 'aarch64-apple-darwin'
+            arch: 'aarch64'
             os: 'macOS'
           - platform: 'ubuntu-20.04'
             target: 'x86_64-unknown-linux-gnu'
