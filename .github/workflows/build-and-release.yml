@@ -179,7 +179,7 @@ jobs:
         with:
           tagName: ${{ github.ref_name }}
           releaseName: 'Open Cleaner ${{ github.ref_name }}'
-          releaseBody: ${{ needs.generate-changelog.outputs.changelog || 'Release notes not available' }}
+          releaseBody: 'Automated release from CI/CD pipeline'
           releaseDraft: false
           prerelease: false
           args: --target ${{ matrix.target }}
@@ -204,7 +204,7 @@ jobs:
   # Notify build completion
   notify:
     name: Notify Build Status
-    needs: [build-docs, deploy, build-app]
+    needs: [build-docs, deploy, build-app, generate-changelog]
     if: always() && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
     runs-on: ubuntu-latest
     steps:
