@@ -1,12 +1,47 @@
 #!/bin/bash
 
-# Pre-commit hook para prevenir conflitos
+# Pre-commit hook para prevenir conflitos E ENFORÇAR PNPM
 # Instalar: cp scripts/pre-commit .git/hooks/ && chmod +x .git/hooks/pre-commit
 
 set -e
 
 echo "🔍 Verificando antes do commit..."
 
+# 🚨 VERIFICAR USO EXCLUSIVO DE PNPM
+echo "🚨 Verificando uso exclusivo de pnpm..."
+
+# Verificar se há package-lock.json ou yarn.lock
+if [ -f "package-lock.json" ] || [ -f "yarn.lock" ]; then
+    echo "❌ ERRO: Encontrados lockfiles de npm/yarn!"
+    echo "🚫 Este projeto usa EXCLUSIVAMENTE pnpm"
+    echo "🔧 Execute: rm package-lock.json yarn.lock && pnpm install"
+    exit 1
+fi
+
+if [ -f "docs-astro/package-lock.json" ] || [ -f "docs-astro/yarn.lock" ]; then
+    echo "❌ ERRO: Encontrados lockfiles de npm/yarn em docs-astro!"
+    echo "🚫 Este projeto usa EXCLUSIVAMENTE pnpm"
+    echo "🔧 Execute: cd docs-astro && rm package-lock.json yarn.lock && pnpm install"
+    exit 1
+fi
+
+# Verificar se node_modules foi criado pelo pnpm
+if [ -d "node_modules" ] && [ ! -f "pnpm-lock.yaml" ]; then
+    echo "❌ ERRO: node_modules existe mas não há pnpm-lock.yaml"
+    echo "🚫 Parece que npm/yarn foi usado"
+    echo "🔧 Execute: rm -rf node_modules && pnpm install"
+    exit 1
+fi
+
+# Verificar se há comandos npm/yarn em workflows
+if grep -r "npm \|yarn " .github/workflows/ --exclude-dir=.git 2>/dev/null; then
+    echo "❌ ERRO: Encontrados comandos npm/yarn em workflows!"
+    echo "🚫 Use apenas pnpm em CI/CD"
+    echo "🔧 Substitua por comandos pnpm"
+    exit 1
+fi
+
+echo "✅ Verificação pnpm OK - apenas pnpm sendo usado"
 # Verificar se há conflitos não resolvidos
 if grep -r "<<<<<<< HEAD" . --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=target; then
     echo "❌ Encontrados marcadores de conflito não resolvidos!"

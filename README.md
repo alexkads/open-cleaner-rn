@@ -16,6 +16,24 @@
 
 </div>
 
+## 🚨 **IMPORTANT: This project uses pnpm EXCLUSIVELY**
+
+> **⚠️ WARNING:** This project **ONLY** supports pnpm. npm and yarn are **BLOCKED** and will cause errors.
+
+📖 **Read [PNPM_ONLY.md](./PNPM_ONLY.md) for complete pnpm usage guide**
+
+### **Quick Setup:**
+```bash
+# 1. Install pnpm (if not installed)
+npm install -g pnpm@8
+
+# 2. Install dependencies
+pnpm install
+
+# 3. For docs
+cd docs-astro && pnpm install
+```
+
 ## ✨ Features
 
 - **⚡ Lightning Fast**: Built with Rust for maximum performance

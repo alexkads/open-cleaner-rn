@@ -1,4 +1,5 @@
-name: Build Documentation and Release
+name: 🚀 Build Documentation and Release
+
 on:
   push:
     branches: [ main, dev ]
@@ -10,10 +11,15 @@ on:
       - 'src-tauri/**'
       - 'package.json'
       - 'pnpm-lock.yaml'
-      - '.github/workflows/deploy.yml'
+      - '.github/workflows/build-and-release.yml'
   pull_request:
     branches: [ main, dev ]
   workflow_dispatch:
+    inputs:
+      skip-tests:
+        description: 'Skip tests (for emergency deployments)'
+        required: false
+        default: 'false'
 
 permissions:
   contents: write
@@ -25,68 +31,6 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Build and deploy documentation
-  build-docs:
-    name: Build and Deploy Documentation
-    runs-on: ubuntu-latest
-    outputs:
-      docs-built: ${{ steps.build-docs.outcome }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Debug directory structure
-        run: |
-          pwd
-          ls -la
-          ls -la docs-astro/
-          echo "--- Root package.json ---"
-          head -10 package.json
-          echo "--- Docs package.json ---"
-          head -10 docs-astro/package.json
-
-      - name: Install Astro dependencies
-        working-directory: docs-astro
-        run: npm ci
-
-      - name: Build Astro documentation
-        id: build-docs
-        working-directory: docs-astro
-        run: npx astro build
-
-      - name: Setup Pages
-        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
-        uses: actions/configure-pages@v4
-
-      - name: Upload artifact
-        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: './docs-astro/dist'
-
-  # Deploy documentation to GitHub Pages
-  deploy-docs:
-    if: (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) && needs.build-docs.outputs.docs-built == 'success'
-    needs: build-docs
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-
   # Generate changelog for releases
   generate-changelog:
     if: startsWith(github.ref, 'refs/tags/v')
@@ -124,6 +68,52 @@ jobs:
           cat changelog.md >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
+  # Build and deploy documentation
+  build-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('docs-astro/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+      - name: Install and build docs
+        working-directory: docs-astro
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
+      - name: Validate build output
+        run: |
+          if [ ! -d "docs-astro/dist" ]; then
+            echo "❌ Build failed - dist directory not found"
+            exit 1
+          fi
+          echo "✅ Build successful - dist directory created"
+      - uses: actions/configure-pages@v4
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: './docs-astro/dist'
+
+  deploy:
+    needs: build-docs
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
   # Build application for all platforms
   build-app:
     name: Build Application
@@ -151,6 +141,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install dependencies (Ubuntu only)
         if: matrix.platform == 'ubuntu-20.04'
@@ -192,7 +184,7 @@ jobs:
           workspaces: './src-tauri -> target'
 
       - name: Install frontend dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: Update version from Git
         run: node scripts/update-version.js
@@ -238,7 +230,7 @@ jobs:
   # Notify build completion
   notify:
     name: Notify Build Status
-    needs: [build-docs, deploy-docs, build-app]
+    needs: [build-docs, deploy, build-app]
     if: always() && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
     runs-on: ubuntu-latest
     steps:
@@ -255,7 +247,7 @@ jobs:
           else
             echo "❌ Falha no build ou deploy"
             echo "📚 Docs: ${{ needs.build-docs.result }}"
-            echo "📱 Deploy Docs: ${{ needs.deploy-docs.result }}"  
+            echo "📱 Deploy: ${{ needs.deploy.result }}"  
             echo "🔨 Build App: ${{ needs.build-app.result }}"
             exit 1
           fi
