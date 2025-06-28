@@ -16,22 +16,19 @@
 
 </div>
 
-## 🚨 **IMPORTANT: This project uses pnpm EXCLUSIVELY**
+## 📦 **PADRONIZADO: Este projeto usa npm**
 
-> **⚠️ WARNING:** This project **ONLY** supports pnpm. npm and yarn are **BLOCKED** and will cause errors.
+> **✅ PADRONIZAÇÃO:** Este projeto usa **EXCLUSIVAMENTE npm** para evitar conflitos de CI/CD.
 
-📖 **Read [PNPM_ONLY.md](./PNPM_ONLY.md) for complete pnpm usage guide**
+📖 **Leia [NPM_ONLY.md](./NPM_ONLY.md) para entender a padronização**
 
 ### **Quick Setup:**
 ```bash
-# 1. Install pnpm (if not installed)
-npm install -g pnpm@8
+# 1. Instalar dependências raiz
+npm install
 
-# 2. Install dependencies
-pnpm install
-
-# 3. For docs
-cd docs-astro && pnpm install
+# 2. Instalar dependências da documentação
+cd docs-astro && npm install
 ```
 
 ## ✨ Features
@@ -72,7 +69,7 @@ cd docs-astro && pnpm install
 ### 📦 **Package Managers**
 - npm Cache Directories
 - Yarn Cache & Temp Files
-- pnpm Store & Cache
+- npm Cache
 - CocoaPods Repos & Cache
 
 </td>
@@ -112,13 +109,13 @@ git clone https://github.com/alexkads/open-cleaner-rn.git
 cd open-cleaner-rn
 
 # Install dependencies
-pnpm install
+npm install
 
 # Start development server
-pnpm dev
+npm run dev
 
 # Build for production
-pnpm build:all
+npm run build:all
 ```
 
 ## 📊 Project Stats
@@ -155,25 +152,25 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 ### Prerequisites
 
-- Node.js 20+ and pnpm 8+
+- Node.js 20+ and npm 8+
 - Rust 1.70+ and Cargo
 - Platform-specific development tools
 
 ### Development Commands
 
 ```bash
-pnpm dev              # Start development server
-pnpm test             # Run tests
-pnpm build            # Build for production
-pnpm release          # Build optimized release
+npm run dev           # Start development server
+npm test              # Run tests
+npm run build         # Build for production
+npm run release       # Build optimized release
 ```
 
 ### Platform Builds
 
 ```bash
-pnpm build:mac        # macOS Universal Binary
-pnpm build:windows    # Windows x64
-pnpm build:linux      # Linux x64
+npm run build:mac     # macOS Universal Binary
+npm run build:windows # Windows x64
+npm run build:linux   # Linux x64
 ```
 
 ## 🐛 Troubleshooting

@@ -9,7 +9,6 @@
 
 # Better merge strategies for specific files
 package-lock.json merge=ours
-pnpm-lock.yaml merge=ours
 Cargo.lock merge=ours
 
 # Line ending normalization

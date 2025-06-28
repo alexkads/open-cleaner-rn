@@ -10,7 +10,7 @@ on:
       - 'src/**'
       - 'src-tauri/**'
       - 'package.json'
-      - 'pnpm-lock.yaml'
+      - 'package-lock.json'
       - '.github/workflows/build-and-release.yml'
   pull_request:
     branches: [ main, dev ]
@@ -85,8 +85,8 @@ jobs:
       - name: Install and build docs
         working-directory: docs-astro
         run: |
-          pnpm install --frozen-lockfile
-          pnpm build
+          npm ci
+          npm run build
       - name: Validate build output
         run: |
           if [ ! -d "docs-astro/dist" ]; then
