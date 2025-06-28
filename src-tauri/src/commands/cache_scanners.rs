@@ -470,3 +470,264 @@ pub async fn scan_homebrew_cache() -> Result<Vec<ScanResult>, String> {
     
     Ok(results)
 }
+
+
+#[tauri::command]
+pub async fn scan_git_cache() -> Result<Vec<ScanResult>, String> {
+    let mut results = Vec::new();
+    
+    let home_dir = dirs::home_dir().ok_or("Could not find home directory")?;
+    
+    let cache_paths = vec![
+        home_dir.join("Library/Caches/com.github.GitHubDesktop"),
+        home_dir.join("AppData/Roaming/GitHub Desktop/logs"),
+    ];
+    
+    for cache_path in cache_paths {
+        if cache_path.exists() && cache_path.is_dir() {
+            if let Ok(size) = get_dir_size(&cache_path) {
+                results.push(ScanResult {
+                    path: cache_path.to_string_lossy().to_string(),
+                    size,
+                    file_type: "git_cache".to_string(),
+                    can_delete: true,
+                });
+            }
+        }
+    }
+    
+    Ok(results)
+}
+
+#[tauri::command]
+pub async fn scan_intellij_cache() -> Result<Vec<ScanResult>, String> {
+    let mut results = Vec::new();
+    
+    let home_dir = dirs::home_dir().ok_or("Could not find home directory")?;
+    
+    let cache_paths = vec![
+        home_dir.join("Library/Caches/JetBrains"),
+        home_dir.join("Library/Logs/JetBrains"),
+        home_dir.join("AppData/Local/JetBrains"),
+    ];
+    
+    for cache_path in cache_paths {
+        if cache_path.exists() {
+            if let Ok(size) = get_dir_size(&cache_path) {
+                results.push(ScanResult {
+                    path: cache_path.to_string_lossy().to_string(),
+                    size,
+                    file_type: "intellij_cache".to_string(),
+                    can_delete: true,
+                });
+            }
+        }
+    }
+    
+    Ok(results)
+}
+
+#[tauri::command]
+pub async fn scan_python_cache() -> Result<Vec<ScanResult>, String> {
+    let mut results = Vec::new();
+    
+    let home_dir = dirs::home_dir().ok_or("Could not find home directory")?;
+    
+    let cache_paths = vec![
+        home_dir.join(".pip/cache"),
+        home_dir.join("Library/Caches/pip"),
+        home_dir.join("AppData/Local/pip/Cache"),
+        home_dir.join(".cache/pypoetry"),
+        home_dir.join("Library/Caches/pypoetry"),
+        home_dir.join(".conda/pkgs"),
+        home_dir.join("Library/Caches/conda"),
+    ];
+    
+    for cache_path in cache_paths {
+        if cache_path.exists() {
+            if let Ok(size) = get_dir_size(&cache_path) {
+                results.push(ScanResult {
+                    path: cache_path.to_string_lossy().to_string(),
+                    size,
+                    file_type: "python_cache".to_string(),
+                    can_delete: true,
+                });
+            }
+        }
+    }
+    
+    Ok(results)
+}
+
+#[tauri::command]
+pub async fn scan_rust_cache() -> Result<Vec<ScanResult>, String> {
+    let mut results = Vec::new();
+    
+    let home_dir = dirs::home_dir().ok_or("Could not find home directory")?;
+    
+    let cache_paths = vec![
+        home_dir.join(".cargo/registry"),
+        home_dir.join(".cargo/git"),
+        home_dir.join(".rustup/downloads"),
+        home_dir.join(".rustup/tmp"),
+    ];
+    
+    for cache_path in cache_paths {
+        if cache_path.exists() {
+            if let Ok(size) = get_dir_size(&cache_path) {
+                results.push(ScanResult {
+                    path: cache_path.to_string_lossy().to_string(),
+                    size,
+                    file_type: "rust_cache".to_string(),
+                    can_delete: true,
+                });
+            }
+        }
+    }
+    
+    Ok(results)
+}
+
+#[tauri::command]
+pub async fn scan_browser_cache() -> Result<Vec<ScanResult>, String> {
+    let mut results = Vec::new();
+    
+    let home_dir = dirs::home_dir().ok_or("Could not find home directory")?;
+    
+    let cache_paths = vec![
+        home_dir.join("Library/Caches/Google/Chrome"),
+        home_dir.join("Library/Caches/Mozilla/Firefox"),
+        home_dir.join("Library/Caches/com.apple.Safari"),
+        home_dir.join("AppData/Local/Google/Chrome/User Data/Default/Cache"),
+        home_dir.join("AppData/Local/Mozilla/Firefox/Profiles"),
+        home_dir.join("AppData/Local/Microsoft/Edge/User Data/Default/Cache"),
+    ];
+    
+    for cache_path in cache_paths {
+        if cache_path.exists() {
+            if let Ok(size) = get_dir_size(&cache_path) {
+                results.push(ScanResult {
+                    path: cache_path.to_string_lossy().to_string(),
+                    size,
+                    file_type: "browser_cache".to_string(),
+                    can_delete: true,
+                });
+            }
+        }
+    }
+    
+    Ok(results)
+}
+
+#[tauri::command]
+pub async fn scan_system_logs() -> Result<Vec<ScanResult>, String> {
+    let mut results = Vec::new();
+    
+    let home_dir = dirs::home_dir().ok_or("Could not find home directory")?;
+    
+    let log_paths = vec![
+        home_dir.join("Library/Logs"),
+        home_dir.join("Library/Application Support/CrashReporter"),
+        std::path::PathBuf::from("/tmp"),
+    ];
+    
+    for log_path in log_paths {
+        if log_path.exists() {
+            if let Ok(size) = get_dir_size(&log_path) {
+                results.push(ScanResult {
+                    path: log_path.to_string_lossy().to_string(),
+                    size,
+                    file_type: "system_logs".to_string(),
+                    can_delete: true,
+                });
+            }
+        }
+    }
+    
+    Ok(results)
+}
+
+#[tauri::command]
+pub async fn scan_pnpm_cache() -> Result<Vec<ScanResult>, String> {
+    let mut results = Vec::new();
+    
+    let home_dir = dirs::home_dir().ok_or("Could not find home directory")?;
+    
+    let cache_paths = vec![
+        home_dir.join(".pnpm-store"),
+        home_dir.join("Library/pnpm"),
+        home_dir.join("AppData/Local/pnpm-cache"),
+    ];
+    
+    for cache_path in cache_paths {
+        if cache_path.exists() {
+            if let Ok(size) = get_dir_size(&cache_path) {
+                results.push(ScanResult {
+                    path: cache_path.to_string_lossy().to_string(),
+                    size,
+                    file_type: "pnpm_cache".to_string(),
+                    can_delete: true,
+                });
+            }
+        }
+    }
+    
+    Ok(results)
+}
+
+#[tauri::command]
+pub async fn scan_unity_cache() -> Result<Vec<ScanResult>, String> {
+    let mut results = Vec::new();
+    
+    let home_dir = dirs::home_dir().ok_or("Could not find home directory")?;
+    
+    let cache_paths = vec![
+        home_dir.join("Library/Unity/cache"),
+        home_dir.join("Library/Logs/Unity"),
+        home_dir.join("AppData/Local/Unity/cache"),
+        home_dir.join("AppData/LocalLow/Unity"),
+    ];
+    
+    for cache_path in cache_paths {
+        if cache_path.exists() {
+            if let Ok(size) = get_dir_size(&cache_path) {
+                results.push(ScanResult {
+                    path: cache_path.to_string_lossy().to_string(),
+                    size,
+                    file_type: "unity_cache".to_string(),
+                    can_delete: true,
+                });
+            }
+        }
+    }
+    
+    Ok(results)
+}
+
+#[tauri::command]
+pub async fn scan_simulator_cache() -> Result<Vec<ScanResult>, String> {
+    let mut results = Vec::new();
+    
+    let home_dir = dirs::home_dir().ok_or("Could not find home directory")?;
+    
+    let cache_paths = vec![
+        home_dir.join("Library/Developer/CoreSimulator/Devices"),
+        home_dir.join("Library/Logs/CoreSimulator"),
+        home_dir.join("Library/Saved Application State/com.apple.iphonesimulator.savedState"),
+    ];
+    
+    for cache_path in cache_paths {
+        if cache_path.exists() {
+            if let Ok(size) = get_dir_size(&cache_path) {
+                results.push(ScanResult {
+                    path: cache_path.to_string_lossy().to_string(),
+                    size,
+                    file_type: "simulator_cache".to_string(),
+                    can_delete: true,
+                });
+            }
+        }
+    }
+    
+    Ok(results)
+}

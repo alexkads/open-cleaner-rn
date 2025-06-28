@@ -38,7 +38,16 @@ pub fn run() {
             clean_docker_resources,
             scan_node_modules,
             clean_files,
-            get_system_info
+            get_system_info,
+            scan_git_cache,
+            scan_intellij_cache,
+            scan_python_cache,
+            scan_rust_cache,
+            scan_browser_cache,
+            scan_system_logs,
+            scan_pnpm_cache,
+            scan_unity_cache,
+            scan_simulator_cache
         ])
         .setup(|app| {
             create_tray(app.handle())?;
