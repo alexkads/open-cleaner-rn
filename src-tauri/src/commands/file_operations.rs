@@ -57,7 +57,7 @@ pub async fn clean_files(file_paths: Vec<String>) -> Result<CleaningResult, Stri
 
             match result {
                 Ok(_) => files_deleted += 1,
-                Err(e) => errors.push(format!("Failed to delete {}: {}", file_path, e)),
+                Err(e) => errors.push(format!("Failed to delete {file_path}: {e}")),
             }
         }
     }
