@@ -28,7 +28,14 @@
 npm install
 
 # 2. Instalar dependências da documentação
-cd docs-astro && npm install
+npm run docs:install
+```
+
+### **Documentation Commands:**
+```bash
+npm run docs:dev      # Start docs dev server
+npm run docs:build    # Build documentation
+npm run docs:preview  # Preview built docs
 ```
 
 ## ✨ Features
