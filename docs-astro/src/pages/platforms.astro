@@ -1,0 +1,213 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Platform Support - Open Cleaner RN">
+	<main>
+		<h1>Platform Support</h1>
+		
+		<section class="content-section">
+			<h2>Supported Platforms</h2>
+			<p>
+				Open Cleaner RN is a cross-platform application that runs natively on:
+			</p>
+			<div class="platform-grid">
+				<div class="platform-card">
+					<h3>Windows</h3>
+					<ul>
+						<li>Windows 10 and newer</li>
+						<li>64-bit architecture</li>
+						<li>MSI installer package</li>
+						<li>Auto-updates supported</li>
+					</ul>
+				</div>
+				<div class="platform-card">
+					<h3>macOS</h3>
+					<ul>
+						<li>macOS 10.15 and newer</li>
+						<li>Intel and Apple Silicon</li>
+						<li>DMG package</li>
+						<li>Notarized for security</li>
+					</ul>
+				</div>
+				<div class="platform-card">
+					<h3>Linux</h3>
+					<ul>
+						<li>Ubuntu 20.04 and newer</li>
+						<li>Other major distributions</li>
+						<li>AppImage, DEB, RPM</li>
+						<li>System tray support</li>
+					</ul>
+				</div>
+			</div>
+		</section>
+
+		<section class="content-section">
+			<h2>Build Configurations</h2>
+			<p>
+				Each platform has specific build configurations and requirements:
+			</p>
+			
+			<h3>Windows Requirements</h3>
+			<ul>
+				<li>Visual Studio Build Tools</li>
+				<li>Windows SDK</li>
+				<li>WiX Toolset for MSI creation</li>
+			</ul>
+
+			<h3>macOS Requirements</h3>
+			<ul>
+				<li>Xcode Command Line Tools</li>
+				<li>Apple Developer Certificate (for distribution)</li>
+				<li>Universal binary support</li>
+			</ul>
+
+			<h3>Linux Requirements</h3>
+			<ul>
+				<li>Build essentials package</li>
+				<li>GTK development libraries</li>
+				<li>AppImage tools</li>
+				<li>RPM and DEB build tools</li>
+			</ul>
+		</section>
+
+		<section class="content-section">
+			<h2>Automated Builds</h2>
+			<p>
+				Our GitHub Actions workflow automatically handles:
+			</p>
+			<ul>
+				<li>Cross-platform compilation</li>
+				<li>Package creation for each platform</li>
+				<li>Code signing and notarization</li>
+				<li>Artifact uploading</li>
+			</ul>
+			<pre><code>Platform-specific artifacts are built using matrix strategy:
+- Windows: .msi
+- macOS: .dmg (Intel + Apple Silicon)
+- Linux: .AppImage, .deb, .rpm</code></pre>
+		</section>
+
+		<section class="content-section">
+			<h2>Testing</h2>
+			<p>
+				Each platform build undergoes:
+			</p>
+			<ul>
+				<li>Automated testing on CI</li>
+				<li>Platform-specific integration tests</li>
+				<li>Installation testing</li>
+				<li>Update mechanism verification</li>
+			</ul>
+		</section>
+
+		<section class="content-section">
+			<h2>Known Limitations</h2>
+			<table>
+				<thead>
+					<tr>
+						<th>Platform</th>
+						<th>Limitation</th>
+						<th>Workaround</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>Windows</td>
+						<td>Requires admin for first run</td>
+						<td>Use installer flags</td>
+					</tr>
+					<tr>
+						<td>macOS</td>
+						<td>Gatekeeper warning</td>
+						<td>Notarization process</td>
+					</tr>
+					<tr>
+						<td>Linux</td>
+						<td>Varied system tray support</td>
+						<td>Fallback to app indicator</td>
+					</tr>
+				</tbody>
+			</table>
+		</section>
+	</main>
+</Layout>
+
+<style>
+	main {
+		margin: auto;
+		padding: 1.5rem;
+		max-width: 900px;
+	}
+	.content-section {
+		margin: 2rem 0;
+		padding: 1.5rem;
+		border-radius: 8px;
+		background-color: #23262d;
+		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+	}
+	h1 {
+		font-size: 3rem;
+		font-weight: 700;
+		line-height: 1;
+		text-align: center;
+		margin-bottom: 1em;
+	}
+	h2 {
+		color: rgb(var(--accent-light));
+		font-size: 1.8rem;
+		margin-bottom: 1rem;
+	}
+	h3 {
+		font-size: 1.4rem;
+		margin: 1rem 0;
+		color: rgb(var(--accent-light));
+	}
+	.platform-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+		gap: 1.5rem;
+		margin: 2rem 0;
+	}
+	.platform-card {
+		background-color: #1a1a1a;
+		padding: 1.5rem;
+		border-radius: 8px;
+		border: 1px solid rgba(var(--accent-light), 25%);
+	}
+	pre {
+		background-color: #1a1a1a;
+		padding: 1rem;
+		border-radius: 4px;
+		overflow-x: auto;
+		margin: 1rem 0;
+	}
+	code {
+		font-family: monospace;
+		white-space: pre;
+	}
+	ul {
+		margin-left: 1.5rem;
+		margin-bottom: 1rem;
+	}
+	li {
+		margin: 0.5rem 0;
+	}
+	table {
+		width: 100%;
+		border-collapse: collapse;
+		margin: 1rem 0;
+	}
+	th, td {
+		padding: 0.75rem;
+		text-align: left;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+	}
+	th {
+		background-color: #1a1a1a;
+		color: rgb(var(--accent-light));
+	}
+	tr:nth-child(even) {
+		background-color: #1a1a1a;
+	}
+</style> 

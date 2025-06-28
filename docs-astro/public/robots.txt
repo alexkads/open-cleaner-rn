@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://alexkads.github.io/open-cleaner-rn/sitemap.xml

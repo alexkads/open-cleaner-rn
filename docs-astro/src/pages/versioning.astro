@@ -1,0 +1,167 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Versioning and Release Process - Open Cleaner RN">
+	<main>
+		<h1>Versioning and Release Process</h1>
+		
+		<section class="content-section">
+			<h2>Version Numbering</h2>
+			<p>
+				We follow Semantic Versioning (SemVer) for our releases:
+			</p>
+			<pre><code>MAJOR.MINOR.PATCH</code></pre>
+			<ul>
+				<li><strong>MAJOR</strong>: Incompatible API changes</li>
+				<li><strong>MINOR</strong>: New features (backwards-compatible)</li>
+				<li><strong>PATCH</strong>: Bug fixes (backwards-compatible)</li>
+			</ul>
+		</section>
+
+		<section class="content-section">
+			<h2>Automated Release Process</h2>
+			<p>
+				Our release process is fully automated using GitHub Actions. Here's how it works:
+			</p>
+			<ol>
+				<li>Create and push a new tag:
+					<pre><code>git tag -a v1.0.0 -m "Release v1.0.0"
+git push origin v1.0.0</code></pre>
+				</li>
+				<li>The GitHub Action workflow automatically:
+					<ul>
+						<li>Builds the application for all platforms (Windows, macOS, Linux)</li>
+						<li>Creates platform-specific packages</li>
+						<li>Generates a GitHub Release</li>
+						<li>Uploads all artifacts</li>
+					</ul>
+				</li>
+			</ol>
+		</section>
+
+		<section class="content-section">
+			<h2>Available Platforms</h2>
+			<p>We automatically build and package for:</p>
+			<ul>
+				<li><strong>Windows</strong>: MSI installer</li>
+				<li><strong>macOS</strong>: DMG package</li>
+				<li><strong>Linux</strong>: AppImage, DEB, and RPM packages</li>
+			</ul>
+		</section>
+
+		<section class="content-section">
+			<h2>Release Channels</h2>
+			<table>
+				<thead>
+					<tr>
+						<th>Channel</th>
+						<th>Description</th>
+						<th>Version Pattern</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>Stable</td>
+						<td>Production-ready releases</td>
+						<td>v1.0.0</td>
+					</tr>
+					<tr>
+						<td>Beta</td>
+						<td>Pre-release testing</td>
+						<td>v1.0.0-beta.1</td>
+					</tr>
+					<tr>
+						<td>Alpha</td>
+						<td>Early testing</td>
+						<td>v1.0.0-alpha.1</td>
+					</tr>
+				</tbody>
+			</table>
+		</section>
+
+		<section class="content-section">
+			<h2>Development Workflow</h2>
+			<ol>
+				<li>Development happens on feature branches</li>
+				<li>Features are merged into the <code>dev</code> branch</li>
+				<li>Release candidates are created from <code>dev</code></li>
+				<li>After testing, releases are merged into <code>main</code></li>
+				<li>Tags are created on <code>main</code> for releases</li>
+			</ol>
+		</section>
+
+		<section class="content-section">
+			<h2>Automatic Updates</h2>
+			<p>
+				The application checks for updates automatically and can self-update on all platforms.
+				Updates are signed and verified for security.
+			</p>
+		</section>
+	</main>
+</Layout>
+
+<style>
+	main {
+		margin: auto;
+		padding: 1.5rem;
+		max-width: 900px;
+	}
+	.content-section {
+		margin: 2rem 0;
+		padding: 1.5rem;
+		border-radius: 8px;
+		background-color: #23262d;
+		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+	}
+	h1 {
+		font-size: 3rem;
+		font-weight: 700;
+		line-height: 1;
+		text-align: center;
+		margin-bottom: 1em;
+	}
+	h2 {
+		color: rgb(var(--accent-light));
+		font-size: 1.8rem;
+		margin-bottom: 1rem;
+	}
+	pre {
+		background-color: #1a1a1a;
+		padding: 1rem;
+		border-radius: 4px;
+		overflow-x: auto;
+		margin: 1rem 0;
+	}
+	code {
+		font-family: monospace;
+		white-space: pre;
+	}
+	ul, ol {
+		margin-left: 1.5rem;
+		margin-bottom: 1rem;
+	}
+	li {
+		margin: 0.5rem 0;
+	}
+	strong {
+		color: rgb(var(--accent-light));
+	}
+	table {
+		width: 100%;
+		border-collapse: collapse;
+		margin: 1rem 0;
+	}
+	th, td {
+		padding: 0.75rem;
+		text-align: left;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+	}
+	th {
+		background-color: #1a1a1a;
+		color: rgb(var(--accent-light));
+	}
+	tr:nth-child(even) {
+		background-color: #1a1a1a;
+	}
+</style> 

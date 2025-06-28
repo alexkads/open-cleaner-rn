@@ -1,0 +1,735 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Navigation from '../components/Navigation.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<BaseLayout 
+  title="Open Cleaner RN"
+  description="Professional development environment cleaner for React Native and cross-platform projects. Free up disk space, clean cache files, and optimize your development workflow with our powerful desktop application."
+>
+  <Navigation />
+  
+  <main>
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="container">
+        <div class="hero-content">
+          <div class="hero-text">
+            <div class="hero-badges">
+              <span class="badge badge-primary">
+                <svg width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                </svg>
+                Open Source
+              </span>
+              <span class="badge badge-secondary">
+                ⚡ Lightning Fast
+              </span>
+              <span class="badge badge-success">
+                🛡️ Safe & Reliable
+              </span>
+            </div>
+            
+            <h1 class="hero-title">
+              Clean Your Development Environment Like a 
+              <span class="gradient-text">Pro</span>
+            </h1>
+            
+            <p class="hero-description">
+              Free up gigabytes of disk space by cleaning React Native cache, Xcode DerivedData, 
+              Android build artifacts, and more. Built with Rust and Tauri for maximum performance 
+              and cross-platform compatibility.
+            </p>
+            
+            <div class="hero-actions">
+              <a href="https://github.com/alexkads/open-cleaner-rn/releases" class="btn btn-primary btn-large" target="_blank" rel="noopener noreferrer">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                  <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                </svg>
+                Download Now
+              </a>
+              <a href="/getting-started" class="btn btn-outline btn-large">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="m9.708 6.075-3.024.379-.108.502.595.108c.387.093.464.232.38.619l-.975 4.577c-.255 1.183.14 1.74 1.067 1.74.72 0 1.554-.332 1.933-.789l.116-.549c-.263.232-.65.325-.905.325-.363 0-.494-.255-.402-.704l1.323-6.208Zm.091-2.755a1.32 1.32 0 1 1-2.64 0 1.32 1.32 0 0 1 2.64 0Z"/>
+                </svg>
+                Get Started
+              </a>
+            </div>
+            
+            <div class="hero-stats">
+              <div class="stat">
+                <div class="stat-number">50GB+</div>
+                <div class="stat-label">Space Cleaned</div>
+              </div>
+              <div class="stat">
+                <div class="stat-number">3 Platforms</div>
+                <div class="stat-label">Supported</div>
+              </div>
+              <div class="stat">
+                <div class="stat-number">10+ Tools</div>
+                <div class="stat-label">Supported</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="hero-visual">
+            <div class="app-preview">
+              <div class="app-window">
+                <div class="app-titlebar">
+                  <div class="window-controls">
+                    <span class="control close"></span>
+                    <span class="control minimize"></span>
+                    <span class="control maximize"></span>
+                  </div>
+                  <div class="window-title">Open Cleaner RN</div>
+                </div>
+                <div class="app-content">
+                  <div class="scan-result">
+                    <div class="result-header">
+                      <div class="result-icon">🧹</div>
+                      <div class="result-text">
+                        <h3>Scan Complete</h3>
+                        <p>Found 15.2 GB of cache files</p>
+                      </div>
+                    </div>
+                    <div class="result-items">
+                      <div class="result-item">
+                        <span class="item-icon">📱</span>
+                        <span class="item-name">React Native Metro Cache</span>
+                        <span class="item-size">2.1 GB</span>
+                      </div>
+                      <div class="result-item">
+                        <span class="item-icon">🔨</span>
+                        <span class="item-name">Xcode DerivedData</span>
+                        <span class="item-size">8.7 GB</span>
+                      </div>
+                      <div class="result-item">
+                        <span class="item-icon">🤖</span>
+                        <span class="item-name">Android Build Cache</span>
+                        <span class="item-size">4.4 GB</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+      <div class="container">
+        <div class="section-header">
+          <h2>Why Choose Open Cleaner RN?</h2>
+          <p>Built by developers, for developers. Get the most powerful cache cleaning tool for your development environment.</p>
+        </div>
+        
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Lightning Fast</h3>
+            <p>Built with Rust for maximum performance. Scan gigabytes of files in seconds with multi-threaded scanning.</p>
+          </div>
+          
+          <div class="feature-card">
+            <div class="feature-icon">🛡️</div>
+            <h3>Safe & Reliable</h3>
+            <p>Only removes cache files and temporary data. Your important files and projects are always protected.</p>
+          </div>
+          
+          <div class="feature-card">
+            <div class="feature-icon">🎯</div>
+            <h3>Smart Detection</h3>
+            <p>Automatically detects development tools and finds their cache directories across all platforms.</p>
+          </div>
+          
+          <div class="feature-card">
+            <div class="feature-icon">🌍</div>
+            <h3>Cross Platform</h3>
+            <p>Works seamlessly on macOS, Windows, and Linux. Native performance on every platform.</p>
+          </div>
+          
+          <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3>Detailed Analytics</h3>
+            <p>Track your cleaning history, see space freed over time, and get insights into your development workflow.</p>
+          </div>
+          
+          <div class="feature-card">
+            <div class="feature-icon">🎨</div>
+            <h3>Beautiful UI</h3>
+            <p>Modern, intuitive interface that makes cache management a pleasure, not a chore.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Supported Tools Section -->
+    <section class="supported-tools">
+      <div class="container">
+        <div class="section-header">
+          <h2>Supports All Your Favorite Tools</h2>
+          <p>Comprehensive support for popular development tools and frameworks.</p>
+        </div>
+        
+        <div class="tools-grid">
+          <div class="tool-category">
+            <h3>📱 React Native & Mobile</h3>
+            <ul>
+              <li>React Native Metro Cache</li>
+              <li>Expo Cache & Build Artifacts</li>
+              <li>Hermes Engine Cache</li>
+              <li>React Native CLI Cache</li>
+            </ul>
+          </div>
+          
+          <div class="tool-category">
+            <h3>🛠️ Development IDEs</h3>
+            <ul>
+              <li>Xcode DerivedData & Caches</li>
+              <li>Android Studio System Files</li>
+              <li>VS Code Extensions & Logs</li>
+              <li>IntelliJ IDEA Caches</li>
+            </ul>
+          </div>
+          
+          <div class="tool-category">
+            <h3>📦 Package Managers</h3>
+            <ul>
+              <li>npm Cache Directories</li>
+              <li>Yarn Cache & Temp Files</li>
+              <li>pnpm Store & Cache</li>
+              <li>CocoaPods Repos & Cache</li>
+            </ul>
+          </div>
+          
+          <div class="tool-category">
+            <h3>🐳 Build Tools & More</h3>
+            <ul>
+              <li>Docker Images & Containers</li>
+              <li>Gradle Build Cache</li>
+              <li>Browser Cache Files</li>
+              <li>System Temporary Files</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+      <div class="container">
+        <div class="cta-content">
+          <h2>Ready to Clean Up Your Dev Environment?</h2>
+          <p>Join thousands of developers who trust Open Cleaner RN to keep their systems running smoothly.</p>
+          <div class="cta-actions">
+            <a href="https://github.com/alexkads/open-cleaner-rn/releases" class="btn btn-primary btn-large" target="_blank" rel="noopener noreferrer">
+              Download for Free
+            </a>
+            <a href="/getting-started" class="btn btn-outline btn-large">
+              View Documentation
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  
+  <Footer />
+</BaseLayout>
+
+<style>
+  /* Hero Section */
+  .hero {
+    padding: 4rem 0 6rem;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230ea5e9' fill-opacity='0.03'%3E%3Ccircle cx='10' cy='10' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+    z-index: 0;
+  }
+
+  .hero-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-badges {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: 1rem;
+    border: 1px solid;
+  }
+
+  .badge-primary {
+    color: var(--color-primary);
+    background: rgba(14, 165, 233, 0.1);
+    border-color: rgba(14, 165, 233, 0.2);
+  }
+
+  .badge-secondary {
+    color: var(--color-secondary);
+    background: rgba(139, 92, 246, 0.1);
+    border-color: rgba(139, 92, 246, 0.2);
+  }
+
+  .badge-success {
+    color: var(--color-success);
+    background: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.2);
+  }
+
+  .hero-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    color: var(--color-text);
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-description {
+    font-size: 1.25rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    margin-bottom: 2.5rem;
+    max-width: 90%;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 3rem;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 0.75rem;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  .btn-large {
+    padding: 1rem 2rem;
+    font-size: 1.125rem;
+  }
+
+  .btn-primary {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+  }
+
+  .btn-primary:hover {
+    background: var(--color-primary-dark);
+    border-color: var(--color-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .btn-outline {
+    color: var(--color-text);
+    border-color: var(--color-border);
+    background: rgba(255, 255, 255, 0.8);
+  }
+
+  .btn-outline:hover {
+    border-color: var(--color-primary);
+    background: rgba(14, 165, 233, 0.05);
+    color: var(--color-primary);
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 2rem;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: 0.25rem;
+  }
+
+  .stat-label {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+  }
+
+  /* App Preview */
+  .hero-visual {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .app-preview {
+    perspective: 1000px;
+  }
+
+  .app-window {
+    background: white;
+    border-radius: 1rem;
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+    transform: rotateY(-5deg) rotateX(5deg);
+    transition: transform 0.3s ease;
+    border: 1px solid var(--color-border-light);
+  }
+
+  .app-window:hover {
+    transform: rotateY(0deg) rotateX(0deg);
+  }
+
+  .app-titlebar {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: #f8fafc;
+    border-bottom: 1px solid var(--color-border-light);
+  }
+
+  .window-controls {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .control {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+  }
+
+  .control.close { background: #ef4444; }
+  .control.minimize { background: #f59e0b; }
+  .control.maximize { background: #10b981; }
+
+  .window-title {
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+  }
+
+  .app-content {
+    padding: 1.5rem;
+    width: 350px;
+  }
+
+  .scan-result {
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.05), rgba(139, 92, 246, 0.05));
+    border: 1px solid rgba(14, 165, 233, 0.1);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+  }
+
+  .result-header {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .result-icon {
+    font-size: 2rem;
+  }
+
+  .result-text h3 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+  }
+
+  .result-text p {
+    margin: 0;
+    color: var(--color-text-muted);
+  }
+
+  .result-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .result-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+  }
+
+  .item-name {
+    flex: 1;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .item-size {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+
+  /* Features Section */
+  .features {
+    padding: 6rem 0;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+
+  .section-header h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--color-text);
+  }
+
+  .section-header p {
+    font-size: 1.125rem;
+    color: var(--color-text-muted);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+
+  .feature-card {
+    padding: 2rem;
+    background: white;
+    border: 1px solid var(--color-border-light);
+    border-radius: 1rem;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--color-primary);
+  }
+
+  .feature-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .feature-card h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--color-text);
+  }
+
+  .feature-card p {
+    color: var(--color-text-muted);
+    line-height: 1.6;
+  }
+
+  /* Supported Tools Section */
+  .supported-tools {
+    padding: 6rem 0;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  }
+
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+  }
+
+  .tool-category {
+    padding: 2rem;
+    background: white;
+    border: 1px solid var(--color-border-light);
+    border-radius: 1rem;
+  }
+
+  .tool-category h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--color-text);
+  }
+
+  .tool-category ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .tool-category li {
+    padding: 0.5rem 0;
+    color: var(--color-text-muted);
+    border-bottom: 1px solid var(--color-border-light);
+  }
+
+  .tool-category li:last-child {
+    border-bottom: none;
+  }
+
+  /* CTA Section */
+  .cta {
+    padding: 6rem 0;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  }
+
+  .cta-content {
+    text-align: center;
+    color: white;
+  }
+
+  .cta h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  .cta p {
+    font-size: 1.125rem;
+    margin-bottom: 2.5rem;
+    opacity: 0.9;
+  }
+
+  .cta-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+  }
+
+  .cta .btn-primary {
+    background: white;
+    color: var(--color-primary);
+    border-color: white;
+  }
+
+  .cta .btn-primary:hover {
+    background: rgba(255, 255, 255, 0.9);
+  }
+
+  .cta .btn-outline {
+    color: white;
+    border-color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .cta .btn-outline:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: white;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .hero-content {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+      text-align: center;
+    }
+
+    .hero-title {
+      font-size: 2.5rem;
+    }
+
+    .hero-actions {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .hero-stats {
+      justify-content: center;
+    }
+
+    .app-window {
+      transform: none;
+    }
+
+    .features-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .tools-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .cta-actions {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero {
+      padding: 2rem 0 3rem;
+    }
+
+    .hero-title {
+      font-size: 2rem;
+    }
+
+    .section-header h2 {
+      font-size: 2rem;
+    }
+
+    .cta h2 {
+      font-size: 2rem;
+    }
+
+    .app-content {
+      width: 280px;
+    }
+  }
+</style>
