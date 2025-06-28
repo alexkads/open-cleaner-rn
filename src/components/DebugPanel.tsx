@@ -256,12 +256,21 @@ export default function DebugPanel({ isVisible, onClose, debugInfo }: DebugPanel
                         Button Status: {
                           !debugInfo.isScanning && 
                           !debugInfo.isCleaning && 
-                          debugInfo.totalSpaceFound > 0 && 
-                          debugInfo.cleanableTasks > 0
+                          (debugInfo.totalSpaceFound > 0 || debugInfo.cleanableTasks > 0)
                             ? <span className="text-green-500">ENABLED ✅</span>
                             : <span className="text-red-500">DISABLED ❌</span>
                         }
                       </p>
+                    </div>
+                    
+                    <div className="mt-3 p-2 rounded bg-black/20">
+                      <p className="font-medium mb-1">Debug Info:</p>
+                      <ul className="text-xs space-y-1">
+                        <li>• Total Space Found: {formatBytes(debugInfo.totalSpaceFound)}</li>
+                        <li>• Cleanable Tasks: {debugInfo.cleanableTasks}</li>
+                        <li>• Total Tasks: {debugInfo.tasksCount}</li>
+                        <li>• Last Error: {debugInfo.lastError || 'None'}</li>
+                      </ul>
                     </div>
                   </div>
                 </div>

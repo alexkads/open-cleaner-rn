@@ -22,7 +22,7 @@ import { toast } from 'sonner';
 import DebugPanel from '../components/DebugPanel';
 import { CleaningHistory, DatabaseService } from '../services/database';
 import { MockTauriService } from '../services/mock-tauri';
-import { CleaningResult, formatBytes, formatDuration, ScanResult } from '../services/tauri';
+import { formatBytes, formatDuration, ScanResult } from '../services/tauri';
 import { runToastDemo } from '../utils/toast-demo';
 
 // Use MockTauriService temporariamente para testes
@@ -178,32 +178,38 @@ export default function Dashboard() {
   const [tasks, setTasks] = useState<CleaningTask[]>([]);
   const [isScanning, setIsScanning] = useState(false);
   const [isCleaning, setIsCleaning] = useState(false);
-  const [totalSpaceFound, setTotalSpaceFound] = useState(0);
-  const [totalSpaceCleaned, setTotalSpaceCleaned] = useState(0);
-  const [lastCleanResult, setLastCleanResult] = useState<CleaningResult | null>(null);
   const [currentTask, setCurrentTask] = useState<string | null>(null);
-  const [systemStatus, setSystemStatus] = useState({
-    reactNative: 'checking',
-    metroBundle: 'checking'
-  });
+  const [totalSpaceFound, setTotalSpaceFound] = useState(0);
+  const [lastCleanResult, setLastCleanResult] = useState<{
+    files_deleted: number;
+    space_freed: number;
+    duration: number;
+    errors: string[];
+  } | null>(null);
+  const [lastError, setLastError] = useState<string | undefined>();
   const [recentHistory, setRecentHistory] = useState<CleaningHistory[]>([]);
   const [stats, setStats] = useState({
     total_space_cleaned: 0,
+    total_files_deleted: 0,
     total_sessions: 0,
     avg_duration: 0
   });
-  
-  // Debug panel state
+  const [systemStatus, setSystemStatus] = useState({
+    reactNative: 'checking' as 'active' | 'idle' | 'error' | 'checking',
+    metroBundle: 'checking' as 'active' | 'idle' | 'error' | 'checking'
+  });
   const [showDebugPanel, setShowDebugPanel] = useState(false);
-  const [lastError, setLastError] = useState<string | undefined>();
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const scanButtonControls = useAnimation();
   const cleanButtonControls = useAnimation();
 
   // Inicializar componente
   useEffect(() => {
-    initializeDashboard();
-  }, []);
+    if (!isInitialized) {
+      initializeDashboard();
+    }
+  }, [isInitialized]);
 
   // Debug event listener
   useEffect(() => {
@@ -229,8 +235,12 @@ export default function Dashboard() {
     return () => window.removeEventListener('debug-log-tasks', handleDebugLogTasks);
   }, [tasks, isScanning, isCleaning, totalSpaceFound]);
 
-  const initializeDashboard = async () => {
+  const initializeDashboard = useCallback(async () => {
+    if (isInitialized) return; // Evitar inicialização duplicada
+    
     try {
+      console.log('Initializing dashboard...');
+      
       // Inicializar banco de dados
       await DatabaseService.init();
       
@@ -248,6 +258,9 @@ export default function Dashboard() {
         duration: 3000
       });
       
+      setIsInitialized(true);
+      console.log('Dashboard initialized successfully');
+      
     } catch (error) {
       console.error('Failed to initialize dashboard:', error);
       setLastError(`Initialization failed: ${error}`);
@@ -257,7 +270,7 @@ export default function Dashboard() {
         duration: 5000
       });
     }
-  };
+  }, [isInitialized]);
 
   const loadTasks = () => {
     const initialTasks: CleaningTask[] = CLEANING_TASKS.map(task => ({
@@ -409,6 +422,7 @@ export default function Dashboard() {
     // Debug: Log estado atual das tasks
     console.log('=== DEBUG CLEAN ===');
     console.log('Total tasks:', tasks.length);
+    console.log('Total space found:', totalSpaceFound);
     console.log('Tasks detail:', tasks.map(t => ({
       id: t.id,
       name: t.name,
@@ -429,8 +443,10 @@ export default function Dashboard() {
       itemsLength: t.items.length
     })));
     
-    // Improved condition check with more detailed feedback
-    if (cleanableTasks.length === 0) {
+    // Verificar se há espaço encontrado OU tarefas limpeáveis
+    const hasCleanableContent = totalSpaceFound > 0 || cleanableTasks.length > 0;
+    
+    if (!hasCleanableContent) {
       // Check what's wrong
       const tasksWithItems = tasks.filter(task => task.items.length > 0);
       const tasksWithFoundStatus = tasks.filter(task => task.status === 'found');
@@ -456,6 +472,188 @@ export default function Dashboard() {
       return;
     }
     
+    // Se não há cleanableTasks mas há totalSpaceFound, tentar recarregar as tasks
+    if (cleanableTasks.length === 0 && totalSpaceFound > 0) {
+      console.log('No cleanable tasks found but space exists, attempting to reload tasks...');
+      
+      // Recarregar tasks e tentar novamente
+      const reloadedTasks = tasks.map(task => ({
+        ...task,
+        status: task.items.length > 0 ? 'found' : task.status
+      }));
+      
+      const reloadedCleanableTasks = reloadedTasks.filter(task => 
+        task.status === 'found' && task.items.length > 0
+      );
+      
+      if (reloadedCleanableTasks.length > 0) {
+        console.log('Successfully reloaded cleanable tasks:', reloadedCleanableTasks.length);
+        // Continuar com as tasks recarregadas
+        const tasksToClean = reloadedCleanableTasks;
+        
+        // Toast de início da limpeza
+        const cleanToast = toast.loading('Iniciando limpeza...', {
+          duration: Infinity,
+          description: `${tasksToClean.length} categorias serão limpas`
+        });
+        
+        try {
+          console.log('Starting cleaning process with reloaded tasks...');
+          setIsCleaning(true);
+          const startTime = Date.now();
+          let totalSpaceCleaned = 0;
+          let totalFilesDeleted = 0;
+          let completedTasks = 0;
+          const errors: string[] = [];
+          
+          await cleanButtonControls.start({
+            scale: [1, 1.2, 1],
+            rotate: [0, -360],
+            transition: { duration: 0.8 }
+          });
+
+          for (const task of tasksToClean) {
+            try {
+              console.log(`Processing task: ${task.name} with ${task.items.length} items`);
+              setCurrentTask(`Cleaning ${task.name}`);
+              updateTaskStatus(task.id, { status: 'cleaning' });
+              
+              // Atualizar toast com progresso
+              toast.loading(`Limpando ${task.name}...`, {
+                id: cleanToast,
+                description: `${completedTasks + 1}/${tasksToClean.length} - ${formatBytes(totalSpaceCleaned)} liberados`
+              });
+              
+              const filePaths = task.items
+                .filter(item => item.can_delete)
+                .map(item => item.path);
+              
+              console.log(`Cleaning ${task.name}:`, filePaths.length, 'files');
+              console.log('File paths:', filePaths);
+              
+              if (filePaths.length > 0) {
+                console.log(`Calling TestTauriService.cleanFiles with ${filePaths.length} files`);
+                const result = await TestTauriService.cleanFiles(filePaths);
+                console.log(`Clean result for ${task.name}:`, result);
+                
+                totalSpaceCleaned += result.space_freed;
+                totalFilesDeleted += result.files_deleted;
+                errors.push(...result.errors);
+                
+                console.log(`Cleaned ${task.name}:`, {
+                  files: result.files_deleted,
+                  space: result.space_freed,
+                  errors: result.errors
+                });
+              } else {
+                console.log(`No files to clean for ${task.name}`);
+              }
+              
+              updateTaskStatus(task.id, { 
+                status: 'completed',
+                size: 0,
+                items: []
+              });
+              
+              completedTasks++;
+              
+            } catch (error) {
+              console.error(`Failed to clean ${task.name}:`, error);
+              setLastError(`Failed to clean ${task.name}: ${error}`);
+              updateTaskStatus(task.id, { status: 'error' });
+              errors.push(`Failed to clean ${task.name}: ${error}`);
+              
+              // Toast de erro específico da task
+              toast.error(`Erro ao limpar ${task.name}`, {
+                description: `${error}`
+              });
+            }
+            
+            await new Promise(resolve => setTimeout(resolve, 500));
+          }
+          
+          const duration = Date.now() - startTime;
+          
+          console.log('Clean completed:', {
+            totalSpaceCleaned,
+            totalFilesDeleted,
+            duration,
+            errors
+          });
+          
+          // Toast de sucesso
+          const hasErrors = errors.length > 0;
+          const toastType = hasErrors ? 'warning' : 'success';
+          const toastTitle = hasErrors ? 'Limpeza concluída com avisos' : 'Limpeza concluída com sucesso!';
+          const toastDescription = `${formatBytes(totalSpaceCleaned)} liberados • ${totalFilesDeleted} arquivos removidos • ${formatDuration(duration)}`;
+          
+          toast[toastType](toastTitle, {
+            id: cleanToast,
+            description: toastDescription,
+            duration: 7000
+          });
+          
+          // Se houver erros, mostrar detalhes
+          if (hasErrors) {
+            setTimeout(() => {
+              toast.error('Alguns erros ocorreram durante a limpeza', {
+                description: `${errors.length} erro(s) encontrado(s). Verifique o console para detalhes.`,
+                duration: 5000
+              });
+            }, 1000);
+          }
+          
+          // Salvar resultado no banco de dados
+          const cleaningRecord: Omit<CleaningHistory, 'id' | 'created_at'> = {
+            date: new Date().toISOString().split('T')[0],
+            time: new Date().toTimeString().split(' ')[0],
+            space_cleaned: totalSpaceCleaned,
+            files_deleted: totalFilesDeleted,
+            duration: duration,
+            type: tasksToClean.length > 5 ? 'deep' : 'quick',
+            status: errors.length > 0 ? 'warning' : 'success',
+            errors: errors.length > 0 ? errors.join('; ') : undefined
+          };
+          
+          console.log('Saving cleaning record to database:', cleaningRecord);
+          await DatabaseService.addCleaningRecord(cleaningRecord);
+          
+          // Atualizar resultado para exibição
+          setLastCleanResult({
+            files_deleted: totalFilesDeleted,
+            space_freed: totalSpaceCleaned,
+            duration: duration,
+            errors: errors
+          });
+          
+          // Recarregar dados
+          console.log('Reloading data...');
+          await Promise.all([
+            loadRecentHistory(),
+            loadStats()
+          ]);
+          
+          setTotalSpaceFound(0);
+          
+        } catch (error) {
+          console.error('Cleaning failed:', error);
+          setLastError(`Cleaning failed: ${error}`);
+          
+          // Toast de erro geral
+          toast.error('Falha na limpeza do sistema', {
+            id: cleanToast,
+            description: `${error}`,
+            duration: 5000
+          });
+        } finally {
+          setIsCleaning(false);
+          setCurrentTask(null);
+        }
+        
+        return;
+      }
+    }
+    
     // Toast de início da limpeza
     const cleanToast = toast.loading('Iniciando limpeza...', {
       duration: Infinity,
@@ -463,6 +661,7 @@ export default function Dashboard() {
     });
     
     try {
+      console.log('Starting cleaning process with original tasks...');
       setIsCleaning(true);
       const startTime = Date.now();
       let totalSpaceCleaned = 0;
@@ -478,6 +677,7 @@ export default function Dashboard() {
 
       for (const task of cleanableTasks) {
         try {
+          console.log(`Processing task: ${task.name} with ${task.items.length} items`);
           setCurrentTask(`Cleaning ${task.name}`);
           updateTaskStatus(task.id, { status: 'cleaning' });
           
@@ -492,9 +692,13 @@ export default function Dashboard() {
             .map(item => item.path);
           
           console.log(`Cleaning ${task.name}:`, filePaths.length, 'files');
+          console.log('File paths:', filePaths);
           
           if (filePaths.length > 0) {
+            console.log(`Calling TestTauriService.cleanFiles with ${filePaths.length} files`);
             const result = await TestTauriService.cleanFiles(filePaths);
+            console.log(`Clean result for ${task.name}:`, result);
+            
             totalSpaceCleaned += result.space_freed;
             totalFilesDeleted += result.files_deleted;
             errors.push(...result.errors);
@@ -504,6 +708,8 @@ export default function Dashboard() {
               space: result.space_freed,
               errors: result.errors
             });
+          } else {
+            console.log(`No files to clean for ${task.name}`);
           }
           
           updateTaskStatus(task.id, { 
@@ -572,6 +778,7 @@ export default function Dashboard() {
         errors: errors.length > 0 ? errors.join('; ') : undefined
       };
       
+      console.log('Saving cleaning record to database:', cleaningRecord);
       await DatabaseService.addCleaningRecord(cleaningRecord);
       
       // Atualizar resultado para exibição
@@ -583,6 +790,7 @@ export default function Dashboard() {
       });
       
       // Recarregar dados
+      console.log('Reloading data...');
       await Promise.all([
         loadRecentHistory(),
         loadStats()
@@ -604,7 +812,7 @@ export default function Dashboard() {
       setIsCleaning(false);
       setCurrentTask(null);
     }
-  }, [tasks, isCleaning, isScanning, cleanButtonControls, loadRecentHistory, loadStats]);
+  }, [tasks, isCleaning, isScanning, cleanButtonControls, loadRecentHistory, loadStats, totalSpaceFound]);
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -798,15 +1006,15 @@ export default function Dashboard() {
         <motion.button
           className={clsx(
             "glass-effect rounded-2xl p-6 text-left transition-all duration-300 relative overflow-hidden",
-            !isScanning && !isCleaning && totalSpaceFound > 0
+            !isScanning && !isCleaning && (totalSpaceFound > 0 || tasks.some(t => t.status === 'found' && t.items.length > 0))
               ? "hover:scale-105 neon-border cursor-pointer" 
               : "opacity-75 cursor-not-allowed"
           )}
           variants={itemVariants}
           onClick={handleClean}
-          disabled={isScanning || isCleaning || totalSpaceFound === 0}
+          disabled={isScanning || isCleaning || (totalSpaceFound === 0 && !tasks.some(t => t.status === 'found' && t.items.length > 0))}
           animate={cleanButtonControls}
-                     whileHover={!isScanning && !isCleaning && totalSpaceFound > 0 ? glowAnimation : {}}
+                     whileHover={!isScanning && !isCleaning && (totalSpaceFound > 0 || tasks.some(t => t.status === 'found' && t.items.length > 0)) ? glowAnimation : {}}
         >
           <motion.div
             className="absolute inset-0 bg-gradient-to-br from-success/20 to-accent/20"
@@ -839,7 +1047,9 @@ export default function Dashboard() {
                   ? currentTask || 'Cleaning files...'
                   : totalSpaceFound > 0 
                     ? `Ready to clean ${formatBytes(totalSpaceFound)}`
-                    : 'Scan first to find cleanable files'
+                    : tasks.some(t => t.status === 'found' && t.items.length > 0)
+                      ? `Ready to clean ${tasks.filter(t => t.status === 'found' && t.items.length > 0).length} categories`
+                      : 'Scan first to find cleanable files'
                 }
               </p>
             </div>

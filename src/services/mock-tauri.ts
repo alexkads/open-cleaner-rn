@@ -128,6 +128,15 @@ export class MockTauriService {
   }
 
   static async cleanFiles(filePaths: string[]): Promise<CleaningResult> {
+    if (!filePaths || filePaths.length === 0) {
+      return {
+        files_deleted: 0,
+        space_freed: 0,
+        duration: 0,
+        errors: ['No files provided for cleaning']
+      };
+    }
+
     await delay(Math.min(filePaths.length * 200, 3000)); // Simular tempo proporcional
     
     const totalSize = filePaths.reduce((sum, path) => {
@@ -139,10 +148,12 @@ export class MockTauriService {
       return sum + 1024 * 1024 * 10; // Default 10MB
     }, 0);
 
-    // Simular alguns erros ocasionais
+    // Remover simulação de erros aleatórios para tornar mais estável
     const errors: string[] = [];
-    if (Math.random() < 0.1) { // 10% chance de erro
-      errors.push(`Permission denied: ${filePaths[0]}`);
+    
+    // Simular apenas erros específicos em casos muito raros (1% chance)
+    if (Math.random() < 0.01 && filePaths.length > 0) {
+      errors.push(`Mock permission error: ${filePaths[0]}`);
     }
 
     return {
