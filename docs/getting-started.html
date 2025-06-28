@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Getting Started - Clean RN Dev</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/docs.css">
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+</head>
+<body>
+    <nav class="docs-nav">
+        <div class="container">
+            <a href="index.html" class="nav-logo">
+                <span class="gradient-text">Clean RN Dev</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="getting-started.html" class="active">Getting Started</a>
+                <a href="build-guide.html">Build Guide</a>
+                <a href="features.html">Features</a>
+                <a href="https://github.com/seu-usuario/clean-rn-dev">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="docs-main">
+        <div class="container">
+            <div class="docs-layout">
+                <aside class="docs-sidebar">
+                    <nav class="docs-toc">
+                        <h3>Getting Started</h3>
+                        <ul>
+                            <li><a href="#installation">Installation</a></li>
+                            <li><a href="#quick-start">Quick Start</a></li>
+                            <li><a href="#system-requirements">System Requirements</a></li>
+                            <li><a href="#first-scan">First Scan</a></li>
+                            <li><a href="#understanding-results">Understanding Results</a></li>
+                            <li><a href="#troubleshooting">Troubleshooting</a></li>
+                        </ul>
+                    </nav>
+                </aside>
+
+                <article class="docs-content">
+                    <header class="docs-header">
+                        <h1>🚀 Getting Started</h1>
+                        <p class="docs-subtitle">Learn how to install and use Clean RN Dev to optimize your development environment</p>
+                    </header>
+
+                    <section id="installation" class="docs-section">
+                        <h2>📦 Installation</h2>
+                        
+                        <div class="platform-tabs">
+                            <button class="tab-button active" onclick="showPlatform('macos')">🍎 macOS</button>
+                            <button class="tab-button" onclick="showPlatform('windows')">🪟 Windows</button>
+                            <button class="tab-button" onclick="showPlatform('linux')">🐧 Linux</button>
+                        </div>
+
+                        <div id="macos" class="platform-content active">
+                            <h3>macOS Installation</h3>
+                            <div class="install-methods">
+                                <div class="install-method">
+                                    <h4>📥 Direct Download (Recommended)</h4>
+                                    <ol>
+                                        <li>Download the latest <code>.dmg</code> file from <a href="https://github.com/seu-usuario/clean-rn-dev/releases/latest">GitHub Releases</a></li>
+                                        <li>Double-click the downloaded file to mount the disk image</li>
+                                        <li>Drag <strong>Clean RN Dev</strong> to the Applications folder</li>
+                                        <li>Launch from Applications or Spotlight</li>
+                                    </ol>
+                                    <div class="note">
+                                        <strong>Note:</strong> On first launch, you may see a security warning. Go to System Preferences > Security & Privacy and click "Open Anyway".
+                                    </div>
+                                </div>
+
+                                <div class="install-method">
+                                    <h4>🍺 Homebrew (Coming Soon)</h4>
+                                    <pre><code>brew install --cask clean-rn-dev</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="windows" class="platform-content">
+                            <h3>Windows Installation</h3>
+                            <div class="install-methods">
+                                <div class="install-method">
+                                    <h4>📥 MSI Installer (Recommended)</h4>
+                                    <ol>
+                                        <li>Download the latest <code>.msi</code> file from <a href="https://github.com/seu-usuario/clean-rn-dev/releases/latest">GitHub Releases</a></li>
+                                        <li>Right-click the file and select "Install"</li>
+                                        <li>Follow the installation wizard</li>
+                                        <li>Launch from Start Menu or Desktop shortcut</li>
+                                    </ol>
+                                </div>
+
+                                <div class="install-method">
+                                    <h4>🚀 NSIS Installer</h4>
+                                    <ol>
+                                        <li>Download the <code>.exe</code> installer</li>
+                                        <li>Run as Administrator</li>
+                                        <li>Follow installation steps</li>
+                                    </ol>
+                                </div>
+
+                                <div class="install-method">
+                                    <h4>🍫 Chocolatey (Coming Soon)</h4>
+                                    <pre><code>choco install clean-rn-dev</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="linux" class="platform-content">
+                            <h3>Linux Installation</h3>
+                            <div class="install-methods">
+                                <div class="install-method">
+                                    <h4>📦 Debian/Ubuntu (.deb)</h4>
+                                    <pre><code>wget https://github.com/seu-usuario/clean-rn-dev/releases/latest/download/clean-rn-dev_amd64.deb
+sudo dpkg -i clean-rn-dev_amd64.deb
+sudo apt-get install -f  # Fix dependencies if needed</code></pre>
+                                </div>
+
+                                <div class="install-method">
+                                    <h4>🎩 Red Hat/Fedora (.rpm)</h4>
+                                    <pre><code>wget https://github.com/seu-usuario/clean-rn-dev/releases/latest/download/clean-rn-dev.rpm
+sudo rpm -i clean-rn-dev.rpm</code></pre>
+                                </div>
+
+                                <div class="install-method">
+                                    <h4>📱 AppImage (Universal)</h4>
+                                    <pre><code>wget https://github.com/seu-usuario/clean-rn-dev/releases/latest/download/clean-rn-dev.AppImage
+chmod +x clean-rn-dev.AppImage
+./clean-rn-dev.AppImage</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="quick-start" class="docs-section">
+                        <h2>⚡ Quick Start</h2>
+                        <p>Get up and running with Clean RN Dev in less than 2 minutes:</p>
+                        
+                        <div class="quick-steps">
+                            <div class="step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <h3>Launch the App</h3>
+                                    <p>Open Clean RN Dev from your Applications folder, Start Menu, or application launcher.</p>
+                                </div>
+                            </div>
+
+                            <div class="step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <h3>Run Quick Scan</h3>
+                                    <p>Click the <strong>"Quick Scan"</strong> button to automatically detect all cache files in your system.</p>
+                                </div>
+                            </div>
+
+                            <div class="step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <h3>Review Results</h3>
+                                    <p>Check the scan results to see what cache files were found and how much space they're using.</p>
+                                </div>
+                            </div>
+
+                            <div class="step">
+                                <div class="step-number">4</div>
+                                <div class="step-content">
+                                    <h3>Clean Selected Items</h3>
+                                    <p>Click <strong>"Clean Selected"</strong> to remove the cache files and free up disk space.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="system-requirements" class="docs-section">
+                        <h2>💻 System Requirements</h2>
+                        
+                        <div class="requirements-grid">
+                            <div class="requirement-card">
+                                <h3>🍎 macOS</h3>
+                                <ul>
+                                    <li><strong>OS:</strong> macOS 10.15 (Catalina) or later</li>
+                                    <li><strong>Architecture:</strong> Intel x64 or Apple Silicon</li>
+                                    <li><strong>RAM:</strong> 4GB recommended</li>
+                                    <li><strong>Storage:</strong> 50MB free space</li>
+                                </ul>
+                            </div>
+
+                            <div class="requirement-card">
+                                <h3>🪟 Windows</h3>
+                                <ul>
+                                    <li><strong>OS:</strong> Windows 10 version 1903 or later</li>
+                                    <li><strong>Architecture:</strong> x64 (64-bit)</li>
+                                    <li><strong>RAM:</strong> 4GB recommended</li>
+                                    <li><strong>Storage:</strong> 50MB free space</li>
+                                </ul>
+                            </div>
+
+                            <div class="requirement-card">
+                                <h3>🐧 Linux</h3>
+                                <ul>
+                                    <li><strong>OS:</strong> Ubuntu 18.04+, Debian 10+, Fedora 31+</li>
+                                    <li><strong>Architecture:</strong> x64 or ARM64</li>
+                                    <li><strong>Dependencies:</strong> libwebkit2gtk-4.0-37, libssl3</li>
+                                    <li><strong>Storage:</strong> 50MB free space</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="first-scan" class="docs-section">
+                        <h2>🔍 Your First Scan</h2>
+                        <p>Understanding what happens during your first scan:</p>
+
+                        <div class="scan-explanation">
+                            <h3>What Gets Scanned</h3>
+                            <div class="scan-categories">
+                                <div class="scan-category">
+                                    <h4>📱 React Native / Expo</h4>
+                                    <ul>
+                                        <li>Expo cache directories</li>
+                                        <li>Metro bundler cache</li>
+                                        <li>React Native temp files</li>
+                                        <li>Hermes engine cache</li>
+                                    </ul>
+                                </div>
+
+                                <div class="scan-category">
+                                    <h4>🛠️ Development Tools</h4>
+                                    <ul>
+                                        <li>Xcode DerivedData</li>
+                                        <li>Android Gradle cache</li>
+                                        <li>VS Code extensions cache</li>
+                                        <li>Docker build cache</li>
+                                    </ul>
+                                </div>
+
+                                <div class="scan-category">
+                                    <h4>📦 Package Managers</h4>
+                                    <ul>
+                                        <li>npm cache</li>
+                                        <li>Yarn cache</li>
+                                        <li>pnpm store</li>
+                                        <li>CocoaPods cache</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="understanding-results" class="docs-section">
+                        <h2>📊 Understanding Results</h2>
+                        
+                        <div class="results-guide">
+                            <h3>Result Categories</h3>
+                            <div class="category-explanations">
+                                <div class="category-explanation">
+                                    <div class="category-icon">🟢</div>
+                                    <div class="category-info">
+                                        <h4>Safe to Delete</h4>
+                                        <p>These are temporary files and caches that can be safely removed. They'll be regenerated when needed.</p>
+                                    </div>
+                                </div>
+
+                                <div class="category-explanation">
+                                    <div class="category-icon">🟡</div>
+                                    <div class="category-info">
+                                        <h4>Caution Advised</h4>
+                                        <p>Files that are generally safe to delete but may require re-downloading or rebuilding.</p>
+                                    </div>
+                                </div>
+
+                                <div class="category-explanation">
+                                    <div class="category-icon">🔴</div>
+                                    <div class="category-info">
+                                        <h4>Keep Protected</h4>
+                                        <p>Important files that should not be deleted. These are automatically excluded from cleaning.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="troubleshooting" class="docs-section">
+                        <h2>🛠️ Troubleshooting</h2>
+                        
+                        <div class="troubleshooting-guide">
+                            <div class="trouble-item">
+                                <h3>App won't start on macOS</h3>
+                                <div class="solution">
+                                    <p><strong>Solution:</strong> This is usually due to Gatekeeper security. Follow these steps:</p>
+                                    <ol>
+                                        <li>Go to System Preferences > Security & Privacy</li>
+                                        <li>Click "Open Anyway" next to the Clean RN Dev warning</li>
+                                        <li>Or run: <code>sudo xattr -rd com.apple.quarantine /Applications/Clean\ RN\ Dev.app</code></li>
+                                    </ol>
+                                </div>
+                            </div>
+
+                            <div class="trouble-item">
+                                <h3>Permission denied errors</h3>
+                                <div class="solution">
+                                    <p><strong>Solution:</strong> Grant necessary permissions:</p>
+                                    <ul>
+                                        <li><strong>macOS:</strong> System Preferences > Security & Privacy > Full Disk Access</li>
+                                        <li><strong>Linux:</strong> Run with sudo if needed, or check file permissions</li>
+                                        <li><strong>Windows:</strong> Run as Administrator for system-level cleaning</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="trouble-item">
+                                <h3>Scan finds no files</h3>
+                                <div class="solution">
+                                    <p><strong>Solution:</strong> This might happen if:</p>
+                                    <ul>
+                                        <li>Your development environment is already clean</li>
+                                        <li>Cache directories are in non-standard locations</li>
+                                        <li>You haven't done React Native development recently</li>
+                                    </ul>
+                                    <p>Try running a React Native project first to generate cache files.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <div class="docs-navigation">
+                        <a href="index.html" class="nav-prev">← Back to Home</a>
+                        <a href="features.html" class="nav-next">Features Overview →</a>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </main>
+
+    <script src="assets/script.js"></script>
+    <script>
+        function showPlatform(platform) {
+            // Hide all platform contents
+            document.querySelectorAll('.platform-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Hide all tab buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Show selected platform
+            document.getElementById(platform).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

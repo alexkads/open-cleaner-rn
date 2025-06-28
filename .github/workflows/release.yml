@@ -141,3 +141,21 @@ jobs:
             src-tauri/target/${{ matrix.target }}/release/bundle/
             !src-tauri/target/${{ matrix.target }}/release/bundle/**/*.pdb
           retention-days: 30
+
+  # Update documentation after successful release
+  update-docs:
+    needs: build-and-release
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Trigger documentation update
+        run: |
+          # Trigger docs workflow to update download links and stats
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/actions/workflows/docs.yml/dispatches \
+            -d '{"ref":"main"}'
