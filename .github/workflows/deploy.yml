@@ -40,14 +40,31 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Debug directory structure
+        run: |
+          pwd
+          ls -la
+          ls -la docs-astro/
+          echo "--- Root package.json ---"
+          head -10 package.json
+          echo "--- Docs package.json ---"
+          head -10 docs-astro/package.json
+
       - name: Install Astro dependencies
-        working-directory: ./docs-astro
-        run: npm install
+        working-directory: docs-astro
+        run: |
+          pwd
+          ls -la
+          npm ci
 
       - name: Build Astro documentation
         id: build-docs
-        working-directory: ./docs-astro
-        run: npm run build
+        working-directory: docs-astro
+        run: |
+          pwd
+          ls -la
+          echo "Running astro build with explicit package.json..."
+          npx astro build
 
       - name: Setup Pages
         if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
@@ -112,8 +129,7 @@ jobs:
   # Build application for all platforms
   build-app:
     name: Build Application
-    needs: [build-docs]
-    if: needs.build-docs.outputs.docs-built == 'success'
+    # Remove dependency on build-docs since they should be independent
     strategy:
       fail-fast: false
       matrix:
@@ -204,7 +220,7 @@ jobs:
           args: --target ${{ matrix.target }}
 
       - name: Build Tauri app (Development)
-        if: "!startsWith(github.ref, 'refs/tags/v')"
+        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
