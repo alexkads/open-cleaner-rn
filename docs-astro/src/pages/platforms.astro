@@ -1,9 +1,16 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Navigation from '../components/Navigation.astro';
+import Footer from '../components/Footer.astro';
 ---
 
-<Layout title="Platform Support - Open Cleaner RN">
-	<main>
+<BaseLayout 
+  title="Platform Support"
+  description="Learn about Open Cleaner RN's cross-platform support for Windows, macOS, and Linux with detailed installation guides and platform-specific features."
+>
+  <Navigation />
+  
+  <main>
 		<h1>Platform Support</h1>
 		
 		<section class="content-section">
@@ -131,13 +138,36 @@ import Layout from '../layouts/Layout.astro';
 			</table>
 		</section>
 	</main>
-</Layout>
+  
+  <Footer />
+</BaseLayout>
 
 <style>
 	main {
 		margin: auto;
-		padding: 1.5rem;
+		padding: 4rem 1.5rem;
 		max-width: 900px;
+	}
+	
+	/* Page Hero */
+	.page-hero {
+		padding: 3rem 0;
+		background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+		border-bottom: 1px solid var(--color-border-light);
+		margin-bottom: 2rem;
+	}
+	
+	[data-theme="dark"] .page-hero {
+		background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+	}
+	
+	h1 {
+		font-size: 2.5rem;
+		font-weight: 700;
+		line-height: 1.1;
+		text-align: center;
+		margin-bottom: 1rem;
+		color: var(--color-text);
 	}
 	.content-section {
 		margin: 2rem 0;
