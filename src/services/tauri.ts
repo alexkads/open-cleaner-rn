@@ -91,6 +91,30 @@ export class TauriService {
   static async greet(name: string): Promise<string> {
     return await invoke('greet', { name });
   }
+
+  static async scanReactNativeCache(): Promise<ScanResult[]> {
+    return await invoke('scan_react_native_cache');
+  }
+
+  static async scanHermesCache(): Promise<ScanResult[]> {
+    return await invoke('scan_hermes_cache');
+  }
+
+  static async scanVsCodeCache(): Promise<ScanResult[]> {
+    return await invoke('scan_vscode_cache');
+  }
+
+  static async scanAndroidStudioCache(): Promise<ScanResult[]> {
+    return await invoke('scan_android_studio_cache');
+  }
+
+  static async scanBuildArtifacts(): Promise<ScanResult[]> {
+    return await invoke('scan_build_artifacts');
+  }
+
+  static async scanHomebrewCache(): Promise<ScanResult[]> {
+    return await invoke('scan_homebrew_cache');
+  }
 }
 
 export const formatBytes = (bytes: number): string => {

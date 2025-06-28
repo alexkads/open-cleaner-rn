@@ -125,6 +125,60 @@ const CLEANING_TASKS: Omit<CleaningTask, 'status' | 'size' | 'items'>[] = [
     icon: Trash2,
     scanFunction: TestTauriService.scanTempFiles,
     color: 'text-gray-400'
+  },
+  {
+    id: 'react-native-cache',
+    name: 'React Native Cache',
+    description: 'Clean React Native CLI cache and development files',
+    category: 'cache',
+    icon: Smartphone,
+    scanFunction: TestTauriService.scanReactNativeCache,
+    color: 'text-sky-400'
+  },
+  {
+    id: 'hermes-cache',
+    name: 'Hermes Cache',
+    description: 'Clean Hermes JavaScript engine cache',
+    category: 'cache',
+    icon: Cpu,
+    scanFunction: TestTauriService.scanHermesCache,
+    color: 'text-violet-400'
+  },
+  {
+    id: 'vscode-cache',
+    name: 'VS Code Cache',
+    description: 'Clean Visual Studio Code logs and extensions',
+    category: 'tools',
+    icon: HardDrive,
+    scanFunction: TestTauriService.scanVsCodeCache,
+    color: 'text-blue-500'
+  },
+  {
+    id: 'android-studio-cache',
+    name: 'Android Studio Cache',
+    description: 'Clean Android Studio system cache and logs',
+    category: 'tools',
+    icon: Shield,
+    scanFunction: TestTauriService.scanAndroidStudioCache,
+    color: 'text-green-500'
+  },
+  {
+    id: 'build-artifacts',
+    name: 'Build Artifacts',
+    description: 'Clean old APK and IPA files from common folders',
+    category: 'build',
+    icon: Trash2,
+    scanFunction: TestTauriService.scanBuildArtifacts,
+    color: 'text-amber-400'
+  },
+  {
+    id: 'homebrew-cache',
+    name: 'Homebrew Cache',
+    description: 'Clean Homebrew package manager cache',
+    category: 'tools',
+    icon: Download,
+    scanFunction: TestTauriService.scanHomebrewCache,
+    color: 'text-orange-500'
   }
 ];
 

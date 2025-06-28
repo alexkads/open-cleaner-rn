@@ -286,3 +286,187 @@ pub async fn scan_temp_files() -> Result<Vec<ScanResult>, String> {
     
     Ok(results)
 }
+
+#[tauri::command]
+pub async fn scan_react_native_cache() -> Result<Vec<ScanResult>, String> {
+    let mut results = Vec::new();
+    
+    let home_dir = dirs::home_dir().ok_or("Could not find home directory")?;
+    
+    let cache_paths = vec![
+        home_dir.join(".react-native"),
+        home_dir.join("Library/Caches/com.facebook.react"),
+        home_dir.join("AppData/Local/React Native"),
+    ];
+    
+    for cache_path in cache_paths {
+        if cache_path.exists() {
+            if let Ok(size) = get_dir_size(&cache_path) {
+                results.push(ScanResult {
+                    path: cache_path.to_string_lossy().to_string(),
+                    size,
+                    file_type: "react_native_cache".to_string(),
+                    can_delete: true,
+                });
+            }
+        }
+    }
+    
+    Ok(results)
+}
+
+#[tauri::command]
+pub async fn scan_hermes_cache() -> Result<Vec<ScanResult>, String> {
+    let mut results = Vec::new();
+    
+    let home_dir = dirs::home_dir().ok_or("Could not find home directory")?;
+    
+    let cache_paths = vec![
+        home_dir.join(".hermes"),
+        home_dir.join("Library/Caches/Hermes"),
+        home_dir.join("AppData/Local/Hermes"),
+        std::env::temp_dir().join("hermes-*"),
+    ];
+    
+    for cache_path in cache_paths {
+        if cache_path.exists() {
+            if let Ok(size) = get_dir_size(&cache_path) {
+                results.push(ScanResult {
+                    path: cache_path.to_string_lossy().to_string(),
+                    size,
+                    file_type: "hermes_cache".to_string(),
+                    can_delete: true,
+                });
+            }
+        }
+    }
+    
+    Ok(results)
+}
+
+#[tauri::command]
+pub async fn scan_vscode_cache() -> Result<Vec<ScanResult>, String> {
+    let mut results = Vec::new();
+    
+    let home_dir = dirs::home_dir().ok_or("Could not find home directory")?;
+    
+    let cache_paths = vec![
+        home_dir.join(".vscode/extensions"),
+        home_dir.join("Library/Application Support/Code/logs"),
+        home_dir.join("Library/Caches/com.microsoft.VSCode"),
+        home_dir.join("AppData/Roaming/Code/logs"),
+        home_dir.join("AppData/Roaming/Code/CachedExtensions"),
+    ];
+    
+    for cache_path in cache_paths {
+        if cache_path.exists() {
+            if let Ok(size) = get_dir_size(&cache_path) {
+                results.push(ScanResult {
+                    path: cache_path.to_string_lossy().to_string(),
+                    size,
+                    file_type: "vscode_cache".to_string(),
+                    can_delete: true,
+                });
+            }
+        }
+    }
+    
+    Ok(results)
+}
+
+#[tauri::command]
+pub async fn scan_android_studio_cache() -> Result<Vec<ScanResult>, String> {
+    let mut results = Vec::new();
+    
+    let home_dir = dirs::home_dir().ok_or("Could not find home directory")?;
+    
+    let cache_paths = vec![
+        home_dir.join("Library/Application Support/Google/AndroidStudio*/system"),
+        home_dir.join("Library/Logs/Google/AndroidStudio*"),
+        home_dir.join("Library/Caches/Google/AndroidStudio*"),
+        home_dir.join("AppData/Local/Google/AndroidStudio*/system"),
+        home_dir.join("AppData/Local/Google/AndroidStudio*/log"),
+    ];
+    
+    for cache_path in cache_paths {
+        if cache_path.exists() {
+            if let Ok(size) = get_dir_size(&cache_path) {
+                results.push(ScanResult {
+                    path: cache_path.to_string_lossy().to_string(),
+                    size,
+                    file_type: "android_studio_cache".to_string(),
+                    can_delete: true,
+                });
+            }
+        }
+    }
+    
+    Ok(results)
+}
+
+#[tauri::command]
+pub async fn scan_build_artifacts() -> Result<Vec<ScanResult>, String> {
+    let mut results = Vec::new();
+    
+    let home_dir = dirs::home_dir().ok_or("Could not find home directory")?;
+    
+    let artifact_paths = vec![
+        home_dir.join("Desktop/*.apk"),
+        home_dir.join("Desktop/*.ipa"),
+        home_dir.join("Downloads/*.apk"),
+        home_dir.join("Downloads/*.ipa"),
+        home_dir.join("Documents/*.apk"),
+        home_dir.join("Documents/*.ipa"),
+    ];
+    
+    for pattern in artifact_paths {
+        let parent = pattern.parent().unwrap_or(&home_dir);
+        if parent.exists() {
+            if let Ok(entries) = std::fs::read_dir(parent) {
+                for entry in entries.flatten() {
+                    let path = entry.path();
+                    if let Some(extension) = path.extension().and_then(|e| e.to_str()) {
+                        if extension == "apk" || extension == "ipa" {
+                            if let Ok(metadata) = entry.metadata() {
+                                results.push(ScanResult {
+                                    path: path.to_string_lossy().to_string(),
+                                    size: metadata.len(),
+                                    file_type: "build_artifacts".to_string(),
+                                    can_delete: true,
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    Ok(results)
+}
+
+#[tauri::command]
+pub async fn scan_homebrew_cache() -> Result<Vec<ScanResult>, String> {
+    let mut results = Vec::new();
+    
+    let cache_paths = vec![
+        std::path::PathBuf::from("/opt/homebrew/var/cache"),
+        std::path::PathBuf::from("/usr/local/var/cache"),
+        dirs::home_dir().unwrap_or_default().join("Library/Caches/Homebrew"),
+    ];
+    
+    for cache_path in cache_paths {
+        if cache_path.exists() {
+            if let Ok(size) = get_dir_size(&cache_path) {
+                results.push(ScanResult {
+                    path: cache_path.to_string_lossy().to_string(),
+                    size,
+                    file_type: "homebrew_cache".to_string(),
+                    can_delete: true,
+                });
+            }
+        }
+    }
+    
+    Ok(results)
+}
