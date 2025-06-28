@@ -53,24 +53,9 @@ log "Configurando proteção do branch 'main'..."
 
 gh api repos/$OWNER/$REPO_NAME/branches/main/protection \
   --method PUT \
-  --field required_status_checks='{
-    "strict": true,
-    "contexts": [
-      "🧪 Automated Tests (ubuntu-latest)",
-      "🧪 Automated Tests (windows-latest)", 
-      "🧪 Automated Tests (macos-latest)",
-      "📋 PR Information Validation",
-      "🔒 Security Check",
-      "⚡ Performance Check"
-    ]
-  }' \
+  --raw-field required_status_checks='{"strict":true,"contexts":["🧪 Automated Tests (ubuntu-latest)","🧪 Automated Tests (windows-latest)","🧪 Automated Tests (macos-latest)","📋 PR Information Validation","🔒 Security Check","⚡ Performance Check"]}' \
   --field enforce_admins=true \
-  --field required_pull_request_reviews='{
-    "required_approving_review_count": 1,
-    "dismiss_stale_reviews": true,
-    "require_code_owner_reviews": true,
-    "require_last_push_approval": false
-  }' \
+  --raw-field required_pull_request_reviews='{"required_approving_review_count":1,"dismiss_stale_reviews":true,"require_code_owner_reviews":true,"require_last_push_approval":false}' \
   --field restrictions=null \
   --field required_conversation_resolution=true \
   --field block_creations=false \
@@ -87,20 +72,9 @@ if gh api repos/$OWNER/$REPO_NAME/branches/develop &> /dev/null; then
     
     gh api repos/$OWNER/$REPO_NAME/branches/develop/protection \
       --method PUT \
-      --field required_status_checks='{
-        "strict": true,
-        "contexts": [
-          "🧪 Automated Tests (ubuntu-latest)",
-          "📋 PR Information Validation",
-          "🔒 Security Check"
-        ]
-      }' \
+      --raw-field required_status_checks='{"strict":true,"contexts":["🧪 Automated Tests (ubuntu-latest)","📋 PR Information Validation","🔒 Security Check"]}' \
       --field enforce_admins=false \
-      --field required_pull_request_reviews='{
-        "required_approving_review_count": 1,
-        "dismiss_stale_reviews": false,
-        "require_code_owner_reviews": false
-      }' \
+      --raw-field required_pull_request_reviews='{"required_approving_review_count":1,"dismiss_stale_reviews":false,"require_code_owner_reviews":false}' \
       --field restrictions=null \
       --field required_conversation_resolution=true
 

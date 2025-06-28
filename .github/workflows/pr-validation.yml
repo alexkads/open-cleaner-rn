@@ -2,7 +2,7 @@ name: 🔍 Pull Request Validation
 
 on:
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main, dev ]
     types: [opened, synchronize, reopened, ready_for_review]
 
 concurrency:
