@@ -1,239 +1,1311 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Navigation from '../components/Navigation.astro';
+import Footer from '../components/Footer.astro';
 ---
 
-<Layout title="CI/CD Pipeline - Open Cleaner RN">
-	<main>
-		<h1>CI/CD Pipeline Documentation</h1>
-		
-		<section class="content-section">
-			<h2>Overview</h2>
-			<p>
-				Our CI/CD pipeline is implemented using GitHub Actions, providing a unified automated process for:
-			</p>
-			<ul>
-				<li>Building and deploying Astro documentation</li>
-				<li>Building cross-platform applications</li>
-				<li>Creating releases with installers</li>
-				<li>Automated testing and verification</li>
-			</ul>
-		</section>
+<BaseLayout 
+  title="CI/CD Pipeline"
+  description="Learn about the automated CI/CD pipeline that builds, tests, and deploys Open Cleaner RN across multiple platforms."
+>
+  <Navigation />
+  
+  <main>
+    <!-- Hero Section -->
+    <section class="page-hero">
+      <div class="container">
+        <div class="hero-content">
+          <h1>CI/CD Pipeline</h1>
+          <p class="hero-description">
+            Automated continuous integration and deployment pipeline powered by GitHub Actions 
+            for building, testing, and releasing Open Cleaner RN across all platforms.
+          </p>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Overview Section -->
+    <section class="overview">
+      <div class="container">
+        <div class="section-header">
+          <h2>Pipeline Overview</h2>
+          <p>Fully automated GitHub Actions workflow for seamless development and deployment</p>
+        </div>
+        
+        <div class="pipeline-features">
+          <div class="feature-card">
+            <div class="feature-icon">📚</div>
+            <h3>Documentation Deployment</h3>
+            <p>Automatic building and deployment of Astro documentation to GitHub Pages on every main branch update.</p>
+          </div>
+          
+          <div class="feature-card">
+            <div class="feature-icon">🏗️</div>
+            <h3>Cross-Platform Builds</h3>
+            <p>Simultaneous building for Windows, macOS, and Linux with platform-specific optimizations and installers.</p>
+          </div>
+          
+          <div class="feature-card">
+            <div class="feature-icon">🚀</div>
+            <h3>Automated Releases</h3>
+            <p>Tag-triggered releases with automatic artifact collection, GitHub release creation, and installer uploads.</p>
+          </div>
+          
+          <div class="feature-card">
+            <div class="feature-icon">🧪</div>
+            <h3>Quality Assurance</h3>
+            <p>Automated testing, linting, and code quality checks ensuring every release meets our standards.</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-		<section class="content-section">
-			<h2>Pipeline Structure</h2>
-			<div class="workflow-diagram">
-				<pre><code>
-Trigger (Push/PR/Tag)
-       ↓
-Build Documentation
-       ↓
-Deploy to GitHub Pages
-       ↓
-Build Applications
- ├─→ Windows (.msi)
- ├─→ macOS (.dmg)
- └─→ Linux (.AppImage, .deb, .rpm)
-       ↓
-Create Release (on tag)
-       ↓
-Notify Team</code></pre>
-			</div>
-		</section>
+    <!-- Pipeline Flow -->
+    <section class="pipeline-flow">
+      <div class="container">
+        <div class="section-header">
+          <h2>Pipeline Flow</h2>
+          <p>Visual representation of our automated CI/CD process</p>
+        </div>
+        
+        <div class="flow-diagram">
+          <div class="flow-step">
+            <div class="step-icon">🔄</div>
+            <div class="step-content">
+              <h3>Trigger</h3>
+              <p>Push to main/dev, PR, or version tag</p>
+            </div>
+          </div>
+          
+          <div class="flow-arrow">↓</div>
+          
+          <div class="flow-step">
+            <div class="step-icon">📝</div>
+            <div class="step-content">
+              <h3>Code Quality</h3>
+              <p>ESLint, Prettier, TypeScript checks</p>
+            </div>
+          </div>
+          
+          <div class="flow-arrow">↓</div>
+          
+          <div class="flow-step">
+            <div class="step-icon">📚</div>
+            <div class="step-content">
+              <h3>Documentation</h3>
+              <p>Build and deploy Astro docs to GitHub Pages</p>
+            </div>
+          </div>
+          
+          <div class="flow-arrow">↓</div>
+          
+          <div class="flow-step parallel">
+            <div class="step-icon">🏗️</div>
+            <div class="step-content">
+              <h3>Multi-Platform Build</h3>
+              <div class="platform-builds">
+                <span class="platform">🪟 Windows</span>
+                <span class="platform">🍎 macOS</span>
+                <span class="platform">🐧 Linux</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="flow-arrow">↓</div>
+          
+          <div class="flow-step">
+            <div class="step-icon">🚀</div>
+            <div class="step-content">
+              <h3>Release</h3>
+              <p>Create GitHub release with all installers</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-		<section class="content-section">
-			<h2>Jobs Description</h2>
-			
-			<h3>1. Build Documentation</h3>
-			<ul>
-				<li>Builds Astro documentation site</li>
-				<li>Deploys to GitHub Pages on main branch or tags</li>
-				<li>Ensures documentation is always up to date</li>
-			</ul>
+    <!-- Detailed Jobs -->
+    <section class="detailed-jobs">
+      <div class="container">
+        <div class="section-header">
+          <h2>Pipeline Jobs</h2>
+          <p>Detailed breakdown of each automated job in our CI/CD pipeline</p>
+        </div>
+        
+        <div class="jobs-grid">
+          <div class="job-card">
+            <div class="job-header">
+              <span class="job-icon">📝</span>
+              <h3>Code Quality Check</h3>
+              <span class="job-status success">Always runs</span>
+            </div>
+            <div class="job-content">
+              <ul class="job-steps">
+                <li>ESLint code analysis</li>
+                <li>Prettier formatting check</li>
+                <li>TypeScript type checking</li>
+                <li>Dependency vulnerability scan</li>
+              </ul>
+              <div class="job-timing">⏱️ ~2-3 minutes</div>
+            </div>
+          </div>
+          
+          <div class="job-card">
+            <div class="job-header">
+              <span class="job-icon">📚</span>
+              <h3>Documentation Build</h3>
+              <span class="job-status success">On main/tags</span>
+            </div>
+            <div class="job-content">
+              <ul class="job-steps">
+                <li>Install pnpm dependencies</li>
+                <li>Build Astro documentation</li>
+                <li>Deploy to GitHub Pages</li>
+                <li>Update documentation URL</li>
+              </ul>
+              <div class="job-timing">⏱️ ~3-4 minutes</div>
+            </div>
+          </div>
+          
+          <div class="job-card">
+            <div class="job-header">
+              <span class="job-icon">🏗️</span>
+              <h3>Application Build</h3>
+              <span class="job-status parallel">Matrix strategy</span>
+            </div>
+            <div class="job-content">
+              <ul class="job-steps">
+                <li>Setup platform dependencies</li>
+                <li>Install Rust and Tauri</li>
+                <li>Build native application</li>
+                <li>Create platform installers</li>
+                <li>Upload build artifacts</li>
+              </ul>
+              <div class="job-timing">⏱️ ~10-15 minutes per platform</div>
+            </div>
+          </div>
+          
+          <div class="job-card">
+            <div class="job-header">
+              <span class="job-icon">🚀</span>
+              <h3>Release Creation</h3>
+              <span class="job-status conditional">On version tags</span>
+            </div>
+            <div class="job-content">
+              <ul class="job-steps">
+                <li>Download all platform artifacts</li>
+                <li>Generate release notes</li>
+                <li>Create GitHub release</li>
+                <li>Upload all installers</li>
+                <li>Notify team channels</li>
+              </ul>
+              <div class="job-timing">⏱️ ~2-3 minutes</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-			<h3>2. Build Application</h3>
-			<ul>
-				<li>Matrix build strategy for all platforms</li>
-				<li>Platform-specific dependencies installation</li>
-				<li>Tauri build process for native binaries</li>
-				<li>Artifact collection and storage</li>
-			</ul>
+    <!-- Configuration Section -->
+    <section class="configuration">
+      <div class="container">
+        <div class="section-header">
+          <h2>Workflow Configuration</h2>
+          <p>GitHub Actions YAML configuration powering our CI/CD pipeline</p>
+        </div>
+        
+        <div class="config-tabs">
+          <div class="tab-buttons">
+            <button class="tab-button active" data-tab="triggers">
+              <span class="tab-icon">🔄</span>
+              Triggers
+            </button>
+            <button class="tab-button" data-tab="jobs">
+              <span class="tab-icon">⚙️</span>
+              Jobs
+            </button>
+            <button class="tab-button" data-tab="matrix">
+              <span class="tab-icon">🔢</span>
+              Matrix
+            </button>
+          </div>
+          
+          <div class="tab-content">
+            <div class="tab-panel active" id="triggers">
+              <h3>Event Triggers</h3>
+              <div class="code-block">
+                <pre><code>name: CI/CD Pipeline
 
-			<h3>3. Create Release</h3>
-			<ul>
-				<li>Triggered by version tags (v*)</li>
-				<li>Collects all platform builds</li>
-				<li>Creates GitHub release with installers</li>
-				<li>Generates release notes</li>
-			</ul>
-		</section>
-
-		<section class="content-section">
-			<h2>Workflow Configuration</h2>
-			<pre><code>name: CI/CD Pipeline
 on:
   push:
     branches: [ main, dev ]
-    tags:
-      - 'v*'
+    tags: [ 'v*' ]
   pull_request:
     branches: [ main, dev ]
-
-jobs:
-  build-docs:
-    name: Build and Deploy Documentation
+  workflow_dispatch:  # Manual trigger</code></pre>
+              </div>
+              <div class="trigger-explanation">
+                <div class="trigger-item">
+                  <strong>Push to main/dev:</strong> Runs full pipeline including deployment
+                </div>
+                <div class="trigger-item">
+                  <strong>Version tags (v*):</strong> Triggers release creation
+                </div>
+                <div class="trigger-item">
+                  <strong>Pull requests:</strong> Runs tests and validation only
+                </div>
+              </div>
+            </div>
+            
+            <div class="tab-panel" id="jobs">
+              <h3>Job Dependencies</h3>
+              <div class="code-block">
+                <pre><code>jobs:
+  lint-and-test:
+    name: Code Quality
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-      - name: Setup Node.js
-      - name: Install Astro dependencies
-      - name: Build Astro documentation
-      - name: Deploy to GitHub Pages
-
+    
+  build-docs:
+    name: Documentation
+    needs: lint-and-test
+    runs-on: ubuntu-latest
+    
   build-app:
-    name: Build Application
-    needs: build-docs
+    name: Application
+    needs: lint-and-test
     strategy:
       matrix:
-        platform: [macos-latest, ubuntu-latest, windows-latest]
-    steps:
-      - name: Build platform-specific app
-      - name: Create installers
-      - name: Upload artifacts
-
+        platform: [ubuntu-latest, macos-latest, windows-latest]
+        
   create-release:
-    name: Create Release
-    needs: [build-app, build-docs]
-    if: startsWith(github.ref, 'refs/tags/v')
-    steps:
-      - name: Create GitHub Release
-      - name: Upload installers</code></pre>
-		</section>
+    name: Release
+    needs: [build-docs, build-app]
+    if: startsWith(github.ref, 'refs/tags/v')</code></pre>
+              </div>
+            </div>
+            
+            <div class="tab-panel" id="matrix">
+              <h3>Platform Matrix</h3>
+              <div class="code-block">
+                <pre><code>strategy:
+  matrix:
+    include:
+      - platform: ubuntu-latest
+        target: x86_64-unknown-linux-gnu
+        installer: .AppImage, .deb
+      - platform: macos-latest
+        target: universal-apple-darwin
+        installer: .dmg
+      - platform: windows-latest
+        target: x86_64-pc-windows-msvc
+        installer: .msi</code></pre>
+              </div>
+              <div class="matrix-benefits">
+                <div class="benefit-item">
+                  ✅ Parallel execution reduces build time
+                </div>
+                <div class="benefit-item">
+                  ✅ Platform-specific optimizations
+                </div>
+                <div class="benefit-item">
+                  ✅ Native installer generation
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-		<section class="content-section">
-			<h2>Triggering Builds</h2>
-			<table>
-				<thead>
-					<tr>
-						<th>Event</th>
-						<th>Trigger</th>
-						<th>Actions</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td>Push to main/dev</td>
-						<td>Automatic</td>
-						<td>Build + Deploy Docs</td>
-					</tr>
-					<tr>
-						<td>Pull Request</td>
-						<td>Automatic</td>
-						<td>Build + Test</td>
-					</tr>
-					<tr>
-						<td>Version Tag</td>
-						<td>Manual</td>
-						<td>Full Release</td>
-					</tr>
-				</tbody>
-			</table>
-		</section>
+    <!-- Build Triggers -->
+    <section class="triggers">
+      <div class="container">
+        <div class="section-header">
+          <h2>Build Triggers & Actions</h2>
+          <p>Understanding when and how builds are triggered automatically</p>
+        </div>
+        
+        <div class="triggers-grid">
+          <div class="trigger-card">
+            <div class="trigger-header">
+              <span class="trigger-icon">🔄</span>
+              <h3>Push to main/dev</h3>
+              <span class="trigger-badge automatic">Automatic</span>
+            </div>
+            <div class="trigger-actions">
+              <div class="action-item">
+                <span class="action-icon">✅</span>
+                <span>Code quality checks</span>
+              </div>
+              <div class="action-item">
+                <span class="action-icon">📚</span>
+                <span>Build & deploy documentation</span>
+              </div>
+              <div class="action-item">
+                <span class="action-icon">🏗️</span>
+                <span>Build applications (all platforms)</span>
+              </div>
+            </div>
+            <div class="trigger-timing">🕰️ Total time: ~15-20 minutes</div>
+          </div>
+          
+          <div class="trigger-card">
+            <div class="trigger-header">
+              <span class="trigger-icon">🔀</span>
+              <h3>Pull Request</h3>
+              <span class="trigger-badge automatic">Automatic</span>
+            </div>
+            <div class="trigger-actions">
+              <div class="action-item">
+                <span class="action-icon">✅</span>
+                <span>Code quality checks</span>
+              </div>
+              <div class="action-item">
+                <span class="action-icon">🧪</span>
+                <span>Run test suite</span>
+              </div>
+              <div class="action-item">
+                <span class="action-icon">🔍</span>
+                <span>Security vulnerability scan</span>
+              </div>
+            </div>
+            <div class="trigger-timing">🕰️ Total time: ~5-8 minutes</div>
+          </div>
+          
+          <div class="trigger-card">
+            <div class="trigger-header">
+              <span class="trigger-icon">🏷️</span>
+              <h3>Version Tag (v*)</h3>
+              <span class="trigger-badge manual">Manual</span>
+            </div>
+            <div class="trigger-actions">
+              <div class="action-item">
+                <span class="action-icon">🚀</span>
+                <span>Create GitHub release</span>
+              </div>
+              <div class="action-item">
+                <span class="action-icon">📦</span>
+                <span>Upload all platform installers</span>
+              </div>
+              <div class="action-item">
+                <span class="action-icon">📝</span>
+                <span>Generate release notes</span>
+              </div>
+            </div>
+            <div class="trigger-timing">🕰️ Total time: ~20-25 minutes</div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-		<section class="content-section">
-			<h2>Creating a Release</h2>
-			<p>To create a new release:</p>
-			<pre><code># Create and push a new version tag
-git tag -a v1.0.0 -m "Release v1.0.0"
-git push origin v1.0.0
+    <!-- Release Process -->
+    <section class="release-process">
+      <div class="container">
+        <div class="section-header">
+          <h2>Creating a Release</h2>
+          <p>Step-by-step guide to creating and publishing a new release</p>
+        </div>
+        
+        <div class="release-steps">
+          <div class="release-step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <h3>Prepare Release</h3>
+              <div class="code-block">
+                <pre><code># Update version in package.json and Cargo.toml
+# Update CHANGELOG.md with new features
+# Commit all changes to main branch</code></pre>
+              </div>
+            </div>
+          </div>
+          
+          <div class="release-step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <h3>Create Version Tag</h3>
+              <div class="code-block">
+                <pre><code># Create annotated tag with release notes
+git tag -a v1.2.0 -m "Release v1.2.0
 
-# The workflow will automatically:
-1. Build documentation
-2. Build all platform versions
-3. Create GitHub release
-4. Upload all artifacts</code></pre>
-		</section>
+✨ New Features:
+- Feature A implementation
+- Feature B enhancement
 
-		<section class="content-section">
-			<h2>Monitoring and Troubleshooting</h2>
-			<ul>
-				<li>Check GitHub Actions tab for build status and logs</li>
-				<li>Review deployment status in repository settings</li>
-				<li>Monitor release page for artifacts</li>
-				<li>Check documentation deployment in GitHub Pages settings</li>
-			</ul>
-		</section>
-	</main>
-</Layout>
+🐛 Bug Fixes:
+- Fixed issue with cache cleaning
+- Improved error handling"
+
+# Push the tag to trigger release
+git push origin v1.2.0</code></pre>
+              </div>
+            </div>
+          </div>
+          
+          <div class="release-step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <h3>Automated Pipeline</h3>
+              <div class="pipeline-actions">
+                <div class="pipeline-action">
+                  <span class="action-icon">⚙️</span>
+                  <span>CI/CD pipeline triggered automatically</span>
+                </div>
+                <div class="pipeline-action">
+                  <span class="action-icon">🏗️</span>
+                  <span>Builds created for all platforms</span>
+                </div>
+                <div class="pipeline-action">
+                  <span class="action-icon">📦</span>
+                  <span>Installers packaged and signed</span>
+                </div>
+                <div class="pipeline-action">
+                  <span class="action-icon">🚀</span>
+                  <span>GitHub release created with artifacts</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="release-artifacts">
+          <h3>Generated Artifacts</h3>
+          <div class="artifacts-list">
+            <div class="artifact-item">
+              <span class="platform-icon">🪟</span>
+              <div class="artifact-info">
+                <strong>Windows</strong>
+                <span>open-cleaner-rn_1.2.0_x64.msi</span>
+              </div>
+            </div>
+            <div class="artifact-item">
+              <span class="platform-icon">🍎</span>
+              <div class="artifact-info">
+                <strong>macOS</strong>
+                <span>open-cleaner-rn_1.2.0_universal.dmg</span>
+              </div>
+            </div>
+            <div class="artifact-item">
+              <span class="platform-icon">🐧</span>
+              <div class="artifact-info">
+                <strong>Linux</strong>
+                <span>open-cleaner-rn_1.2.0_amd64.AppImage, .deb</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Monitoring Section -->
+    <section class="monitoring">
+      <div class="container">
+        <div class="section-header">
+          <h2>Monitoring & Troubleshooting</h2>
+          <p>Tools and techniques for monitoring pipeline health and resolving issues</p>
+        </div>
+        
+        <div class="monitoring-grid">
+          <div class="monitor-card">
+            <div class="monitor-icon">📊</div>
+            <h3>Build Status</h3>
+            <div class="monitor-items">
+              <div class="monitor-item">
+                <span class="status-icon green">✅</span>
+                <span>GitHub Actions tab for real-time status</span>
+              </div>
+              <div class="monitor-item">
+                <span class="status-icon blue">📊</span>
+                <span>Build duration and performance metrics</span>
+              </div>
+              <div class="monitor-item">
+                <span class="status-icon yellow">⚠️</span>
+                <span>Failed job logs and error details</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="monitor-card">
+            <div class="monitor-icon">🚀</div>
+            <h3>Deployments</h3>
+            <div class="monitor-items">
+              <div class="monitor-item">
+                <span class="status-icon green">📚</span>
+                <span>GitHub Pages deployment status</span>
+              </div>
+              <div class="monitor-item">
+                <span class="status-icon blue">📦</span>
+                <span>Release artifacts and downloads</span>
+              </div>
+              <div class="monitor-item">
+                <span class="status-icon purple">🔗</span>
+                <span>CDN cache and global distribution</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="monitor-card">
+            <div class="monitor-icon">🔧</div>
+            <h3>Troubleshooting</h3>
+            <div class="monitor-items">
+              <div class="monitor-item">
+                <span class="status-icon red">🚫</span>
+                <span>Common build failures and solutions</span>
+              </div>
+              <div class="monitor-item">
+                <span class="status-icon orange">🔄</span>
+                <span>Re-run failed jobs and workflows</span>
+              </div>
+              <div class="monitor-item">
+                <span class="status-icon gray">📝</span>
+                <span>Debug logs and environment variables</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="troubleshooting-tips">
+          <h3>Common Issues & Solutions</h3>
+          <div class="tips-list">
+            <details class="tip-item">
+              <summary>Build fails on specific platform</summary>
+              <p>Check platform-specific dependencies and ensure all required tools are installed in the runner environment. Review the matrix configuration for platform-specific settings.</p>
+            </details>
+            <details class="tip-item">
+              <summary>Documentation deployment fails</summary>
+              <p>Verify GitHub Pages is enabled, check for pnpm installation issues, and ensure the build output directory is correct in the deployment step.</p>
+            </details>
+            <details class="tip-item">
+              <summary>Release creation is skipped</summary>
+              <p>Ensure the tag follows the pattern 'v*' (e.g., v1.0.0) and that all prerequisite jobs have completed successfully before the release job triggers.</p>
+            </details>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  
+  <Footer />
+</BaseLayout>
 
 <style>
-	main {
-		margin: auto;
-		padding: 1.5rem;
-		max-width: 900px;
-	}
-	.content-section {
-		margin: 2rem 0;
-		padding: 1.5rem;
-		border-radius: 8px;
-		background-color: #23262d;
-		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-	}
-	h1 {
-		font-size: 3rem;
-		font-weight: 700;
-		line-height: 1;
-		text-align: center;
-		margin-bottom: 1em;
-	}
-	h2 {
-		color: rgb(var(--accent-light));
-		font-size: 1.8rem;
-		margin-bottom: 1rem;
-	}
-	h3 {
-		font-size: 1.4rem;
-		margin: 1rem 0;
-		color: rgb(var(--accent-light));
-	}
-	.workflow-diagram {
-		background-color: #1a1a1a;
-		padding: 1.5rem;
-		border-radius: 8px;
-		margin: 1rem 0;
-	}
-	pre {
-		background-color: #1a1a1a;
-		padding: 1rem;
-		border-radius: 4px;
-		overflow-x: auto;
-		margin: 1rem 0;
-	}
-	code {
-		font-family: monospace;
-		white-space: pre;
-	}
-	ul {
-		margin-left: 1.5rem;
-		margin-bottom: 1rem;
-	}
-	li {
-		margin: 0.5rem 0;
-	}
-	table {
-		width: 100%;
-		border-collapse: collapse;
-		margin: 1rem 0;
-	}
-	th, td {
-		padding: 0.75rem;
-		text-align: left;
-		border: 1px solid rgba(255, 255, 255, 0.1);
-	}
-	th {
-		background-color: #1a1a1a;
-		color: rgb(var(--accent-light));
-	}
-	tr:nth-child(even) {
-		background-color: #1a1a1a;
-	}
-</style> 
+  /* Page Hero */
+  .page-hero {
+    padding: 3rem 0;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border-bottom: 1px solid var(--color-border-light);
+  }
+
+  .hero-content {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .page-hero h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--color-text);
+  }
+
+  .hero-description {
+    font-size: 1.125rem;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+  }
+
+  /* Section Headers */
+  .section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .section-header h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+  }
+
+  .section-header p {
+    color: var(--color-text-muted);
+    font-size: 1.125rem;
+  }
+
+  /* Overview Section */
+  .overview {
+    padding: 4rem 0;
+  }
+
+  .pipeline-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+  }
+
+  .feature-card {
+    padding: 2rem;
+    background: white;
+    border-radius: 1rem;
+    border: 1px solid var(--color-border-light);
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--color-primary);
+  }
+
+  .feature-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .feature-card h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--color-text);
+  }
+
+  .feature-card p {
+    color: var(--color-text-muted);
+    line-height: 1.6;
+  }
+
+  /* Pipeline Flow */
+  .pipeline-flow {
+    padding: 4rem 0;
+    background: var(--color-bg-alt);
+  }
+
+  .flow-diagram {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .flow-step {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 1rem;
+    border: 1px solid var(--color-border-light);
+    width: 100%;
+  }
+
+  .flow-step.parallel {
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.05), rgba(139, 92, 246, 0.05));
+  }
+
+  .step-icon {
+    font-size: 2rem;
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(14, 165, 233, 0.1);
+    border-radius: 50%;
+    border: 2px solid rgba(14, 165, 233, 0.2);
+    flex-shrink: 0;
+  }
+
+  .step-content h3 {
+    margin-bottom: 0.5rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .step-content p {
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  .platform-builds {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .platform {
+    padding: 0.25rem 0.5rem;
+    background: rgba(14, 165, 233, 0.1);
+    color: var(--color-primary);
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  .flow-arrow {
+    font-size: 1.5rem;
+    color: var(--color-primary);
+    font-weight: bold;
+  }
+
+  /* Detailed Jobs */
+  .detailed-jobs {
+    padding: 4rem 0;
+  }
+
+  .jobs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+
+  .job-card {
+    background: white;
+    border-radius: 1rem;
+    border: 1px solid var(--color-border-light);
+    overflow: hidden;
+  }
+
+  .job-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem;
+    background: rgba(14, 165, 233, 0.05);
+    border-bottom: 1px solid var(--color-border-light);
+  }
+
+  .job-header .job-icon {
+    font-size: 1.5rem;
+    margin-right: 0.75rem;
+  }
+
+  .job-header h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0;
+    flex: 1;
+  }
+
+  .job-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  .job-status.success {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--color-success);
+  }
+
+  .job-status.parallel {
+    background: rgba(139, 92, 246, 0.1);
+    color: var(--color-secondary);
+  }
+
+  .job-status.conditional {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--color-warning);
+  }
+
+  .job-content {
+    padding: 1.5rem;
+  }
+
+  .job-steps {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem 0;
+  }
+
+  .job-steps li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+    color: var(--color-text-muted);
+    border-bottom: 1px solid var(--color-border-light);
+  }
+
+  .job-steps li:last-child {
+    border-bottom: none;
+  }
+
+  .job-steps li::before {
+    content: '▶';
+    color: var(--color-primary);
+    font-size: 0.75rem;
+  }
+
+  .job-timing {
+    padding: 0.75rem;
+    background: var(--color-bg-alt);
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    text-align: center;
+  }
+
+  /* Configuration Section */
+  .configuration {
+    padding: 4rem 0;
+    background: var(--color-bg-alt);
+  }
+
+  .config-tabs {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .tab-buttons {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    background: white;
+    padding: 0.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--color-border-light);
+  }
+
+  .tab-button {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: none;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .tab-button.active {
+    background: var(--color-primary);
+    color: white;
+  }
+
+  .tab-button:hover:not(.active) {
+    background: rgba(14, 165, 233, 0.1);
+    color: var(--color-primary);
+  }
+
+  .tab-panel {
+    display: none;
+    padding: 2rem;
+    background: white;
+    border-radius: 1rem;
+    border: 1px solid var(--color-border-light);
+  }
+
+  .tab-panel.active {
+    display: block;
+  }
+
+  .tab-panel h3 {
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .code-block {
+    background: #1a1a1a;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+    overflow: hidden;
+  }
+
+  .code-block pre {
+    margin: 0;
+    padding: 1.5rem;
+    overflow-x: auto;
+    color: #e2e8f0;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .trigger-explanation, .matrix-benefits {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .trigger-item, .benefit-item {
+    padding: 0.75rem;
+    background: var(--color-bg-alt);
+    border-radius: 0.5rem;
+    border-left: 3px solid var(--color-primary);
+  }
+
+  /* Build Triggers */
+  .triggers {
+    padding: 4rem 0;
+  }
+
+  .triggers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+  }
+
+  .trigger-card {
+    background: white;
+    border-radius: 1rem;
+    border: 1px solid var(--color-border-light);
+    overflow: hidden;
+  }
+
+  .trigger-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem;
+    background: rgba(14, 165, 233, 0.05);
+    border-bottom: 1px solid var(--color-border-light);
+  }
+
+  .trigger-icon {
+    font-size: 1.5rem;
+    margin-right: 0.75rem;
+  }
+
+  .trigger-header h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0;
+    flex: 1;
+  }
+
+  .trigger-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  .trigger-badge.automatic {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--color-success);
+  }
+
+  .trigger-badge.manual {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--color-warning);
+  }
+
+  .trigger-actions {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .action-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: var(--color-bg-alt);
+    border-radius: 0.5rem;
+  }
+
+  .action-icon {
+    font-size: 1rem;
+    width: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .trigger-timing {
+    padding: 1rem 1.5rem;
+    background: var(--color-bg-alt);
+    border-top: 1px solid var(--color-border-light);
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    text-align: center;
+  }
+
+  /* Release Process */
+  .release-process {
+    padding: 4rem 0;
+    background: var(--color-bg-alt);
+  }
+
+  .release-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .release-step {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  .step-number {
+    width: 2.5rem;
+    height: 2.5rem;
+    background: var(--color-primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1.125rem;
+    flex-shrink: 0;
+  }
+
+  .step-content h3 {
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .pipeline-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .pipeline-action {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    color: var(--color-text-muted);
+  }
+
+  .release-artifacts {
+    margin-top: 3rem;
+    padding: 2rem;
+    background: white;
+    border-radius: 1rem;
+    border: 1px solid var(--color-border-light);
+  }
+
+  .release-artifacts h3 {
+    margin-bottom: 1.5rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .artifacts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .artifact-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--color-bg-alt);
+    border-radius: 0.5rem;
+    border: 1px solid var(--color-border);
+  }
+
+  .platform-icon {
+    font-size: 1.5rem;
+    width: 2rem;
+    flex-shrink: 0;
+  }
+
+  .artifact-info strong {
+    display: block;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .artifact-info span {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+  }
+
+  /* Monitoring */
+  .monitoring {
+    padding: 4rem 0;
+  }
+
+  .monitoring-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .monitor-card {
+    padding: 2rem;
+    background: white;
+    border-radius: 1rem;
+    border: 1px solid var(--color-border-light);
+    text-align: center;
+  }
+
+  .monitor-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .monitor-card h3 {
+    margin-bottom: 1.5rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .monitor-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    text-align: left;
+  }
+
+  .monitor-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: var(--color-bg-alt);
+    border-radius: 0.5rem;
+  }
+
+  .status-icon {
+    font-size: 1rem;
+    width: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .status-icon.green { color: var(--color-success); }
+  .status-icon.blue { color: var(--color-primary); }
+  .status-icon.yellow { color: var(--color-warning); }
+  .status-icon.red { color: var(--color-danger); }
+  .status-icon.purple { color: var(--color-secondary); }
+  .status-icon.orange { color: #f97316; }
+  .status-icon.gray { color: var(--color-text-muted); }
+
+  .troubleshooting-tips {
+    background: white;
+    border-radius: 1rem;
+    border: 1px solid var(--color-border-light);
+    padding: 2rem;
+  }
+
+  .troubleshooting-tips h3 {
+    margin-bottom: 1.5rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .tips-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .tip-item {
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+
+  .tip-item summary {
+    padding: 1rem;
+    background: var(--color-bg-alt);
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--color-text);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .tip-item summary:hover {
+    background: rgba(14, 165, 233, 0.05);
+  }
+
+  .tip-item p {
+    padding: 1rem;
+    margin: 0;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .page-hero h1 {
+      font-size: 2rem;
+    }
+
+    .pipeline-features,
+    .jobs-grid,
+    .triggers-grid,
+    .monitoring-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .tab-buttons {
+      flex-direction: column;
+    }
+
+    .release-step {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+
+    .step-number {
+      margin: 0 auto;
+    }
+
+    .flow-step {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .platform-builds {
+      justify-content: center;
+    }
+  }
+</style>
+
+<script>
+  // Tab functionality
+  document.addEventListener('DOMContentLoaded', () => {
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabPanels = document.querySelectorAll('.tab-panel');
+    
+    tabButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const targetTab = button.getAttribute('data-tab');
+        
+        // Remove active from all buttons and panels
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        tabPanels.forEach(panel => panel.classList.remove('active'));
+        
+        // Add active to clicked button and corresponding panel
+        button.classList.add('active');
+        document.getElementById(targetTab).classList.add('active');
+      });
+    });
+  });
+</script> 

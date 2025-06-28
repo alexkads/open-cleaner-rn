@@ -1,0 +1,763 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Navigation from '../components/Navigation.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<BaseLayout 
+  title="Getting Started"
+  description="Learn how to install and use Open Cleaner RN to clean your development environment and free up disk space."
+>
+  <Navigation />
+  
+  <main>
+    <!-- Hero Section -->
+    <section class="page-hero">
+      <div class="container">
+        <div class="hero-content">
+          <h1>Getting Started with Open Cleaner RN</h1>
+          <p class="hero-description">
+            Learn how to install and use Open Cleaner RN to optimize your development environment 
+            and reclaim valuable disk space in just a few minutes.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Start Section -->
+    <section class="quick-start">
+      <div class="container">
+        <div class="section-header">
+          <h2>Quick Start Guide</h2>
+          <p>Get up and running in under 5 minutes</p>
+        </div>
+        
+        <div class="steps-grid">
+          <div class="step-card">
+            <div class="step-number">1</div>
+            <h3>Download & Install</h3>
+            <p>Download the latest release for your platform and run the installer.</p>
+            <div class="step-actions">
+              <a href="https://github.com/alexkads/open-cleaner-rn/releases" class="btn btn-primary" target="_blank">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                  <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                </svg>
+                Download Now
+              </a>
+            </div>
+          </div>
+          
+          <div class="step-card">
+            <div class="step-number">2</div>
+            <h3>Launch & Scan</h3>
+            <p>Open the app and click "Start Scan" to analyze your development environment.</p>
+            <div class="code-block">
+              <code>💡 First scan may take a few minutes</code>
+            </div>
+          </div>
+          
+          <div class="step-card">
+            <div class="step-number">3</div>
+            <h3>Review & Clean</h3>
+            <p>Review the scan results and select what you want to clean, then click "Clean Selected".</p>
+            <div class="warning-box">
+              <span class="warning-icon">⚠️</span>
+              <span>Always review items before cleaning</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Installation Section -->
+    <section class="installation">
+      <div class="container">
+        <div class="section-header">
+          <h2>Installation Guide</h2>
+          <p>Detailed installation instructions for each platform</p>
+        </div>
+        
+        <div class="platform-tabs">
+          <div class="tab-buttons">
+            <button class="tab-button active" data-tab="windows">
+              <span class="tab-icon">🪟</span>
+              Windows
+            </button>
+            <button class="tab-button" data-tab="macos">
+              <span class="tab-icon">🍎</span>
+              macOS
+            </button>
+            <button class="tab-button" data-tab="linux">
+              <span class="tab-icon">🐧</span>
+              Linux
+            </button>
+          </div>
+          
+          <div class="tab-content">
+            <div class="tab-panel active" id="windows">
+              <h3>Windows Installation</h3>
+              <div class="install-steps">
+                <div class="install-step">
+                  <h4>1. Download the MSI Installer</h4>
+                  <p>Download the latest <code>.msi</code> file from the releases page.</p>
+                </div>
+                <div class="install-step">
+                  <h4>2. Run the Installer</h4>
+                  <p>Double-click the downloaded file and follow the installation wizard.</p>
+                </div>
+                <div class="install-step">
+                  <h4>3. System Requirements</h4>
+                  <ul>
+                    <li>Windows 10 version 1903 or newer</li>
+                    <li>64-bit architecture</li>
+                    <li>At least 100MB free disk space</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            
+            <div class="tab-panel" id="macos">
+              <h3>macOS Installation</h3>
+              <div class="install-steps">
+                <div class="install-step">
+                  <h4>1. Download the DMG File</h4>
+                  <p>Download the latest <code>.dmg</code> file from the releases page.</p>
+                </div>
+                <div class="install-step">
+                  <h4>2. Install the Application</h4>
+                  <p>Open the DMG file and drag the app to your Applications folder.</p>
+                </div>
+                <div class="install-step">
+                  <h4>3. Security Notice</h4>
+                  <p>The app is notarized by Apple. If you see a security warning, go to System Preferences > Security & Privacy and click "Open Anyway".</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="tab-panel" id="linux">
+              <h3>Linux Installation</h3>
+              <div class="install-steps">
+                <div class="install-step">
+                  <h4>1. Choose Your Package Format</h4>
+                  <div class="package-options">
+                    <div class="package-option">
+                      <strong>AppImage (Universal)</strong>
+                      <code>chmod +x open-cleaner-rn.AppImage && ./open-cleaner-rn.AppImage</code>
+                    </div>
+                    <div class="package-option">
+                      <strong>DEB (Ubuntu/Debian)</strong>
+                      <code>sudo dpkg -i open-cleaner-rn.deb</code>
+                    </div>
+                    <div class="package-option">
+                      <strong>RPM (Fedora/RHEL)</strong>
+                      <code>sudo rpm -i open-cleaner-rn.rpm</code>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- First Usage Section -->
+    <section class="first-usage">
+      <div class="container">
+        <div class="section-header">
+          <h2>Your First Cleanup</h2>
+          <p>Follow these steps for your first successful cleanup session</p>
+        </div>
+        
+        <div class="usage-flow">
+          <div class="flow-step">
+            <div class="flow-icon">🔍</div>
+            <h3>1. Initial Scan</h3>
+            <p>Click "Start Scan" to analyze your system. The app will automatically detect development tools and their cache locations.</p>
+            <div class="tip-box">
+              <strong>💡 Tip:</strong> The first scan might take longer as the app builds an index of your system.
+            </div>
+          </div>
+          
+          <div class="flow-step">
+            <div class="flow-icon">📊</div>
+            <h3>2. Review Results</h3>
+            <p>Examine the scan results. Each category shows the amount of space that can be freed and the number of files found.</p>
+            <div class="categories-preview">
+              <div class="category-item">
+                <span class="category-icon">📱</span>
+                <span class="category-name">React Native Cache</span>
+                <span class="category-size">2.1 GB</span>
+              </div>
+              <div class="category-item">
+                <span class="category-icon">🔨</span>
+                <span class="category-name">Xcode DerivedData</span>
+                <span class="category-size">8.7 GB</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="flow-step">
+            <div class="flow-icon">✅</div>
+            <h3>3. Select & Clean</h3>
+            <p>Check the categories you want to clean. Start with cache files - they're safe to remove and will be regenerated as needed.</p>
+            <div class="safety-note">
+              <span class="safety-icon">🛡️</span>
+              <span>Open Cleaner RN only removes cache and temporary files - your projects and important data are always safe.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq">
+      <div class="container">
+        <div class="section-header">
+          <h2>Frequently Asked Questions</h2>
+          <p>Common questions about using Open Cleaner RN</p>
+        </div>
+        
+        <div class="faq-list">
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              <span>Is it safe to clean all the detected files?</span>
+              <span class="faq-arrow">▼</span>
+            </button>
+            <div class="faq-answer">
+              <p>Yes! Open Cleaner RN only targets cache files, temporary data, and build artifacts. It never touches your source code, projects, or important system files. All cleaned files can be regenerated by your development tools when needed.</p>
+            </div>
+          </div>
+          
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              <span>How often should I run Open Cleaner RN?</span>
+              <span class="faq-arrow">▼</span>
+            </button>
+            <div class="faq-answer">
+              <p>We recommend running a cleanup weekly or when you notice low disk space. Some developers run it daily as part of their routine. The app is designed to be fast enough for frequent use.</p>
+            </div>
+          </div>
+          
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              <span>Will cleaning affect my development workflow?</span>
+              <span class="faq-arrow">▼</span>
+            </button>
+            <div class="faq-answer">
+              <p>Cleaning cache files may cause the first build after cleanup to take slightly longer as caches are rebuilt. However, you'll gain significant disk space and potentially improved performance from a cleaner system.</p>
+            </div>
+          </div>
+          
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              <span>What if I accidentally clean something important?</span>
+              <span class="faq-arrow">▼</span>
+            </button>
+            <div class="faq-answer">
+              <p>Open Cleaner RN maintains a history of all cleanup operations. While we only clean safe-to-remove files, you can see exactly what was cleaned in the History tab. Most cleaned files will be automatically regenerated by your tools.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Next Steps Section -->
+    <section class="next-steps">
+      <div class="container">
+        <div class="section-header">
+          <h2>Next Steps</h2>
+          <p>Now that you're set up, explore more features</p>
+        </div>
+        
+        <div class="next-steps-grid">
+          <a href="/features" class="next-step-card">
+            <div class="step-icon">✨</div>
+            <h3>Explore Features</h3>
+            <p>Learn about advanced scanning options, scheduling, and analytics.</p>
+          </a>
+          
+          <a href="/platforms" class="next-step-card">
+            <div class="step-icon">🌍</div>
+            <h3>Platform Specifics</h3>
+            <p>Discover platform-specific features and optimization tips.</p>
+          </a>
+          
+          <a href="/contributing" class="next-step-card">
+            <div class="step-icon">🤝</div>
+            <h3>Contribute</h3>
+            <p>Help improve Open Cleaner RN by contributing to the project.</p>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+  
+  <Footer />
+</BaseLayout>
+
+<style>
+  /* Page Hero */
+  .page-hero {
+    padding: 3rem 0;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border-bottom: 1px solid var(--color-border-light);
+  }
+
+  .hero-content {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .page-hero h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--color-text);
+  }
+
+  .hero-description {
+    font-size: 1.125rem;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+  }
+
+  /* Quick Start */
+  .quick-start {
+    padding: 4rem 0;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .section-header h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+  }
+
+  .section-header p {
+    color: var(--color-text-muted);
+    font-size: 1.125rem;
+  }
+
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+
+  .step-card {
+    padding: 2rem;
+    background: white;
+    border: 1px solid var(--color-border-light);
+    border-radius: 1rem;
+    text-align: center;
+    position: relative;
+  }
+
+  .step-number {
+    position: absolute;
+    top: -1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2rem;
+    height: 2rem;
+    background: var(--color-primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+
+  .step-card h3 {
+    margin: 1rem 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .step-card p {
+    color: var(--color-text-muted);
+    margin-bottom: 1.5rem;
+  }
+
+  .code-block {
+    background: var(--color-bg-alt);
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+  }
+
+  .warning-box {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--color-warning);
+  }
+
+  /* Installation */
+  .installation {
+    padding: 4rem 0;
+    background: var(--color-bg-alt);
+  }
+
+  .platform-tabs {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .tab-buttons {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    background: white;
+    padding: 0.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--color-border-light);
+  }
+
+  .tab-button {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: none;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .tab-button.active {
+    background: var(--color-primary);
+    color: white;
+  }
+
+  .tab-button:hover:not(.active) {
+    background: rgba(14, 165, 233, 0.1);
+    color: var(--color-primary);
+  }
+
+  .tab-panel {
+    display: none;
+    padding: 2rem;
+    background: white;
+    border-radius: 1rem;
+    border: 1px solid var(--color-border-light);
+  }
+
+  .tab-panel.active {
+    display: block;
+  }
+
+  .install-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .install-step h4 {
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
+  .package-options {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .package-option {
+    padding: 1rem;
+    background: var(--color-bg-alt);
+    border-radius: 0.5rem;
+    border: 1px solid var(--color-border);
+  }
+
+  .package-option code {
+    display: block;
+    margin-top: 0.5rem;
+    font-family: var(--font-mono);
+    background: white;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+  }
+
+  /* First Usage */
+  .first-usage {
+    padding: 4rem 0;
+  }
+
+  .usage-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .flow-step {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  .flow-icon {
+    font-size: 2rem;
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(14, 165, 233, 0.1);
+    border-radius: 50%;
+    border: 2px solid rgba(14, 165, 233, 0.2);
+  }
+
+  .flow-step h3 {
+    margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .tip-box, .safety-note {
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 0.5rem;
+  }
+
+  .tip-box {
+    background: rgba(14, 165, 233, 0.1);
+    border: 1px solid rgba(14, 165, 233, 0.2);
+  }
+
+  .safety-note {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .categories-preview {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .category-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: var(--color-bg-alt);
+    border-radius: 0.5rem;
+    border: 1px solid var(--color-border);
+  }
+
+  .category-name {
+    flex: 1;
+    font-weight: 500;
+  }
+
+  .category-size {
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+
+  /* FAQ */
+  .faq {
+    padding: 4rem 0;
+    background: var(--color-bg-alt);
+  }
+
+  .faq-list {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .faq-item {
+    margin-bottom: 1rem;
+    background: white;
+    border-radius: 0.75rem;
+    border: 1px solid var(--color-border-light);
+    overflow: hidden;
+  }
+
+  .faq-question {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem;
+    background: none;
+    border: none;
+    text-align: left;
+    font-weight: 500;
+    color: var(--color-text);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .faq-question:hover {
+    background: var(--color-bg-alt);
+  }
+
+  .faq-arrow {
+    transition: transform 0.2s ease;
+  }
+
+  .faq-question[aria-expanded="true"] .faq-arrow {
+    transform: rotate(180deg);
+  }
+
+  .faq-answer {
+    padding: 0 1.5rem 1.5rem;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+  }
+
+  .faq-item:not(.active) .faq-answer {
+    display: none;
+  }
+
+  /* Next Steps */
+  .next-steps {
+    padding: 4rem 0;
+  }
+
+  .next-steps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+  }
+
+  .next-step-card {
+    display: block;
+    padding: 2rem;
+    background: white;
+    border: 1px solid var(--color-border-light);
+    border-radius: 1rem;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .next-step-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--color-primary);
+  }
+
+  .step-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .next-step-card h3 {
+    margin-bottom: 0.5rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .next-step-card p {
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .page-hero h1 {
+      font-size: 2rem;
+    }
+
+    .steps-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .tab-buttons {
+      flex-direction: column;
+    }
+
+    .flow-step {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+
+    .flow-icon {
+      margin: 0 auto;
+    }
+  }
+</style>
+
+<script>
+  // Tab functionality
+  document.addEventListener('DOMContentLoaded', () => {
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabPanels = document.querySelectorAll('.tab-panel');
+    
+    tabButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const targetTab = button.getAttribute('data-tab');
+        
+        // Remove active from all buttons and panels
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        tabPanels.forEach(panel => panel.classList.remove('active'));
+        
+        // Add active to clicked button and corresponding panel
+        button.classList.add('active');
+        document.getElementById(targetTab).classList.add('active');
+      });
+    });
+    
+    // FAQ functionality
+    const faqQuestions = document.querySelectorAll('.faq-question');
+    
+    faqQuestions.forEach(question => {
+      question.addEventListener('click', () => {
+        const faqItem = question.closest('.faq-item');
+        const isExpanded = question.getAttribute('aria-expanded') === 'true';
+        
+        // Close all other FAQ items
+        faqQuestions.forEach(q => {
+          q.setAttribute('aria-expanded', 'false');
+          q.closest('.faq-item').classList.remove('active');
+        });
+        
+        // Toggle current item
+        if (!isExpanded) {
+          question.setAttribute('aria-expanded', 'true');
+          faqItem.classList.add('active');
+        }
+      });
+    });
+  });
+</script>

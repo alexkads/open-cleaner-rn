@@ -1,0 +1,1036 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Navigation from '../components/Navigation.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<BaseLayout 
+  title="Features"
+  description="Discover all the powerful features of Open Cleaner RN - from smart detection to detailed analytics and cross-platform compatibility."
+>
+  <Navigation />
+  
+  <main>
+    <!-- Hero Section -->
+    <section class="page-hero">
+      <div class="container">
+        <div class="hero-content">
+          <h1>Powerful Features for Developers</h1>
+          <p class="hero-description">
+            Open Cleaner RN is packed with intelligent features designed to keep your 
+            development environment clean, fast, and organized.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Core Features -->
+    <section class="core-features">
+      <div class="container">
+        <div class="section-header">
+          <h2>Core Features</h2>
+          <p>Everything you need for effective development environment management</p>
+        </div>
+        
+        <div class="features-showcase">
+          <div class="feature-highlight">
+            <div class="feature-visual">
+              <div class="scan-animation">
+                <div class="scan-circle"></div>
+                <div class="scan-pulse"></div>
+                <div class="scan-progress">
+                  <div class="progress-bar" style="width: 75%"></div>
+                </div>
+              </div>
+            </div>
+            <div class="feature-content">
+              <h3>🔍 Smart Detection Engine</h3>
+              <p>
+                Our intelligent scanning engine automatically detects development tools 
+                and their cache locations across your system. No manual configuration needed.
+              </p>
+              <ul class="feature-benefits">
+                <li>Automatic tool discovery</li>
+                <li>Multi-threaded scanning for speed</li>
+                <li>Deep directory analysis</li>
+                <li>Safe file identification</li>
+              </ul>
+            </div>
+          </div>
+          
+          <div class="feature-highlight reverse">
+            <div class="feature-visual">
+              <div class="analytics-chart">
+                <div class="chart-bars">
+                  <div class="bar" style="height: 80%"></div>
+                  <div class="bar" style="height: 60%"></div>
+                  <div class="bar" style="height: 90%"></div>
+                  <div class="bar" style="height: 45%"></div>
+                  <div class="bar" style="height: 70%"></div>
+                </div>
+                <div class="chart-legend">
+                  <span>Space Cleaned Over Time</span>
+                </div>
+              </div>
+            </div>
+            <div class="feature-content">
+              <h3>📊 Detailed Analytics</h3>
+              <p>
+                Track your cleaning history, monitor space savings, and get insights 
+                into your development workflow patterns.
+              </p>
+              <ul class="feature-benefits">
+                <li>Cleanup history tracking</li>
+                <li>Space savings analytics</li>
+                <li>Performance impact metrics</li>
+                <li>Usage pattern insights</li>
+              </ul>
+            </div>
+          </div>
+          
+          <div class="feature-highlight">
+            <div class="feature-visual">
+              <div class="safety-shield">
+                <div class="shield-icon">🛡️</div>
+                <div class="shield-checkmarks">
+                  <div class="checkmark">✓</div>
+                  <div class="checkmark">✓</div>
+                  <div class="checkmark">✓</div>
+                </div>
+              </div>
+            </div>
+            <div class="feature-content">
+              <h3>🛡️ Safety First Approach</h3>
+              <p>
+                We only clean cache files, temporary data, and build artifacts. 
+                Your source code and important files are never touched.
+              </p>
+              <ul class="feature-benefits">
+                <li>Whitelist-based cleaning</li>
+                <li>Source code protection</li>
+                <li>Backup recommendations</li>
+                <li>Rollback capabilities</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tool Support -->
+    <section class="tool-support">
+      <div class="container">
+        <div class="section-header">
+          <h2>Comprehensive Tool Support</h2>
+          <p>Works with all your favorite development tools and frameworks</p>
+        </div>
+        
+        <div class="tools-categories">
+          <div class="category-card">
+            <div class="category-header">
+              <span class="category-icon">📱</span>
+              <h3>Mobile Development</h3>
+            </div>
+            <div class="tools-list">
+              <div class="tool-item">
+                <div class="tool-info">
+                  <strong>React Native Metro</strong>
+                  <span>Cache & temporary files</span>
+                </div>
+                <div class="tool-savings">~2-5 GB</div>
+              </div>
+              <div class="tool-item">
+                <div class="tool-info">
+                  <strong>Expo CLI</strong>
+                  <span>Build artifacts & cache</span>
+                </div>
+                <div class="tool-savings">~1-3 GB</div>
+              </div>
+              <div class="tool-item">
+                <div class="tool-info">
+                  <strong>React Native CLI</strong>
+                  <span>Global cache files</span>
+                </div>
+                <div class="tool-savings">~500 MB</div>
+              </div>
+              <div class="tool-item">
+                <div class="tool-info">
+                  <strong>Hermes Engine</strong>
+                  <span>Compiled bytecode cache</span>
+                </div>
+                <div class="tool-savings">~200 MB</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="category-card">
+            <div class="category-header">
+              <span class="category-icon">🛠️</span>
+              <h3>Development IDEs</h3>
+            </div>
+            <div class="tools-list">
+              <div class="tool-item">
+                <div class="tool-info">
+                  <strong>Xcode DerivedData</strong>
+                  <span>Build cache & indexes</span>
+                </div>
+                <div class="tool-savings">~5-15 GB</div>
+              </div>
+              <div class="tool-item">
+                <div class="tool-info">
+                  <strong>Android Studio</strong>
+                  <span>System cache & logs</span>
+                </div>
+                <div class="tool-savings">~2-8 GB</div>
+              </div>
+              <div class="tool-item">
+                <div class="tool-info">
+                  <strong>VS Code</strong>
+                  <span>Extensions & logs</span>
+                </div>
+                <div class="tool-savings">~100-500 MB</div>
+              </div>
+              <div class="tool-item">
+                <div class="tool-info">
+                  <strong>IntelliJ IDEA</strong>
+                  <span>Cache & temp files</span>
+                </div>
+                <div class="tool-savings">~1-3 GB</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="category-card">
+            <div class="category-header">
+              <span class="category-icon">📦</span>
+              <h3>Package Managers</h3>
+            </div>
+            <div class="tools-list">
+              <div class="tool-item">
+                <div class="tool-info">
+                  <strong>npm Cache</strong>
+                  <span>Downloaded packages</span>
+                </div>
+                <div class="tool-savings">~1-5 GB</div>
+              </div>
+              <div class="tool-item">
+                <div class="tool-info">
+                  <strong>Yarn Cache</strong>
+                  <span>Global cache store</span>
+                </div>
+                <div class="tool-savings">~2-8 GB</div>
+              </div>
+              <div class="tool-item">
+                <div class="tool-info">
+                  <strong>pnpm Store</strong>
+                  <span>Content-addressable store</span>
+                </div>
+                <div class="tool-savings">~1-4 GB</div>
+              </div>
+              <div class="tool-item">
+                <div class="tool-info">
+                  <strong>CocoaPods</strong>
+                  <span>Specs repo & cache</span>
+                </div>
+                <div class="tool-savings">~500 MB-2 GB</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="category-card">
+            <div class="category-header">
+              <span class="category-icon">🐳</span>
+              <h3>Build Tools & More</h3>
+            </div>
+            <div class="tools-list">
+              <div class="tool-item">
+                <div class="tool-info">
+                  <strong>Docker</strong>
+                  <span>Images & containers</span>
+                </div>
+                <div class="tool-savings">~5-20 GB</div>
+              </div>
+              <div class="tool-item">
+                <div class="tool-info">
+                  <strong>Gradle</strong>
+                  <span>Build cache & daemons</span>
+                </div>
+                <div class="tool-savings">~1-5 GB</div>
+              </div>
+              <div class="tool-item">
+                <div class="tool-info">
+                  <strong>Browser Cache</strong>
+                  <span>Development browsing data</span>
+                </div>
+                <div class="tool-savings">~500 MB-2 GB</div>
+              </div>
+              <div class="tool-item">
+                <div class="tool-info">
+                  <strong>System Temp</strong>
+                  <span>OS temporary files</span>
+                </div>
+                <div class="tool-savings">~1-3 GB</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Advanced Features -->
+    <section class="advanced-features">
+      <div class="container">
+        <div class="section-header">
+          <h2>Advanced Features</h2>
+          <p>Professional tools for power users and teams</p>
+        </div>
+        
+        <div class="advanced-grid">
+          <div class="advanced-card">
+            <div class="advanced-icon">⚡</div>
+            <h3>Lightning Fast Performance</h3>
+            <p>Built with Rust for maximum performance. Scan gigabytes of files in seconds with multi-threaded processing.</p>
+            <div class="performance-stats">
+              <div class="stat">
+                <span class="stat-number">10x</span>
+                <span class="stat-label">Faster than alternatives</span>
+              </div>
+              <div class="stat">
+                <span class="stat-number">Multi-core</span>
+                <span class="stat-label">CPU utilization</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="advanced-card">
+            <div class="advanced-icon">🔄</div>
+            <h3>Automatic Scheduling</h3>
+            <p>Set up automatic cleanups to run daily, weekly, or monthly. Keep your system optimized without manual intervention.</p>
+            <div class="schedule-options">
+              <span class="schedule-tag">Daily</span>
+              <span class="schedule-tag">Weekly</span>
+              <span class="schedule-tag">Monthly</span>
+              <span class="schedule-tag">Custom</span>
+            </div>
+          </div>
+          
+          <div class="advanced-card">
+            <div class="advanced-icon">📈</div>
+            <h3>Performance Monitoring</h3>
+            <p>Track how cleanups affect your system performance. Monitor build times, disk I/O, and development workflow efficiency.</p>
+            <div class="monitor-metrics">
+              <div class="metric">Build Speed</div>
+              <div class="metric">Disk I/O</div>
+              <div class="metric">Memory Usage</div>
+            </div>
+          </div>
+          
+          <div class="advanced-card">
+            <div class="advanced-icon">🔧</div>
+            <h3>Custom Rules</h3>
+            <p>Create custom cleaning rules for your specific workflow. Add custom paths, exclude patterns, and set size thresholds.</p>
+            <div class="rule-examples">
+              <code>~/custom-cache/**</code>
+              <code>*.tmp, *.log</code>
+              <code>size > 100MB</code>
+            </div>
+          </div>
+          
+          <div class="advanced-card">
+            <div class="advanced-icon">🌐</div>
+            <h3>Team Integration</h3>
+            <p>Export and share cleaning configurations with your team. Ensure consistent development environments across projects.</p>
+            <div class="integration-features">
+              <span class="feature-badge">Config Export</span>
+              <span class="feature-badge">Team Sync</span>
+              <span class="feature-badge">CI/CD Integration</span>
+            </div>
+          </div>
+          
+          <div class="advanced-card">
+            <div class="advanced-icon">📊</div>
+            <h3>Detailed Reporting</h3>
+            <p>Generate comprehensive reports for individuals or teams. Track space savings, performance improvements, and usage patterns.</p>
+            <div class="report-types">
+              <div class="report-type">PDF Reports</div>
+              <div class="report-type">CSV Export</div>
+              <div class="report-type">JSON API</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Platform Specific -->
+    <section class="platform-specific">
+      <div class="container">
+        <div class="section-header">
+          <h2>Platform-Specific Features</h2>
+          <p>Optimized experiences for every operating system</p>
+        </div>
+        
+        <div class="platform-features">
+          <div class="platform-card">
+            <div class="platform-header">
+              <span class="platform-icon">🪟</span>
+              <h3>Windows</h3>
+            </div>
+            <ul class="platform-list">
+              <li>Registry cleaning for development tools</li>
+              <li>Windows Defender exclusion management</li>
+              <li>PowerShell integration</li>
+              <li>Start menu integration</li>
+              <li>System tray notifications</li>
+            </ul>
+          </div>
+          
+          <div class="platform-card">
+            <div class="platform-header">
+              <span class="platform-icon">🍎</span>
+              <h3>macOS</h3>
+            </div>
+            <ul class="platform-list">
+              <li>Spotlight integration</li>
+              <li>Menu bar quick access</li>
+              <li>Keychain integration</li>
+              <li>Apple Silicon optimization</li>
+              <li>macOS notification center</li>
+            </ul>
+          </div>
+          
+          <div class="platform-card">
+            <div class="platform-header">
+              <span class="platform-icon">🐧</span>
+              <h3>Linux</h3>
+            </div>
+            <ul class="platform-list">
+              <li>Desktop environment integration</li>
+              <li>Package manager awareness</li>
+              <li>Systemd service support</li>
+              <li>Shell completion scripts</li>
+              <li>Multiple package formats</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Coming Soon -->
+    <section class="coming-soon">
+      <div class="container">
+        <div class="section-header">
+          <h2>Coming Soon</h2>
+          <p>Exciting features we're working on for future releases</p>
+        </div>
+        
+        <div class="roadmap-items">
+          <div class="roadmap-item">
+            <div class="roadmap-icon">🤖</div>
+            <h3>AI-Powered Suggestions</h3>
+            <p>Machine learning algorithms to predict optimal cleaning schedules and suggest performance improvements.</p>
+            <div class="roadmap-tag">Q2 2025</div>
+          </div>
+          
+          <div class="roadmap-item">
+            <div class="roadmap-icon">☁️</div>
+            <h3>Cloud Sync</h3>
+            <p>Sync your settings and cleanup history across multiple devices. Perfect for developers with multiple workstations.</p>
+            <div class="roadmap-tag">Q3 2025</div>
+          </div>
+          
+          <div class="roadmap-item">
+            <div class="roadmap-icon">🔌</div>
+            <h3>Plugin System</h3>
+            <p>Extensible plugin architecture allowing custom integrations with your favorite tools and workflows.</p>
+            <div class="roadmap-tag">Q4 2025</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  
+  <Footer />
+</BaseLayout>
+
+<style>
+  /* Page Hero */
+  .page-hero {
+    padding: 3rem 0;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border-bottom: 1px solid var(--color-border-light);
+  }
+
+  .hero-content {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .page-hero h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--color-text);
+  }
+
+  .hero-description {
+    font-size: 1.125rem;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+  }
+
+  /* Core Features */
+  .core-features {
+    padding: 4rem 0;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+
+  .section-header h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+  }
+
+  .section-header p {
+    color: var(--color-text-muted);
+    font-size: 1.125rem;
+  }
+
+  .features-showcase {
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+  }
+
+  .feature-highlight {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+  }
+
+  .feature-highlight.reverse {
+    direction: rtl;
+  }
+
+  .feature-highlight.reverse > * {
+    direction: ltr;
+  }
+
+  .feature-visual {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+  }
+
+  /* Animations */
+  .scan-animation {
+    position: relative;
+    width: 150px;
+    height: 150px;
+  }
+
+  .scan-circle {
+    width: 100%;
+    height: 100%;
+    border: 3px solid var(--color-border);
+    border-radius: 50%;
+    border-top-color: var(--color-primary);
+    animation: spin 2s linear infinite;
+  }
+
+  .scan-pulse {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    background: var(--color-primary);
+    border-radius: 50%;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  .scan-progress {
+    position: absolute;
+    bottom: -30px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--color-border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: var(--color-primary);
+    border-radius: 2px;
+    animation: progress 3s ease-in-out infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.7; }
+  }
+
+  @keyframes progress {
+    0% { width: 0%; }
+    50% { width: 75%; }
+    100% { width: 100%; }
+  }
+
+  .analytics-chart {
+    text-align: center;
+  }
+
+  .chart-bars {
+    display: flex;
+    align-items: end;
+    gap: 0.5rem;
+    height: 120px;
+    margin-bottom: 1rem;
+  }
+
+  .bar {
+    width: 20px;
+    background: linear-gradient(to top, var(--color-primary), var(--color-secondary));
+    border-radius: 2px 2px 0 0;
+    animation: grow 2s ease-out infinite;
+  }
+
+  .bar:nth-child(2) { animation-delay: 0.2s; }
+  .bar:nth-child(3) { animation-delay: 0.4s; }
+  .bar:nth-child(4) { animation-delay: 0.6s; }
+  .bar:nth-child(5) { animation-delay: 0.8s; }
+
+  @keyframes grow {
+    0% { height: 0; }
+    100% { height: var(--height, 50%); }
+  }
+
+  .chart-legend {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+  }
+
+  .safety-shield {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .shield-icon {
+    font-size: 4rem;
+    color: var(--color-success);
+  }
+
+  .shield-checkmarks {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .checkmark {
+    width: 24px;
+    height: 24px;
+    background: var(--color-success);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: bold;
+    animation: checkAppear 0.5s ease-out forwards;
+    opacity: 0;
+  }
+
+  .checkmark:nth-child(1) { animation-delay: 0.2s; }
+  .checkmark:nth-child(2) { animation-delay: 0.4s; }
+  .checkmark:nth-child(3) { animation-delay: 0.6s; }
+
+  @keyframes checkAppear {
+    to { opacity: 1; transform: scale(1.1) scale(1); }
+  }
+
+  .feature-content h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--color-text);
+  }
+
+  .feature-content p {
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+  }
+
+  .feature-benefits {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .feature-benefits li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+    color: var(--color-text-muted);
+  }
+
+  .feature-benefits li::before {
+    content: '✓';
+    color: var(--color-success);
+    font-weight: bold;
+  }
+
+  /* Tool Support */
+  .tool-support {
+    padding: 4rem 0;
+    background: var(--color-bg-alt);
+  }
+
+  .tools-categories {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+
+  .category-card {
+    background: white;
+    border-radius: 1rem;
+    border: 1px solid var(--color-border-light);
+    overflow: hidden;
+  }
+
+  .category-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    background: rgba(14, 165, 233, 0.05);
+    border-bottom: 1px solid var(--color-border-light);
+  }
+
+  .category-icon {
+    font-size: 1.5rem;
+  }
+
+  .category-header h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .tools-list {
+    padding: 1.5rem;
+  }
+
+  .tool-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--color-border-light);
+  }
+
+  .tool-item:last-child {
+    border-bottom: none;
+  }
+
+  .tool-info strong {
+    display: block;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .tool-info span {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+  }
+
+  .tool-savings {
+    font-weight: 600;
+    color: var(--color-primary);
+    font-size: 0.875rem;
+  }
+
+  /* Advanced Features */
+  .advanced-features {
+    padding: 4rem 0;
+  }
+
+  .advanced-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+
+  .advanced-card {
+    padding: 2rem;
+    background: white;
+    border-radius: 1rem;
+    border: 1px solid var(--color-border-light);
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .advanced-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--color-primary);
+  }
+
+  .advanced-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .advanced-card h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--color-text);
+  }
+
+  .advanced-card p {
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+  }
+
+  .performance-stats {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-number {
+    display: block;
+    font-weight: 700;
+    color: var(--color-primary);
+    font-size: 1.125rem;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+
+  .schedule-options {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .schedule-tag {
+    padding: 0.25rem 0.75rem;
+    background: rgba(14, 165, 233, 0.1);
+    color: var(--color-primary);
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  .monitor-metrics, .rule-examples, .report-types {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .metric, .report-type {
+    padding: 0.25rem 0.75rem;
+    background: var(--color-bg-alt);
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+  }
+
+  .rule-examples code {
+    background: var(--color-bg-alt);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+
+  .integration-features {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .feature-badge {
+    padding: 0.25rem 0.5rem;
+    background: rgba(139, 92, 246, 0.1);
+    color: var(--color-secondary);
+    border-radius: 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  /* Platform Specific */
+  .platform-specific {
+    padding: 4rem 0;
+    background: var(--color-bg-alt);
+  }
+
+  .platform-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+
+  .platform-card {
+    background: white;
+    border-radius: 1rem;
+    border: 1px solid var(--color-border-light);
+    overflow: hidden;
+  }
+
+  .platform-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    background: rgba(14, 165, 233, 0.05);
+  }
+
+  .platform-icon {
+    font-size: 1.5rem;
+  }
+
+  .platform-header h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .platform-list {
+    list-style: none;
+    padding: 1.5rem;
+    margin: 0;
+  }
+
+  .platform-list li {
+    padding: 0.5rem 0;
+    color: var(--color-text-muted);
+    border-bottom: 1px solid var(--color-border-light);
+    position: relative;
+    padding-left: 1.5rem;
+  }
+
+  .platform-list li:last-child {
+    border-bottom: none;
+  }
+
+  .platform-list li::before {
+    content: '•';
+    color: var(--color-primary);
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+  }
+
+  /* Coming Soon */
+  .coming-soon {
+    padding: 4rem 0;
+  }
+
+  .roadmap-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+
+  .roadmap-item {
+    padding: 2rem;
+    background: white;
+    border-radius: 1rem;
+    border: 1px solid var(--color-border-light);
+    text-align: center;
+    position: relative;
+  }
+
+  .roadmap-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .roadmap-item h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--color-text);
+  }
+
+  .roadmap-item p {
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+  }
+
+  .roadmap-tag {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.25rem 0.75rem;
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--color-warning);
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .page-hero h1 {
+      font-size: 2rem;
+    }
+
+    .feature-highlight {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+
+    .feature-highlight.reverse {
+      direction: ltr;
+    }
+
+    .tools-categories,
+    .advanced-grid,
+    .platform-features,
+    .roadmap-items {
+      grid-template-columns: 1fr;
+    }
+
+    .performance-stats {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+  }
+</style>
