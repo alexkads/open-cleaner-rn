@@ -1,0 +1,239 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="CI/CD Pipeline - Open Cleaner RN">
+	<main>
+		<h1>CI/CD Pipeline Documentation</h1>
+		
+		<section class="content-section">
+			<h2>Overview</h2>
+			<p>
+				Our CI/CD pipeline is implemented using GitHub Actions, providing a unified automated process for:
+			</p>
+			<ul>
+				<li>Building and deploying Astro documentation</li>
+				<li>Building cross-platform applications</li>
+				<li>Creating releases with installers</li>
+				<li>Automated testing and verification</li>
+			</ul>
+		</section>
+
+		<section class="content-section">
+			<h2>Pipeline Structure</h2>
+			<div class="workflow-diagram">
+				<pre><code>
+Trigger (Push/PR/Tag)
+       ↓
+Build Documentation
+       ↓
+Deploy to GitHub Pages
+       ↓
+Build Applications
+ ├─→ Windows (.msi)
+ ├─→ macOS (.dmg)
+ └─→ Linux (.AppImage, .deb, .rpm)
+       ↓
+Create Release (on tag)
+       ↓
+Notify Team</code></pre>
+			</div>
+		</section>
+
+		<section class="content-section">
+			<h2>Jobs Description</h2>
+			
+			<h3>1. Build Documentation</h3>
+			<ul>
+				<li>Builds Astro documentation site</li>
+				<li>Deploys to GitHub Pages on main branch or tags</li>
+				<li>Ensures documentation is always up to date</li>
+			</ul>
+
+			<h3>2. Build Application</h3>
+			<ul>
+				<li>Matrix build strategy for all platforms</li>
+				<li>Platform-specific dependencies installation</li>
+				<li>Tauri build process for native binaries</li>
+				<li>Artifact collection and storage</li>
+			</ul>
+
+			<h3>3. Create Release</h3>
+			<ul>
+				<li>Triggered by version tags (v*)</li>
+				<li>Collects all platform builds</li>
+				<li>Creates GitHub release with installers</li>
+				<li>Generates release notes</li>
+			</ul>
+		</section>
+
+		<section class="content-section">
+			<h2>Workflow Configuration</h2>
+			<pre><code>name: CI/CD Pipeline
+on:
+  push:
+    branches: [ main, dev ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main, dev ]
+
+jobs:
+  build-docs:
+    name: Build and Deploy Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+      - name: Setup Node.js
+      - name: Install Astro dependencies
+      - name: Build Astro documentation
+      - name: Deploy to GitHub Pages
+
+  build-app:
+    name: Build Application
+    needs: build-docs
+    strategy:
+      matrix:
+        platform: [macos-latest, ubuntu-latest, windows-latest]
+    steps:
+      - name: Build platform-specific app
+      - name: Create installers
+      - name: Upload artifacts
+
+  create-release:
+    name: Create Release
+    needs: [build-app, build-docs]
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - name: Create GitHub Release
+      - name: Upload installers</code></pre>
+		</section>
+
+		<section class="content-section">
+			<h2>Triggering Builds</h2>
+			<table>
+				<thead>
+					<tr>
+						<th>Event</th>
+						<th>Trigger</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>Push to main/dev</td>
+						<td>Automatic</td>
+						<td>Build + Deploy Docs</td>
+					</tr>
+					<tr>
+						<td>Pull Request</td>
+						<td>Automatic</td>
+						<td>Build + Test</td>
+					</tr>
+					<tr>
+						<td>Version Tag</td>
+						<td>Manual</td>
+						<td>Full Release</td>
+					</tr>
+				</tbody>
+			</table>
+		</section>
+
+		<section class="content-section">
+			<h2>Creating a Release</h2>
+			<p>To create a new release:</p>
+			<pre><code># Create and push a new version tag
+git tag -a v1.0.0 -m "Release v1.0.0"
+git push origin v1.0.0
+
+# The workflow will automatically:
+1. Build documentation
+2. Build all platform versions
+3. Create GitHub release
+4. Upload all artifacts</code></pre>
+		</section>
+
+		<section class="content-section">
+			<h2>Monitoring and Troubleshooting</h2>
+			<ul>
+				<li>Check GitHub Actions tab for build status and logs</li>
+				<li>Review deployment status in repository settings</li>
+				<li>Monitor release page for artifacts</li>
+				<li>Check documentation deployment in GitHub Pages settings</li>
+			</ul>
+		</section>
+	</main>
+</Layout>
+
+<style>
+	main {
+		margin: auto;
+		padding: 1.5rem;
+		max-width: 900px;
+	}
+	.content-section {
+		margin: 2rem 0;
+		padding: 1.5rem;
+		border-radius: 8px;
+		background-color: #23262d;
+		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+	}
+	h1 {
+		font-size: 3rem;
+		font-weight: 700;
+		line-height: 1;
+		text-align: center;
+		margin-bottom: 1em;
+	}
+	h2 {
+		color: rgb(var(--accent-light));
+		font-size: 1.8rem;
+		margin-bottom: 1rem;
+	}
+	h3 {
+		font-size: 1.4rem;
+		margin: 1rem 0;
+		color: rgb(var(--accent-light));
+	}
+	.workflow-diagram {
+		background-color: #1a1a1a;
+		padding: 1.5rem;
+		border-radius: 8px;
+		margin: 1rem 0;
+	}
+	pre {
+		background-color: #1a1a1a;
+		padding: 1rem;
+		border-radius: 4px;
+		overflow-x: auto;
+		margin: 1rem 0;
+	}
+	code {
+		font-family: monospace;
+		white-space: pre;
+	}
+	ul {
+		margin-left: 1.5rem;
+		margin-bottom: 1rem;
+	}
+	li {
+		margin: 0.5rem 0;
+	}
+	table {
+		width: 100%;
+		border-collapse: collapse;
+		margin: 1rem 0;
+	}
+	th, td {
+		padding: 0.75rem;
+		text-align: left;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+	}
+	th {
+		background-color: #1a1a1a;
+		color: rgb(var(--accent-light));
+	}
+	tr:nth-child(even) {
+		background-color: #1a1a1a;
+	}
+</style> 
