@@ -1,0 +1,248 @@
+name: Build Documentation and Release
+
+on:
+  push:
+    branches: [ main, dev ]
+    tags:
+      - 'v*'
+    paths:
+      - 'docs-astro/**'
+      - 'src/**'
+      - 'src-tauri/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/build-and-release.yml'
+  pull_request:
+    branches: [ main, dev ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # Generate changelog for releases
+  generate-changelog:
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    outputs:
+      changelog: ${{ steps.changelog.outputs.changelog }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          LATEST_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          
+          if [ -z "$LATEST_TAG" ]; then
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)" --no-merges)
+          else
+            CHANGELOG=$(git log ${LATEST_TAG}..HEAD --pretty=format:"- %s (%h)" --no-merges)
+          fi
+          
+          cat << EOF > changelog.md
+          ## What's Changed
+          
+          $CHANGELOG
+          
+          📚 **Documentação:** https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+          
+          **Full Changelog:** https://github.com/${{ github.repository }}/compare/${LATEST_TAG}...${{ github.ref_name }}
+          EOF
+          
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          cat changelog.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+  # Build and deploy documentation
+  build-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('docs-astro/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+      - name: Install and build docs
+        working-directory: docs-astro
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
+      - name: Validate build output
+        run: |
+          if [ ! -d "docs-astro/dist" ]; then
+            echo "❌ Build failed - dist directory not found"
+            exit 1
+          fi
+          echo "✅ Build successful - dist directory created"
+      - uses: actions/configure-pages@v4
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: './docs-astro/dist'
+
+  deploy:
+    needs: build-docs
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+  # Build application for all platforms
+  build-app:
+    name: Build Application
+    needs: [generate-changelog]
+    if: always() # Execute mesmo se generate-changelog for skipped
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: 'macos-latest'
+            target: 'universal-apple-darwin'
+            arch: 'universal'
+            os: 'macOS'
+          - platform: 'ubuntu-20.04'
+            target: 'x86_64-unknown-linux-gnu'
+            arch: 'x86_64'
+            os: 'Linux'
+          - platform: 'windows-latest'
+            target: 'x86_64-pc-windows-msvc'
+            arch: 'x86_64'
+            os: 'Windows'
+
+    runs-on: ${{ matrix.platform }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install dependencies (Ubuntu only)
+        if: matrix.platform == 'ubuntu-20.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.0-dev libssl-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Update version from Git
+        run: node scripts/update-version.js
+
+      - name: Run tests
+        run: pnpm test:once
+
+      - name: Build frontend
+        run: pnpm build
+
+      - name: Build Tauri app (Release)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: 'Open Cleaner ${{ github.ref_name }}'
+          releaseBody: ${{ needs.generate-changelog.outputs.changelog || 'Release notes not available' }}
+          releaseDraft: false
+          prerelease: false
+          args: --target ${{ matrix.target }}
+
+      - name: Build Tauri app (Development)
+        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: --target ${{ matrix.target }}
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: open-cleaner-${{ matrix.os }}-${{ matrix.arch }}
+          path: |
+            src-tauri/target/${{ matrix.target }}/release/bundle/
+            !src-tauri/target/${{ matrix.target }}/release/bundle/**/*.pdb
+          retention-days: 30
+
+  # Notify build completion
+  notify:
+    name: Notify Build Status
+    needs: [build-docs, deploy, build-app]
+    if: always() && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check build status
+        run: |
+          if [ "${{ needs.build-docs.result }}" == "success" ] && [ "${{ needs.build-app.result }}" == "success" ]; then
+            echo "✅ Build e deploy concluídos com sucesso!"
+            echo "📚 Documentação: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
+            if [ "${{ startsWith(github.ref, 'refs/tags/v') }}" == "true" ]; then
+              echo "🚀 Release ${{ github.ref_name }} criado com instaladores para todas as plataformas"
+            else
+              echo "📦 Build artifacts disponíveis para download"
+            fi
+          else
+            echo "❌ Falha no build ou deploy"
+            echo "📚 Docs: ${{ needs.build-docs.result }}"
+            echo "📱 Deploy: ${{ needs.deploy.result }}"  
+            echo "🔨 Build App: ${{ needs.build-app.result }}"
+            exit 1
+          fi
