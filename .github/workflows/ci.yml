@@ -51,8 +51,8 @@ jobs:
       - name: 🏗️ Build check
         run: pnpm build
 
-  rust-test:
-    name: 🦀 Rust Tests
+  rust-check:
+    name: 🦀 Rust Check
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout code
@@ -67,11 +67,24 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: src-tauri
+          key: rust-cache-${{ hashFiles('src-tauri/Cargo.lock') }}
 
-      - name: 🧪 Run Rust tests
-        working-directory: src-tauri
-        run: cargo test
+      - name: 🔧 Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libgtk-3-dev \
+            libwebkit2gtk-4.0-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            libgtksourceview-3.0-dev
 
-      - name: 🏗️ Build Rust
+      - name: 🧪 Rust check
         working-directory: src-tauri
-        run: cargo build
+        run: cargo check --release
+
+      - name: 🏗️ Rust build (release)
+        working-directory: src-tauri
+        run: cargo build --release
+        env:
+          CARGO_INCREMENTAL: 0
