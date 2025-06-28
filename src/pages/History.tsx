@@ -533,7 +533,7 @@ export default function History() {
                 )}
               </motion.div>
             ) : (
-              filteredRecords.map((record, index) => {
+              filteredRecords.map((record) => {
                 const uiRecord = convertToUIFormat(record);
                 return (
                   <motion.div
