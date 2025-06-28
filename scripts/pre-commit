@@ -1,58 +1,58 @@
 #!/bin/bash
 
-# Pre-commit hook para prevenir conflitos E ENFORÇAR PNPM
+# Pre-commit hook para prevenir conflitos e ENFORÇAR NPM
 # Instalar: cp scripts/pre-commit .git/hooks/ && chmod +x .git/hooks/pre-commit
 
 set -e
 
 echo "🔍 Verificando antes do commit..."
 
-# 🚨 VERIFICAR USO EXCLUSIVO DE PNPM
-echo "🚨 Verificando uso exclusivo de pnpm..."
+# 📦 VERIFICAR USO PADRONIZADO DE NPM
+echo "📦 Verificando padronização npm..."
 
-# Verificar se há package-lock.json ou yarn.lock
-if [ -f "package-lock.json" ] || [ -f "yarn.lock" ]; then
-    echo "❌ ERRO: Encontrados lockfiles de npm/yarn!"
-    echo "🚫 Este projeto usa EXCLUSIVAMENTE pnpm"
-    echo "🔧 Execute: rm package-lock.json yarn.lock && pnpm install"
+# Verificar se há pnpm-lock.yaml ou yarn.lock
+if [ -f "pnpm-lock.yaml" ] || [ -f "yarn.lock" ]; then
+    echo "❌ ERRO: Encontrados lockfiles de pnpm/yarn!"
+    echo "📦 Este projeto usa EXCLUSIVAMENTE npm"
+    echo "🔧 Execute: rm pnpm-lock.yaml yarn.lock && npm install"
     exit 1
 fi
 
-if [ -f "docs-astro/package-lock.json" ] || [ -f "docs-astro/yarn.lock" ]; then
-    echo "❌ ERRO: Encontrados lockfiles de npm/yarn em docs-astro!"
-    echo "🚫 Este projeto usa EXCLUSIVAMENTE pnpm"
-    echo "🔧 Execute: cd docs-astro && rm package-lock.json yarn.lock && pnpm install"
+if [ -f "docs-astro/pnpm-lock.yaml" ] || [ -f "docs-astro/yarn.lock" ]; then
+    echo "❌ ERRO: Encontrados lockfiles de pnpm/yarn em docs-astro!"
+    echo "📦 Este projeto usa EXCLUSIVAMENTE npm"
+    echo "🔧 Execute: cd docs-astro && rm pnpm-lock.yaml yarn.lock && npm install"
     exit 1
 fi
 
-# Verificar se node_modules foi criado pelo pnpm
-if [ -d "node_modules" ] && [ ! -f "pnpm-lock.yaml" ]; then
-    echo "❌ ERRO: node_modules existe mas não há pnpm-lock.yaml"
-    echo "🚫 Parece que npm/yarn foi usado"
-    echo "🔧 Execute: rm -rf node_modules && pnpm install"
+# Verificar se há package-lock.json (deve ter)
+if [ ! -f "package-lock.json" ]; then
+    echo "❌ ERRO: package-lock.json não encontrado na raiz"
+    echo "🔧 Execute: npm install"
     exit 1
 fi
 
-# Verificar se há comandos npm/yarn em workflows
-if grep -r "npm \|yarn " .github/workflows/ --exclude-dir=.git 2>/dev/null; then
-    echo "❌ ERRO: Encontrados comandos npm/yarn em workflows!"
-    echo "🚫 Use apenas pnpm em CI/CD"
-    echo "🔧 Substitua por comandos pnpm"
+if [ ! -f "docs-astro/package-lock.json" ]; then
+    echo "❌ ERRO: package-lock.json não encontrado em docs-astro"
+    echo "🔧 Execute: cd docs-astro && npm install"
     exit 1
 fi
 
-echo "✅ Verificação pnpm OK - apenas pnpm sendo usado"
+# Verificar se há comandos pnpm/yarn em workflows
+if grep -r "pnpm \|yarn " .github/workflows/ --exclude-dir=.git 2>/dev/null; then
+    echo "❌ ERRO: Encontrados comandos pnpm/yarn em workflows!"
+    echo "📦 Use apenas npm em CI/CD"
+    echo "🔧 Substitua por comandos npm"
+    exit 1
+fi
+
+echo "✅ Verificação npm OK - apenas npm sendo usado"
+
 # Verificar se há conflitos não resolvidos
 if grep -r "<<<<<<< HEAD" . --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=target; then
     echo "❌ Encontrados marcadores de conflito não resolvidos!"
     echo "🛠️  Resolva os conflitos antes de fazer commit"
     exit 1
-fi
-
-# Verificar se package-lock.json e pnpm-lock.yaml estão sincronizados
-if [ -f "package-lock.json" ] && [ -f "pnpm-lock.yaml" ]; then
-    echo "⚠️  Aviso: package-lock.json e pnpm-lock.yaml presentes"
-    echo "💡 Considere usar apenas um gerenciador de pacotes"
 fi
 
 # Verificar formatação de arquivos importantes

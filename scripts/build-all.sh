@@ -30,8 +30,8 @@ print_error() {
 check_dependencies() {
     print_status "Checking dependencies..."
     
-    if ! command -v pnpm &> /dev/null; then
-        print_error "pnpm is not installed. Please install it first."
+    if ! command -v npm &> /dev/null; then
+        print_error "npm is not installed. Please install it first."
         exit 1
     fi
     
@@ -51,19 +51,19 @@ check_dependencies() {
 # Install frontend dependencies
 install_dependencies() {
     print_status "Installing frontend dependencies..."
-    pnpm install
+    npm install
 }
 
 # Run tests
 run_tests() {
     print_status "Running tests..."
-    pnpm test:once
+    npm run test:once
 }
 
 # Build frontend
 build_frontend() {
     print_status "Building frontend..."
-    pnpm build
+    npm run build
 }
 
 # Build for current platform
@@ -137,7 +137,7 @@ main() {
     echo "   • Linux: .deb, .rpm, .AppImage"
     echo ""
     print_status "For GitHub releases, use the automated workflow or run:"
-    print_status "pnpm release"
+    print_status "npm run release"
 }
 
 # Run the main function
