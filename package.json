@@ -5,14 +5,11 @@
   "type": "module",
   "packageManager": "pnpm@8.0.0",
   "engines": {
-    "node": ">=18",
-    "pnpm": ">=8.0.0",
-    "npm": "please-use-pnpm",
-    "yarn": "please-use-pnpm"
+    "node": ">=18"
   },
   "scripts": {
     "dev": "vite",
-    "build": "pnpm test:once && tsc && vite build",
+    "build": "npm run test:once && tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
     "test": "vitest",
@@ -25,12 +22,12 @@
     "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
     "type-check": "tsc --noEmit",
     "version:update": "node scripts/update-version.js",
-    "build:all": "pnpm version:update && pnpm build && tauri build",
-    "build:mac": "pnpm version:update && pnpm build && tauri build --target universal-apple-darwin",
-    "build:windows": "pnpm version:update && pnpm build && tauri build --target x86_64-pc-windows-msvc",
-    "build:linux": "pnpm version:update && pnpm build && tauri build --target x86_64-unknown-linux-gnu",
-    "build:linux-arm": "pnpm version:update && pnpm build && tauri build --target aarch64-unknown-linux-gnu",
-    "release": "pnpm version:update && pnpm build && tauri build --config src-tauri/tauri.release.conf.json",
+    "build:all": "npm run version:update && npm run build && tauri build",
+    "build:mac": "npm run version:update && npm run build && tauri build --target aarch64-apple-darwin",
+    "build:windows": "npm run version:update && npm run build && tauri build --target x86_64-pc-windows-msvc",
+    "build:linux": "npm run version:update && npm run build && tauri build --target x86_64-unknown-linux-gnu",
+    "build:linux-arm": "npm run version:update && npm run build && tauri build --target aarch64-unknown-linux-gnu",
+    "release": "npm run version:update && npm run build && tauri build --config src-tauri/tauri.release.conf.json",
     "version:bump": "node -e \"const { execSync } = require('child_process'); const version = process.argv[1]; execSync(\\`git tag v\\${version}\\`, { stdio: 'inherit' }); console.log(\\`Tag v\\${version} criada!\\`);\"",
     "pr:validate": "./scripts/validate-pr.sh",
     "pr:setup": "./scripts/setup-branch-protection.sh"

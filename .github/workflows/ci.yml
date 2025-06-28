@@ -24,32 +24,29 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: 📦 Install pnpm
-        uses: pnpm/action-setup@v4
-
       - name: 🏗️ Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+          cache: 'npm'
 
       - name: 📦 Install dependencies
-        run: pnpm install
+        run: npm ci
 
       - name: 🔍 Lint check
-        run: pnpm lint || echo "Lint warnings found"
+        run: npm run lint || echo "Lint warnings found"
 
       - name: 🎨 Format check
-        run: pnpm format:check || echo "Format issues found"
+        run: npm run format:check || echo "Format issues found"
 
       - name: 🏗️ Type check
-        run: pnpm type-check
+        run: npm run type-check
 
       - name: 🧪 Run tests
-        run: pnpm test:once
+        run: npm run test:once
 
       - name: 🏗️ Build check
-        run: pnpm build
+        run: npm run build
 
   rust-quick-check:
     name: 🦀 Rust Quick Check
