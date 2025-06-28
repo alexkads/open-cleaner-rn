@@ -57,21 +57,40 @@
       "exceptionDomain": "",
       "signingIdentity": null,
       "providerShortName": null,
-      "entitlements": null
+      "entitlements": null,
+      "license": "../LICENSE"
     },
     "windows": {
       "certificateThumbprint": null,
       "digestAlgorithm": "sha256",
-      "timestampUrl": ""
+      "timestampUrl": "",
+      "allowDowngrades": false,
+      "wix": {
+        "language": ["en-US"],
+        "template": "main.wxs"
+      },
+      "nsis": {
+        "displayLanguageSelector": true,
+        "languages": ["English"],
+        "template": "main.nsi"
+      }
     },
     "linux": {
       "deb": {
-        "depends": [],
+        "depends": ["libwebkit2gtk-4.0-37", "libssl3"],
         "priority": "optional",
-        "section": "devel"
+        "section": "devel",
+        "maintainer": "Clean RN Dev Team <support@clean-rn-dev.com>",
+        "homepage": "https://github.com/clean-rn-dev/clean-rn-dev"
       },
       "appimage": {
-        "bundleMediaFramework": false
+        "bundleMediaFramework": false,
+        "libs": ["libwebkit2gtk-4.0-37", "libssl3"]
+      },
+      "rpm": {
+        "epoch": 0,
+        "files": {},
+        "release": "1"
       }
     }
   }

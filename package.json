@@ -11,7 +11,13 @@
     "test": "vitest",
     "test:once": "vitest --run",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage",
+    "build:all": "pnpm build && tauri build",
+    "build:mac": "pnpm build && tauri build --target universal-apple-darwin",
+    "build:windows": "pnpm build && tauri build --target x86_64-pc-windows-msvc",
+    "build:linux": "pnpm build && tauri build --target x86_64-unknown-linux-gnu",
+    "build:linux-arm": "pnpm build && tauri build --target aarch64-unknown-linux-gnu",
+    "release": "pnpm build && tauri build --config src-tauri/tauri.release.conf.json"
   },
   "dependencies": {
     "@tauri-apps/api": "^2",

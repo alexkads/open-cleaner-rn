@@ -162,11 +162,33 @@ npm install
 npm run dev
 ```
 
-### Build
+### Build e Instaladores
+
 ```bash
-# Build para produção
-npm run tauri build
+# Desenvolvimento
+npm run dev
+
+# Build para plataforma atual
+make build
+
+# Build para todas as plataformas
+make build-all
+
+# Build específico por plataforma
+make build-mac         # macOS Universal Binary
+make build-windows     # Windows x64
+make build-linux       # Linux x64
+
+# Build de produção otimizado
+make release
 ```
+
+**📦 Instaladores Gerados:**
+- **macOS**: `.dmg`, `.app` (Universal Binary - Intel + Apple Silicon)
+- **Windows**: `.msi`, `.exe` (NSIS)  
+- **Linux**: `.deb`, `.rpm`, `.AppImage`
+
+Para instruções detalhadas de build, consulte [BUILD.md](BUILD.md).
 
 ## 📊 Estrutura do Projeto
 
