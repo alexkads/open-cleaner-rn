@@ -3,6 +3,9 @@ name: Build and Deploy
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'docs-astro/**'
+      - '.github/workflows/simple-deploy.yml'
   workflow_dispatch:
 
 permissions:
@@ -18,11 +21,25 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: docs-astro/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('docs-astro/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
       - name: Install and build docs
         working-directory: docs-astro
         run: |
           npm ci
           npx astro build
+      - name: Validate build output
+        run: |
+          if [ ! -d "docs-astro/dist" ]; then
+            echo "❌ Build failed - dist directory not found"
+            exit 1
+          fi
+          echo "✅ Build successful - dist directory created"
       - uses: actions/configure-pages@v4
       - uses: actions/upload-pages-artifact@v3
         with:
