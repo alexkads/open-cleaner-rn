@@ -13,7 +13,7 @@ Este documento descreve as regras de proteção de branch e merge para o projeto
 - ✅ Require conversation resolution before merging
 - ✅ Restrict pushes that create files larger than 100 MB
 
-### Branch de Desenvolvimento (`develop`)
+### Branch de Desenvolvimento (`dev`)
 - ✅ Require pull request reviews before merging
 - ✅ Require status checks to pass before merging
 - ✅ Require branches to be up to date before merging
@@ -146,6 +146,14 @@ gh api repos/:owner/:repo/branches/main/protection \
   --field required_status_checks='{"strict":true,"contexts":["🧪 Automated Tests (ubuntu-latest)","🧪 Automated Tests (windows-latest)","🧪 Automated Tests (macos-latest)","📋 PR Information Validation","🔒 Security Check"]}' \
   --field enforce_admins=true \
   --field required_pull_request_reviews='{"required_approving_review_count":1,"dismiss_stale_reviews":true,"require_code_owner_reviews":true}' \
+  --field restrictions=null
+
+# Proteção do branch dev (se existir)
+gh api repos/:owner/:repo/branches/dev/protection \
+  --method PUT \
+  --field required_status_checks='{"strict":true,"contexts":["🧪 Automated Tests (ubuntu-latest)","📋 PR Information Validation","🔒 Security Check"]}' \
+  --field enforce_admins=false \
+  --field required_pull_request_reviews='{"required_approving_review_count":1,"dismiss_stale_reviews":false,"require_code_owner_reviews":false}' \
   --field restrictions=null
 
 # Configurar merge methods
