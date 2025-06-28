@@ -11,8 +11,19 @@
 [![Downloads](https://img.shields.io/github/downloads/alexkads/open-cleaner-rn/total?color=green)](https://github.com/alexkads/open-cleaner-rn/releases)
 [![License](https://img.shields.io/github/license/alexkads/open-cleaner-rn?color=purple)](https://github.com/alexkads/open-cleaner-rn/blob/main/LICENSE)
 [![Platform Support](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey)](https://github.com/alexkads/open-cleaner-rn/releases)
+[![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue?logo=github)](https://alexkads.github.io/open-cleaner-rn/)
 
 [📚 Documentation](https://alexkads.github.io/open-cleaner-rn/) • [⬇️ Download](https://github.com/alexkads/open-cleaner-rn/releases) • [🐛 Report Bug](https://github.com/alexkads/open-cleaner-rn/issues) • [💡 Request Feature](https://github.com/alexkads/open-cleaner-rn/issues)
+
+---
+
+## 📚 **[➤ Acesse a Documentação Completa](https://alexkads.github.io/open-cleaner-rn/)**
+
+🌐 **Website oficial**: https://alexkads.github.io/open-cleaner-rn/
+
+> 📖 Documentação completa com guias de instalação, configuração, troubleshooting e muito mais!
+
+---
 
 </div>
 
@@ -141,7 +152,7 @@ npm run build:all
 - **Backend**: Rust + Tauri
 - **UI Framework**: Modern CSS with custom design system
 - **Build System**: Cross-platform compilation
-- **Documentation**: Astro static site generator
+- **Documentation**: Astro static site generator ([📚 Live Docs](https://alexkads.github.io/open-cleaner-rn/))
 
 ## 🤝 Contributing
 
