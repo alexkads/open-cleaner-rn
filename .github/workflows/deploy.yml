@@ -34,6 +34,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -52,19 +54,12 @@ jobs:
 
       - name: Install Astro dependencies
         working-directory: docs-astro
-        run: |
-          pwd
-          ls -la
-          npm ci
+        run: npm ci
 
       - name: Build Astro documentation
         id: build-docs
         working-directory: docs-astro
-        run: |
-          pwd
-          ls -la
-          echo "Running astro build with explicit package.json..."
-          npx astro build
+        run: npx astro build
 
       - name: Setup Pages
         if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
@@ -84,6 +79,9 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
@@ -129,7 +127,8 @@ jobs:
   # Build application for all platforms
   build-app:
     name: Build Application
-    # Remove dependency on build-docs since they should be independent
+    needs: [generate-changelog]
+    if: always() # Execute mesmo se generate-changelog for skipped
     strategy:
       fail-fast: false
       matrix:
@@ -214,7 +213,7 @@ jobs:
         with:
           tagName: ${{ github.ref_name }}
           releaseName: 'Open Cleaner ${{ github.ref_name }}'
-          releaseBody: ${{ needs.generate-changelog.outputs.changelog }}
+          releaseBody: ${{ needs.generate-changelog.outputs.changelog || 'Release notes not available' }}
           releaseDraft: false
           prerelease: false
           args: --target ${{ matrix.target }}
