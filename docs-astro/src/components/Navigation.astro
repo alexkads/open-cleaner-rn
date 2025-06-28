@@ -5,7 +5,7 @@ const navItems = [
   { href: '/features', label: 'Features', icon: '✨' },
   { href: '/platforms', label: 'Platforms', icon: '💻' },
   { href: '/ci-cd', label: 'CI/CD', icon: '⚙️' },
-  { href: '/contributing', label: 'Contributing', icon: '🤝' }
+  { href: '/versioning', label: 'Versioning', icon: '📋' }
 ];
 
 const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
@@ -15,26 +15,31 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
   <div class="container">
     <div class="nav-content">
       <a href="/" class="nav-logo" aria-label="Open Cleaner RN - Home">
-        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="32" height="32" rx="8" fill="url(#gradient)" />
-          <path d="M8 12h16M8 16h16M8 20h12" stroke="white" stroke-width="2" stroke-linecap="round" />
-          <defs>
-            <linearGradient id="gradient" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
-              <stop stop-color="#0ea5e9" />
-              <stop offset="1" stop-color="#8b5cf6" />
-            </linearGradient>
-          </defs>
-        </svg>
-        <span class="nav-title">Open Cleaner RN</span>
+        <div class="logo-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="8" fill="url(#gradient)" />
+            <path d="M8 12h16M8 16h16M8 20h12" stroke="white" stroke-width="2" stroke-linecap="round" />
+            <defs>
+              <linearGradient id="gradient" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#0ea5e9" />
+                <stop offset="1" stop-color="#8b5cf6" />
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <span class="nav-title">Open Cleaner RN</span>
+          <span class="nav-subtitle">Development Tools</span>
+        </div>
       </a>
 
-      <button class="mobile-menu-toggle" aria-label="Toggle mobile menu" aria-expanded="false">
+      <button class="mobile-menu-toggle" aria-label="Toggle mobile menu" aria-expanded="false" id="mobile-menu-toggle">
         <span></span>
         <span></span>
         <span></span>
       </button>
 
-      <div class="nav-links">
+      <div class="nav-links" id="nav-links">
         {navItems.map(({ href, label, icon }) => (
           <a 
             href={href} 
@@ -42,7 +47,8 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
             aria-current={currentPath === href ? 'page' : undefined}
           >
             <span class="nav-icon" aria-hidden="true">{icon}</span>
-            <span>{label}</span>
+            <span class="nav-label">{label}</span>
+            {currentPath === href && <span class="active-indicator"></span>}
           </a>
         ))}
       </div>
@@ -74,19 +80,91 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
           </svg>
           GitHub
         </a>
+
+        <button class="theme-toggle" aria-label="Toggle dark mode" id="theme-toggle">
+          <svg class="sun-icon" width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd" />
+          </svg>
+          <svg class="moon-icon" width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+          </svg>
+        </button>
       </div>
     </div>
   </div>
 </nav>
 
+<script>
+  // Mobile menu toggle
+  const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+  const navLinks = document.getElementById('nav-links');
+  
+  if (mobileMenuToggle && navLinks) {
+    mobileMenuToggle.addEventListener('click', () => {
+      const isExpanded = mobileMenuToggle.getAttribute('aria-expanded') === 'true';
+      mobileMenuToggle.setAttribute('aria-expanded', !isExpanded);
+      navLinks.classList.toggle('mobile-open');
+    });
+  }
+
+  // Theme toggle
+  const themeToggle = document.getElementById('theme-toggle');
+  const html = document.documentElement;
+  
+  // Check for saved theme preference or default to 'light'
+  const currentTheme = localStorage.getItem('theme') || 'light';
+  html.setAttribute('data-theme', currentTheme);
+  
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+    });
+  }
+
+  // Close mobile menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (navLinks && navLinks.classList.contains('mobile-open')) {
+      if (!navLinks.contains(e.target) && !mobileMenuToggle?.contains(e.target)) {
+        navLinks.classList.remove('mobile-open');
+        mobileMenuToggle?.setAttribute('aria-expanded', 'false');
+      }
+    }
+  });
+
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    });
+  });
+</script>
+
 <style>
   .main-nav {
     background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--color-border-light);
     position: sticky;
     top: 0;
     z-index: 50;
+    transition: all 0.3s ease;
+  }
+
+  [data-theme="dark"] .main-nav {
+    background: rgba(17, 24, 39, 0.95);
+    border-bottom-color: var(--color-border);
   }
 
   .nav-content {
@@ -104,19 +182,44 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
     text-decoration: none;
     color: var(--color-text);
     font-weight: 600;
-    font-size: 1.125rem;
+    transition: all 0.2s ease;
   }
 
   .nav-logo:hover {
-    color: var(--color-primary);
+    transform: translateY(-1px);
+  }
+
+  .logo-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+  }
+
+  .logo-text {
+    display: flex;
+    flex-direction: column;
   }
 
   .nav-title {
     font-weight: 700;
+    font-size: 1.125rem;
     background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    line-height: 1.2;
+  }
+
+  .nav-subtitle {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    font-weight: 400;
+    line-height: 1;
   }
 
   .mobile-menu-toggle {
@@ -127,6 +230,12 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
     background: none;
     border: none;
     cursor: pointer;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+  }
+
+  .mobile-menu-toggle:hover {
+    background: var(--color-bg-alt);
   }
 
   .mobile-menu-toggle span {
@@ -134,32 +243,47 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
     height: 2px;
     background: var(--color-text);
     border-radius: 1px;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
+  }
+
+  .mobile-menu-toggle[aria-expanded="true"] span:nth-child(1) {
+    transform: rotate(45deg) translate(0.4rem, 0.4rem);
+  }
+
+  .mobile-menu-toggle[aria-expanded="true"] span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .mobile-menu-toggle[aria-expanded="true"] span:nth-child(3) {
+    transform: rotate(-45deg) translate(0.4rem, -0.4rem);
   }
 
   .nav-links {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.25rem;
     flex: 1;
     justify-content: center;
   }
 
   .nav-link {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.5rem 1rem;
+    padding: 0.75rem 1rem;
     text-decoration: none;
     color: var(--color-text-muted);
-    border-radius: 0.5rem;
+    border-radius: 0.75rem;
     font-weight: 500;
     transition: all 0.2s ease;
+    white-space: nowrap;
   }
 
   .nav-link:hover {
     color: var(--color-primary);
     background: rgba(14, 165, 233, 0.1);
+    transform: translateY(-1px);
   }
 
   .nav-link.active {
@@ -167,7 +291,22 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
     background: rgba(14, 165, 233, 0.15);
   }
 
+  .active-indicator {
+    position: absolute;
+    bottom: 0.25rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0.25rem;
+    height: 0.25rem;
+    background: var(--color-primary);
+    border-radius: 50%;
+  }
+
   .nav-icon {
+    font-size: 0.875rem;
+  }
+
+  .nav-label {
     font-size: 0.875rem;
   }
 
@@ -185,10 +324,11 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
     font-size: 0.875rem;
     font-weight: 500;
     text-decoration: none;
-    border-radius: 0.5rem;
+    border-radius: 0.75rem;
     border: 1px solid transparent;
     transition: all 0.2s ease;
     cursor: pointer;
+    white-space: nowrap;
   }
 
   .btn-primary {
@@ -201,49 +341,124 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
     background: var(--color-primary-dark);
     border-color: var(--color-primary-dark);
     transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
   }
 
   .btn-outline {
-    color: var(--color-text-muted);
+    background: transparent;
+    color: var(--color-text);
     border-color: var(--color-border);
   }
 
   .btn-outline:hover {
-    color: var(--color-text);
+    background: var(--color-bg-alt);
     border-color: var(--color-primary);
-    background: rgba(14, 165, 233, 0.05);
+    color: var(--color-primary);
+    transform: translateY(-1px);
+  }
+
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: 0.75rem;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .theme-toggle:hover {
+    background: var(--color-bg-alt);
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+    transform: translateY(-1px);
+  }
+
+  .theme-toggle .sun-icon {
+    display: block;
+  }
+
+  .theme-toggle .moon-icon {
+    display: none;
+  }
+
+  [data-theme="dark"] .theme-toggle .sun-icon {
+    display: none;
+  }
+
+  [data-theme="dark"] .theme-toggle .moon-icon {
+    display: block;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .nav-links {
+      gap: 0.125rem;
+    }
+
+    .nav-link {
+      padding: 0.5rem 0.75rem;
+    }
+
+    .nav-label {
+      display: none;
+    }
+
+    .nav-icon {
+      font-size: 1rem;
+    }
   }
 
   @media (max-width: 768px) {
+    .nav-content {
+      gap: 1rem;
+    }
+
     .mobile-menu-toggle {
       display: flex;
     }
 
     .nav-links {
-      display: none;
       position: absolute;
       top: 100%;
       left: 0;
       right: 0;
-      background: rgba(255, 255, 255, 0.98);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--color-border-light);
-      box-shadow: var(--shadow-lg);
+      background: var(--color-bg);
+      border-top: 1px solid var(--color-border-light);
       flex-direction: column;
       padding: 1rem;
       gap: 0.5rem;
+      transform: translateY(-100%);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-lg);
     }
 
-    .nav-links.show {
-      display: flex;
+    [data-theme="dark"] .nav-links {
+      background: var(--color-bg);
+      border-top-color: var(--color-border);
+    }
+
+    .nav-links.mobile-open {
+      transform: translateY(0);
+      opacity: 1;
+      visibility: visible;
     }
 
     .nav-link {
       width: 100%;
       justify-content: flex-start;
-      padding: 0.75rem 1rem;
+      padding: 1rem;
       border-radius: 0.5rem;
+    }
+
+    .nav-label {
+      display: block;
     }
 
     .nav-actions {
@@ -251,72 +466,46 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
     }
 
     .btn {
-      padding: 0.375rem 0.75rem;
-      font-size: 0.8125rem;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
     }
 
-    .nav-content {
-      gap: 1rem;
-      position: relative;
-    }
-
-    .mobile-menu-toggle[aria-expanded="true"] span:nth-child(1) {
-      transform: rotate(45deg) translate(5px, 5px);
-    }
-
-    .mobile-menu-toggle[aria-expanded="true"] span:nth-child(2) {
-      opacity: 0;
-    }
-
-    .mobile-menu-toggle[aria-expanded="true"] span:nth-child(3) {
-      transform: rotate(-45deg) translate(7px, -6px);
+    .theme-toggle {
+      width: 2.25rem;
+      height: 2.25rem;
     }
   }
 
   @media (max-width: 480px) {
-    .nav-title {
-      display: none;
+    .nav-logo {
+      gap: 0.5rem;
     }
 
-    .btn span:not(.sr-only) {
-      display: none;
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+    }
+
+    .nav-title {
+      font-size: 1rem;
+    }
+
+    .nav-subtitle {
+      font-size: 0.7rem;
+    }
+
+    .nav-actions {
+      gap: 0.25rem;
     }
 
     .btn {
-      padding: 0.5rem;
+      padding: 0.4rem 0.6rem;
+      font-size: 0.75rem;
+    }
+
+    .btn svg {
+      width: 14px;
+      height: 14px;
     }
   }
 </style>
-
-<script>
-  // Mobile menu functionality
-  document.addEventListener('DOMContentLoaded', () => {
-    const toggle = document.querySelector('.mobile-menu-toggle');
-    const navLinks = document.querySelector('.nav-links');
-    
-    if (toggle && navLinks) {
-      toggle.addEventListener('click', () => {
-        const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
-        toggle.setAttribute('aria-expanded', (!isExpanded).toString());
-        navLinks.classList.toggle('show');
-      });
-
-      // Close mobile menu when clicking a nav link
-      const navLinkElements = navLinks.querySelectorAll('.nav-link');
-      navLinkElements.forEach(link => {
-        link.addEventListener('click', () => {
-          toggle.setAttribute('aria-expanded', 'false');
-          navLinks.classList.remove('show');
-        });
-      });
-
-      // Close mobile menu when clicking outside
-      document.addEventListener('click', (e) => {
-        if (!toggle.contains(e.target) && !navLinks.contains(e.target)) {
-          toggle.setAttribute('aria-expanded', 'false');
-          navLinks.classList.remove('show');
-        }
-      });
-    }
-  });
-</script>

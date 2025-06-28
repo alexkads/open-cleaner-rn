@@ -6,19 +6,25 @@ const footerLinks = {
     { label: 'Features', href: '/features' },
     { label: 'Getting Started', href: '/getting-started' },
     { label: 'Platforms', href: '/platforms' },
-    { label: 'Changelog', href: 'https://github.com/alexkads/open-cleaner-rn/releases' }
+    { label: 'CI/CD Pipeline', href: '/ci-cd' },
+    { label: 'Versioning', href: '/versioning' }
   ],
   community: [
-    { label: 'GitHub', href: 'https://github.com/alexkads/open-cleaner-rn' },
-    { label: 'Issues', href: 'https://github.com/alexkads/open-cleaner-rn/issues' },
+    { label: 'GitHub Repository', href: 'https://github.com/alexkads/open-cleaner-rn' },
+    { label: 'Report Issues', href: 'https://github.com/alexkads/open-cleaner-rn/issues' },
     { label: 'Discussions', href: 'https://github.com/alexkads/open-cleaner-rn/discussions' },
-    { label: 'Contributing', href: '/contributing' }
+    { label: 'Contributing Guide', href: 'https://github.com/alexkads/open-cleaner-rn/blob/main/CONTRIBUTING.md' }
   ],
   resources: [
     { label: 'Documentation', href: '/' },
-    { label: 'CI/CD Pipeline', href: '/ci-cd' },
-    { label: 'Download', href: 'https://github.com/alexkads/open-cleaner-rn/releases' },
+    { label: 'Download Latest', href: 'https://github.com/alexkads/open-cleaner-rn/releases' },
+    { label: 'Changelog', href: 'https://github.com/alexkads/open-cleaner-rn/releases' },
     { label: 'Support', href: 'https://github.com/alexkads/open-cleaner-rn/issues' }
+  ],
+  legal: [
+    { label: 'MIT License', href: 'https://github.com/alexkads/open-cleaner-rn/blob/main/LICENSE' },
+    { label: 'Privacy Policy', href: '#' },
+    { label: 'Terms of Service', href: '#' }
   ]
 };
 
@@ -26,47 +32,78 @@ const socialLinks = [
   {
     name: 'GitHub',
     href: 'https://github.com/alexkads/open-cleaner-rn',
-    icon: 'github'
+    icon: 'github',
+    color: '#333'
   },
   {
     name: 'Twitter',
     href: 'https://twitter.com/alexkads',
-    icon: 'twitter'
+    icon: 'twitter',
+    color: '#1DA1F2'
+  },
+  {
+    name: 'LinkedIn',
+    href: 'https://linkedin.com/in/alexkads',
+    icon: 'linkedin',
+    color: '#0077B5'
   }
+];
+
+const stats = [
+  { label: 'Downloads', value: '1K+' },
+  { label: 'Stars', value: '50+' },
+  { label: 'Contributors', value: '5+' },
+  { label: 'Platforms', value: '3' }
 ];
 ---
 
 <footer class="site-footer">
   <div class="container">
     <div class="footer-content">
+      <!-- Stats Section -->
+      <div class="footer-stats">
+        {stats.map(({ label, value }) => (
+          <div class="stat-item">
+            <div class="stat-value">{value}</div>
+            <div class="stat-label">{label}</div>
+          </div>
+        ))}
+      </div>
+
       <!-- Main Footer Content -->
       <div class="footer-main">
         <div class="footer-brand">
           <div class="footer-logo">
-            <svg width="40" height="40" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="32" height="32" rx="8" fill="url(#footerGradient)" />
-              <path d="M8 12h16M8 16h16M8 20h12" stroke="white" stroke-width="2" stroke-linecap="round" />
-              <defs>
-                <linearGradient id="footerGradient" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
-                  <stop stop-color="#0ea5e9" />
-                  <stop offset="1" stop-color="#8b5cf6" />
-                </linearGradient>
-              </defs>
-            </svg>
-            <span class="footer-title">Open Cleaner RN</span>
+            <div class="logo-icon">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="32" height="32" rx="8" fill="url(#footerGradient)" />
+                <path d="M8 12h16M8 16h16M8 20h12" stroke="white" stroke-width="2" stroke-linecap="round" />
+                <defs>
+                  <linearGradient id="footerGradient" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#0ea5e9" />
+                    <stop offset="1" stop-color="#8b5cf6" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+            <div class="logo-text">
+              <span class="footer-title">Open Cleaner RN</span>
+              <span class="footer-subtitle">Development Tools</span>
+            </div>
           </div>
           <p class="footer-description">
             Professional development environment cleaner for React Native and cross-platform projects. 
-            Free up disk space and optimize your development workflow.
+            Free up disk space and optimize your development workflow with our powerful desktop application.
           </p>
           <div class="social-links">
-            {socialLinks.map(({ name, href, icon }) => (
+            {socialLinks.map(({ name, href, icon, color }) => (
               <a 
                 href={href} 
                 class="social-link"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={`Follow us on ${name}`}
+                style={`--social-color: ${color}`}
               >
                 {icon === 'github' && (
                   <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
@@ -76,6 +113,11 @@ const socialLinks = [
                 {icon === 'twitter' && (
                   <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
                     <path d="M5.026 15c6.038 0 9.341-5.003 9.341-9.334 0-.14 0-.282-.006-.422A6.685 6.685 0 0 0 16 3.542a6.658 6.658 0 0 1-1.889.518 3.301 3.301 0 0 0 1.447-1.817 6.533 6.533 0 0 1-2.087.793A3.286 3.286 0 0 0 7.875 6.03a9.325 9.325 0 0 1-6.767-3.429 3.289 3.289 0 0 0 1.018 4.382A3.323 3.323 0 0 1 .64 6.575v.045a3.288 3.288 0 0 0 2.632 3.218 3.203 3.203 0 0 1-.865.115 3.23 3.23 0 0 1-.614-.057 3.283 3.283 0 0 0 3.067 2.277A6.588 6.588 0 0 1 .78 13.58a6.32 6.32 0 0 1-.78-.045A9.344 9.344 0 0 0 5.026 15z"/>
+                  </svg>
+                )}
+                {icon === 'linkedin' && (
+                  <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854V1.146zm4.943 12.248V6.169H2.542v7.225h2.401zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248-.822 0-1.359.54-1.359 1.248 0 .694.521 1.248 1.327 1.248h.016zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016a5.54 5.54 0 0 1 .016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225h2.4z"/>
                   </svg>
                 )}
               </a>
@@ -125,6 +167,20 @@ const socialLinks = [
               ))}
             </ul>
           </div>
+
+          <div class="footer-section">
+            <h3>Legal</h3>
+            <ul>
+              {footerLinks.legal.map(({ label, href }) => (
+                <li>
+                  <a href={href} target={href.startsWith('http') ? '_blank' : undefined} rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}>
+                    {label}
+                    {href.startsWith('http') && <span class="sr-only"> (opens in new tab)</span>}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
 
@@ -146,7 +202,14 @@ const socialLinks = [
               <svg width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
                 <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.287 5.906c-.778.324-2.334.994-4.666 2.01-.378.15-.577.298-.595.442-.03.243.275.339.69.47l.175.055c.408.133.958.288 1.243.294.26.006.549-.1.868-.32 2.179-1.471 3.304-2.214 3.374-2.23.05-.012.12-.026.166.016.047.041.042.12.037.141-.03.129-1.227 1.241-1.846 1.817-.193.18-.33.307-.358.336a8.154 8.154 0 0 1-.188.186c-.38.366-.664.64.015 1.088.327.216.589.393.85.571.284.194.568.387.936.629.093.06.183.125.27.187.331.236.63.448.997.414.214-.02.435-.22.547-.82.265-1.417.786-4.486.906-5.751a1.426 1.426 0 0 0-.013-.315.337.337 0 0 0-.114-.217.526.526 0 0 0-.31-.093c-.3.005-.763.166-2.984 1.09z"/>
               </svg>
-              Free
+              Free Forever
+            </span>
+            <span class="badge">
+              <svg width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 3a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5H6a.5.5 0 0 1 0-1h1.5V3.5A.5.5 0 0 1 8 3zM3.732 4.732a.5.5 0 0 1 .707 0l1.414 1.414a.5.5 0 1 1-.707.707L3.732 5.439a.5.5 0 0 1 0-.707zM2 8a.5.5 0 0 1 .5-.5h1.586a.5.5 0 0 1 0 1H2.5A.5.5 0 0 1 2 8zm9.5 0a.5.5 0 0 1 .5-.5h1.5a.5.5 0 0 1 .5.5v1.5a.5.5 0 0 1-1 0V8.5H12a.5.5 0 0 1-.5-.5z"/>
+                <path d="M4.5 12.5A.5.5 0 0 1 5 12h1.5a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5zm3.793-1.207a.5.5 0 0 1 .707 0l1.414 1.414a.5.5 0 0 1-.707.707L7.793 12.207a.5.5 0 0 1 0-.707z"/>
+              </svg>
+              Cross Platform
             </span>
           </div>
         </div>
@@ -157,20 +220,52 @@ const socialLinks = [
 
 <style>
   .site-footer {
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    background: var(--color-bg-alt);
     border-top: 1px solid var(--color-border-light);
     margin-top: auto;
+  }
+
+  [data-theme="dark"] .site-footer {
+    background: var(--color-bg-alt);
+    border-top-color: var(--color-border);
   }
 
   .footer-content {
     padding: 3rem 0 1.5rem;
   }
 
+  /* Stats Section */
+  .footer-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+    padding: 2rem 0;
+    border-bottom: 1px solid var(--color-border-light);
+    margin-bottom: 3rem;
+  }
+
+  .stat-item {
+    text-align: center;
+  }
+
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-label {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    font-weight: 500;
+  }
+
   .footer-main {
     display: grid;
     grid-template-columns: 1fr 2fr;
-    gap: 3rem;
-    margin-bottom: 2rem;
+    gap: 4rem;
+    margin-bottom: 3rem;
   }
 
   .footer-brand {
@@ -181,7 +276,23 @@ const socialLinks = [
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .logo-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+  }
+
+  .logo-text {
+    display: flex;
+    flex-direction: column;
   }
 
   .footer-title {
@@ -191,17 +302,25 @@ const socialLinks = [
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    line-height: 1.2;
+  }
+
+  .footer-subtitle {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    font-weight: 400;
+    line-height: 1;
   }
 
   .footer-description {
     color: var(--color-text-muted);
     line-height: 1.6;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
   }
 
   .social-links {
     display: flex;
-    gap: 0.75rem;
+    gap: 1rem;
   }
 
   .social-link {
@@ -210,34 +329,33 @@ const socialLinks = [
     justify-content: center;
     width: 2.5rem;
     height: 2.5rem;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 0.75rem;
     color: var(--color-text-muted);
-    background: rgba(255, 255, 255, 0.8);
-    border: 1px solid var(--color-border-light);
-    border-radius: 0.5rem;
+    text-decoration: none;
     transition: all 0.2s ease;
   }
 
   .social-link:hover {
-    color: var(--color-primary);
-    background: white;
-    border-color: var(--color-primary);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
+    background: var(--social-color);
+    color: white;
+    border-color: var(--social-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
   .footer-links {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 2rem;
   }
 
   .footer-section h3 {
-    font-size: 0.875rem;
+    font-size: 1rem;
     font-weight: 600;
     color: var(--color-text);
     margin-bottom: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
   }
 
   .footer-section ul {
@@ -254,11 +372,12 @@ const socialLinks = [
     color: var(--color-text-muted);
     text-decoration: none;
     font-size: 0.875rem;
-    transition: color 0.2s ease;
+    transition: all 0.2s ease;
   }
 
   .footer-section a:hover {
     color: var(--color-primary);
+    transform: translateX(2px);
   }
 
   .footer-bottom {
@@ -268,8 +387,8 @@ const socialLinks = [
 
   .footer-bottom-content {
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    align-items: center;
     flex-wrap: wrap;
     gap: 1rem;
   }
@@ -277,12 +396,12 @@ const socialLinks = [
   .copyright {
     color: var(--color-text-muted);
     font-size: 0.875rem;
-    margin: 0;
   }
 
   .copyright a {
     color: var(--color-primary);
     text-decoration: none;
+    font-weight: 500;
   }
 
   .copyright a:hover {
@@ -292,19 +411,33 @@ const socialLinks = [
   .footer-meta {
     display: flex;
     gap: 0.75rem;
+    flex-wrap: wrap;
   }
 
   .badge {
     display: inline-flex;
     align-items: center;
     gap: 0.375rem;
-    padding: 0.25rem 0.5rem;
+    padding: 0.375rem 0.75rem;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 1rem;
     font-size: 0.75rem;
     font-weight: 500;
-    color: var(--color-primary);
-    background: rgba(14, 165, 233, 0.1);
-    border: 1px solid rgba(14, 165, 233, 0.2);
-    border-radius: 1rem;
+    color: var(--color-text-muted);
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .footer-stats {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+
+    .footer-links {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
   }
 
   @media (max-width: 768px) {
@@ -313,23 +446,56 @@ const socialLinks = [
       gap: 2rem;
     }
 
+    .footer-brand {
+      max-width: none;
+      text-align: center;
+    }
+
+    .footer-logo {
+      justify-content: center;
+    }
+
+    .social-links {
+      justify-content: center;
+    }
+
     .footer-links {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
     }
 
     .footer-bottom-content {
       flex-direction: column;
       text-align: center;
     }
+
+    .footer-meta {
+      justify-content: center;
+    }
   }
 
   @media (max-width: 480px) {
-    .footer-links {
+    .footer-stats {
       grid-template-columns: 1fr;
+      gap: 1rem;
     }
 
-    .footer-content {
-      padding: 2rem 0 1rem;
+    .stat-value {
+      font-size: 1.5rem;
+    }
+
+    .social-links {
+      gap: 0.75rem;
+    }
+
+    .social-link {
+      width: 2.25rem;
+      height: 2.25rem;
+    }
+
+    .badge {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.7rem;
     }
   }
 </style>
