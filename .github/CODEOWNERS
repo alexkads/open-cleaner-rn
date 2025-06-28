@@ -1,0 +1,45 @@
+# Global owners - default reviewers for everything
+* @alexkads
+
+# Frontend específico
+/src/ @alexkads
+/src/components/ @alexkads
+/src/pages/ @alexkads
+/src/utils/ @alexkads
+/src/services/ @alexkads
+
+# Backend específico (Rust/Tauri)
+/src-tauri/ @alexkads
+/src-tauri/src/ @alexkads
+/src-tauri/capabilities/ @alexkads
+
+# Configurações críticas de segurança e build
+/src-tauri/tauri.conf.json @alexkads
+/src-tauri/tauri.release.conf.json @alexkads
+/src-tauri/Cargo.toml @alexkads
+/package.json @alexkads
+/pnpm-lock.yaml @alexkads
+
+# CI/CD e automação
+/.github/ @alexkads
+/.github/workflows/ @alexkads
+/scripts/ @alexkads
+
+# Configurações de desenvolvimento
+/vite.config.ts @alexkads
+/vitest.config.ts @alexkads
+/tsconfig.json @alexkads
+/tsconfig.node.json @alexkads
+
+# Documentação importante
+/README.md @alexkads
+/CONTRIBUTING.md @alexkads
+/VERSIONING.md @alexkads
+
+# Docker e deployment
+/Dockerfile* @alexkads
+/docker-compose*.yml @alexkads
+/Makefile @alexkads
+
+# Documentação do site
+/docs-astro/ @alexkads

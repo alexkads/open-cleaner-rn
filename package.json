@@ -12,6 +12,11 @@
     "test:once": "vitest --run",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
+    "lint": "eslint src --ext .ts,.tsx,.js,.jsx",
+    "lint:fix": "eslint src --ext .ts,.tsx,.js,.jsx --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "type-check": "tsc --noEmit",
     "version:update": "node scripts/update-version.js",
     "build:all": "pnpm version:update && pnpm build && tauri build",
     "build:mac": "pnpm version:update && pnpm build && tauri build --target universal-apple-darwin",
@@ -19,7 +24,9 @@
     "build:linux": "pnpm version:update && pnpm build && tauri build --target x86_64-unknown-linux-gnu",
     "build:linux-arm": "pnpm version:update && pnpm build && tauri build --target aarch64-unknown-linux-gnu",
     "release": "pnpm version:update && pnpm build && tauri build --config src-tauri/tauri.release.conf.json",
-    "version:bump": "node -e \"const { execSync } = require('child_process'); const version = process.argv[1]; execSync(\\`git tag v\\${version}\\`, { stdio: 'inherit' }); console.log(\\`Tag v\\${version} criada!\\`);\""
+    "version:bump": "node -e \"const { execSync } = require('child_process'); const version = process.argv[1]; execSync(\\`git tag v\\${version}\\`, { stdio: 'inherit' }); console.log(\\`Tag v\\${version} criada!\\`);\"",
+    "pr:validate": "./scripts/validate-pr.sh",
+    "pr:setup": "./scripts/setup-branch-protection.sh"
   },
   "dependencies": {
     "@tauri-apps/api": "^2",

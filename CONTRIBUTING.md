@@ -88,6 +88,39 @@ Thank you for your interest in contributing to Open Cleaner RN! This document pr
    git push origin feature/your-feature-name
    ```
 
+## 🚀 Pull Request Process
+
+### Creating Effective PRs
+Open Cleaner RN uses templates específicos para diferentes tipos de contribuições:
+
+- **🐛 Bug Fix**: `.github/pull_request_template/bugfix.md`
+- **✨ Feature**: `.github/pull_request_template/feature.md`  
+- **📚 Documentation**: `.github/pull_request_template/documentation.md`
+- **♻️ Refactoring**: `.github/pull_request_template/refactoring.md`
+
+### Como Usar Templates
+Para usar um template específico, adicione `?template=nome_do_template.md` na URL do PR:
+```
+?template=feature.md
+```
+
+### PR Guidelines
+- **Título claro**: Use convenção `type: description`
+- **Descrição detalhada**: Explique o contexto e mudanças
+- **Screenshots**: Para mudanças visuais
+- **Testes**: Demonstre que funciona
+- **Links**: Referencie issues relacionadas
+
+### Status Checks
+Todos os PRs devem passar por:
+- ✅ Testes automatizados (todas as plataformas)
+- ✅ Lint e formatação
+- ✅ Type checking  
+- ✅ Security audit
+- ✅ Code review (1+ approvals)
+
+📚 **Guia completo**: [.github/PR_GUIDE.md](.github/PR_GUIDE.md)
+
 ## 📋 Coding Standards
 
 ### TypeScript/JavaScript
