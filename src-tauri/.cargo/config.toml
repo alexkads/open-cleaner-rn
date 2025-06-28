@@ -1,8 +1,4 @@
-[build]
-# Use faster linker for development builds
-rustflags = [
-  "-C", "link-arg=-fuse-ld=lld",  # Use LLD linker (faster)
-]
+# Note: LLD linker configuration only for Linux CI - macOS uses default linker
 
 [target.x86_64-unknown-linux-gnu]
 rustflags = [

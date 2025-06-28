@@ -11,7 +11,7 @@ pub async fn scan_docker_containers() -> Result<Vec<ScanResult>, String> {
     }
 
     let output = Command::new("docker")
-        .args(&[
+        .args([
             "container",
             "ls",
             "-a",
@@ -36,7 +36,7 @@ pub async fn scan_docker_containers() -> Result<Vec<ScanResult>, String> {
 
                     if size > 0 {
                         results.push(ScanResult {
-                            path: format!("docker://container/{}", container_id),
+                            path: format!("docker://container/{container_id}"),
                             size,
                             file_type: "docker_container".to_string(),
                             can_delete: true,
@@ -59,7 +59,7 @@ pub async fn scan_docker_images() -> Result<Vec<ScanResult>, String> {
     }
 
     let output = Command::new("docker")
-        .args(&[
+        .args([
             "images",
             "-f",
             "dangling=true",
@@ -81,7 +81,7 @@ pub async fn scan_docker_images() -> Result<Vec<ScanResult>, String> {
 
                     if size > 0 {
                         results.push(ScanResult {
-                            path: format!("docker://image/{}", image_id),
+                            path: format!("docker://image/{image_id}"),
                             size,
                             file_type: "docker_image".to_string(),
                             can_delete: true,
@@ -104,7 +104,7 @@ pub async fn scan_docker_volumes() -> Result<Vec<ScanResult>, String> {
     }
 
     let output = Command::new("docker")
-        .args(&[
+        .args([
             "volume",
             "ls",
             "-f",
@@ -121,7 +121,7 @@ pub async fn scan_docker_volumes() -> Result<Vec<ScanResult>, String> {
                 let volume_name = line.trim();
                 if !volume_name.is_empty() {
                     let inspect_output = Command::new("docker")
-                        .args(&[
+                        .args([
                             "system",
                             "df",
                             "-v",
@@ -142,7 +142,7 @@ pub async fn scan_docker_volumes() -> Result<Vec<ScanResult>, String> {
                     };
 
                     results.push(ScanResult {
-                        path: format!("docker://volume/{}", volume_name),
+                        path: format!("docker://volume/{volume_name}"),
                         size,
                         file_type: "docker_volume".to_string(),
                         can_delete: true,
@@ -164,7 +164,7 @@ pub async fn scan_docker_cache() -> Result<Vec<ScanResult>, String> {
     }
 
     let output = Command::new("docker")
-        .args(&[
+        .args([
             "system",
             "df",
             "--format",
@@ -226,19 +226,19 @@ pub async fn clean_docker_resources(resource_paths: Vec<String>) -> Result<Clean
 
                 let result = match resource_type {
                     "container" => Command::new("docker")
-                        .args(&["container", "rm", resource_id])
+                        .args(["container", "rm", resource_id])
                         .output(),
                     "image" => Command::new("docker")
-                        .args(&["image", "rm", resource_id])
+                        .args(["image", "rm", resource_id])
                         .output(),
                     "volume" => Command::new("docker")
-                        .args(&["volume", "rm", resource_id])
+                        .args(["volume", "rm", resource_id])
                         .output(),
                     "cache" => Command::new("docker")
-                        .args(&["builder", "prune", "-f"])
+                        .args(["builder", "prune", "-f"])
                         .output(),
                     _ => {
-                        errors.push(format!("Unknown Docker resource type: {}", resource_type));
+                        errors.push(format!("Unknown Docker resource type: {resource_type}"));
                         continue;
                     }
                 };
@@ -250,14 +250,12 @@ pub async fn clean_docker_resources(resource_paths: Vec<String>) -> Result<Clean
                             space_freed += 10 * 1024 * 1024;
                         } else {
                             let error_msg = String::from_utf8_lossy(&output.stderr);
-                            errors
-                                .push(format!("Failed to remove {}: {}", resource_path, error_msg));
+                            errors.push(format!("Failed to remove {resource_path}: {error_msg}"));
                         }
                     }
                     Err(e) => {
                         errors.push(format!(
-                            "Failed to execute Docker command for {}: {}",
-                            resource_path, e
+                            "Failed to execute Docker command for {resource_path}: {e}"
                         ));
                     }
                 }

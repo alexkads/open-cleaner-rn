@@ -3,7 +3,7 @@ use crate::utils::get_dir_size;
 
 #[tauri::command]
 pub fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
+    format!("Hello, {name}! You've been greeted from Rust!")
 }
 
 #[tauri::command]
