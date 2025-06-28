@@ -241,4 +241,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 [⭐ Star this repo](https://github.com/alexkads/open-cleaner-rn) • [🐛 Report bugs](https://github.com/alexkads/open-cleaner-rn/issues) • [💬 Join discussions](https://github.com/alexkads/open-cleaner-rn/discussions)
 
-</div>
+</div># CI/CD funcionando! ✅
