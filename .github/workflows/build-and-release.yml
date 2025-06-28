@@ -76,10 +76,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Setup Node.js cache
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
           cache: 'npm'
           cache-dependency-path: docs-astro/package-lock.json
       - name: Install and build docs
@@ -112,8 +108,7 @@ jobs:
   # Build application for all platforms
   build-app:
     name: Build Application
-    needs: [generate-changelog]
-    if: always() # Execute mesmo se generate-changelog for skipped
+    if: always() # Execute sempre, independente de outros jobs
     strategy:
       fail-fast: false
       matrix:
@@ -149,11 +144,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
           cache: 'npm'
 
       - name: Install Rust
@@ -170,9 +160,10 @@ jobs:
         run: npm ci
 
       - name: Update version from Git
-        run: node scripts/update-version.js
+        run: node scripts/update-version.cjs
 
       - name: Run tests
+        if: github.event.inputs.skip-tests != 'true'
         run: npm run test:once
 
       - name: Build frontend
