@@ -11,7 +11,7 @@
     "dev": "vite",
     "build": "npm run test:once && tsc && vite build",
     "preview": "vite preview",
-    "tauri": "tauri",
+    "tauri": "tauri dev",
     "test": "vitest",
     "test:once": "vitest --run",
     "test:ui": "vitest --ui",
