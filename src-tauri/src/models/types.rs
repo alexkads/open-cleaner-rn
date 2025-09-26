@@ -14,4 +14,6 @@ pub struct ScanResult {
     pub size: u64,
     pub file_type: String,
     pub can_delete: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub warning: Option<String>,
 }

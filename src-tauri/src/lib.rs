@@ -44,6 +44,7 @@ pub fn run() {
             scan_rust_cache,
             scan_browser_cache,
             scan_system_logs,
+            scan_system_data,
             scan_pnpm_cache,
             scan_unity_cache,
             scan_simulator_cache

@@ -21,6 +21,7 @@ describe('TauriService', () => {
         size: 1024000,
         file_type: 'cache',
         can_delete: true,
+        warning: 'Test warning',
       },
     ]
 
@@ -102,6 +103,24 @@ describe('TauriService', () => {
       const result = await TauriService.scanTempFiles()
 
       expect(mockInvoke).toHaveBeenCalledWith('scan_temp_files')
+      expect(result).toEqual(mockScanResult)
+    })
+
+    test('scanSystemLogs should call correct tauri command', async () => {
+      mockInvoke.mockResolvedValue(mockScanResult)
+
+      const result = await TauriService.scanSystemLogs()
+
+      expect(mockInvoke).toHaveBeenCalledWith('scan_system_logs')
+      expect(result).toEqual(mockScanResult)
+    })
+
+    test('scanSystemData should call correct tauri command', async () => {
+      mockInvoke.mockResolvedValue(mockScanResult)
+
+      const result = await TauriService.scanSystemData()
+
+      expect(mockInvoke).toHaveBeenCalledWith('scan_system_data')
       expect(result).toEqual(mockScanResult)
     })
   })

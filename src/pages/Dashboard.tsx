@@ -5,6 +5,7 @@ import {
   CheckCircle,
   Clock,
   Cpu,
+  Database,
   Download,
   HardDrive,
   Layers,
@@ -16,7 +17,7 @@ import {
   Trash2,
   Zap,
 } from 'lucide-react'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import DebugPanel from '../components/DebugPanel'
 import { CleaningHistory, DatabaseService } from '../services/database'
@@ -38,7 +39,7 @@ interface CleaningTask {
   id: string
   name: string
   description: string
-  category: 'cache' | 'logs' | 'temp' | 'build' | 'docker' | 'tools'
+  category: 'cache' | 'logs' | 'temp' | 'build' | 'docker' | 'tools' | 'system'
   icon: React.ComponentType<{ className?: string }>
   scanFunction: () => Promise<ScanResult[]>
   color: string
@@ -189,6 +190,15 @@ const CLEANING_TASKS: Omit<CleaningTask, 'status' | 'size' | 'items'>[] = [
     color: 'text-orange-500',
   },
   {
+    id: 'system-data',
+    name: 'System Data',
+    description: 'Deep clean OS caches, backups, and diagnostic data with warnings',
+    category: 'system',
+    icon: Database,
+    scanFunction: TestTauriService.scanSystemData,
+    color: 'text-warning',
+  },
+  {
     id: 'system-logs',
     name: 'System Logs',
     description: 'Clean OS logs, crash reports, and temporary system files',
@@ -212,6 +222,7 @@ export default function Dashboard() {
     space_freed: number
     duration: number
     errors: string[]
+    warnings: string[]
   } | null>(null)
   const [lastError, setLastError] = useState<string | undefined>()
   const [recentHistory, setRecentHistory] = useState<CleaningHistory[]>([])
@@ -228,42 +239,64 @@ export default function Dashboard() {
   const [showDebugPanel, setShowDebugPanel] = useState(false)
   const [isInitialized, setIsInitialized] = useState(false)
 
-  // Inicializar componente
-  useEffect(() => {
-    if (!isInitialized) {
-      initializeDashboard()
-    }
-  }, [isInitialized])
+  const totalWarnings = useMemo(
+    () =>
+      tasks.reduce(
+        (count, task) =>
+          count + task.items.filter(item => Boolean(item.warning)).length,
+        0
+      ),
+    [tasks]
+  )
 
-  // Debug event listener
-  useEffect(() => {
-    const handleDebugLogTasks = () => {
-      console.log('=== TASK DEBUG FROM DASHBOARD ===')
-      console.log(
-        'Current tasks state:',
-        tasks.map(t => ({
-          id: t.id,
-          name: t.name,
-          status: t.status,
-          size: t.size,
-          itemsLength: t.items.length,
-          items: t.items,
-        }))
-      )
-      console.log('Current states:', {
-        isScanning,
-        isCleaning,
-        totalSpaceFound,
-        cleanableTasks: tasks.filter(
-          task => task.status === 'found' && task.items.length > 0
-        ).length,
+  const loadTasks = useCallback(() => {
+    const initialTasks: CleaningTask[] = CLEANING_TASKS.map(task => ({
+      ...task,
+      size: 0,
+      status: 'pending',
+      items: [],
+    }))
+    setTasks(initialTasks)
+  }, [])
+
+  const loadRecentHistory = useCallback(async () => {
+    try {
+      console.log('Loading recent history...')
+      const history = await DatabaseService.getCleaningHistory(5)
+      console.log('Loaded history:', history)
+      setRecentHistory(history)
+    } catch (error) {
+      console.error('Failed to load recent history:', error)
+    }
+  }, [])
+
+  const loadStats = useCallback(async () => {
+    try {
+      console.log('Loading stats...')
+      const statsData = await DatabaseService.getCleaningStats()
+      console.log('Loaded stats:', statsData)
+      setStats(statsData)
+    } catch (error) {
+      console.error('Failed to load stats:', error)
+    }
+  }, [])
+
+  const checkSystemStatus = useCallback(async () => {
+    try {
+      // Simular verificação de status do sistema
+      // Em uma implementação real, isso verificaria se os serviços estão rodando
+      setSystemStatus({
+        reactNative: Math.random() > 0.5 ? 'active' : 'idle',
+        metroBundle: Math.random() > 0.3 ? 'active' : 'idle',
+      })
+    } catch (error) {
+      console.error('Failed to check system status:', error)
+      setSystemStatus({
+        reactNative: 'error',
+        metroBundle: 'error',
       })
     }
-
-    window.addEventListener('debug-log-tasks', handleDebugLogTasks)
-    return () =>
-      window.removeEventListener('debug-log-tasks', handleDebugLogTasks)
-  }, [tasks, isScanning, isCleaning, totalSpaceFound])
+  }, [])
 
   const initializeDashboard = useCallback(async () => {
     if (isInitialized) return // Evitar inicialização duplicada
@@ -300,56 +333,50 @@ export default function Dashboard() {
         duration: 5000,
       })
     }
-  }, [isInitialized])
+  }, [
+    checkSystemStatus,
+    isInitialized,
+    loadRecentHistory,
+    loadStats,
+    loadTasks,
+  ])
 
-  const loadTasks = () => {
-    const initialTasks: CleaningTask[] = CLEANING_TASKS.map(task => ({
-      ...task,
-      size: 0,
-      status: 'pending',
-      items: [],
-    }))
-    setTasks(initialTasks)
-  }
-
-  const loadRecentHistory = async () => {
-    try {
-      console.log('Loading recent history...')
-      const history = await DatabaseService.getCleaningHistory(5)
-      console.log('Loaded history:', history)
-      setRecentHistory(history)
-    } catch (error) {
-      console.error('Failed to load recent history:', error)
+  // Inicializar componente
+  useEffect(() => {
+    if (!isInitialized) {
+      initializeDashboard()
     }
-  }
+  }, [initializeDashboard, isInitialized])
 
-  const loadStats = async () => {
-    try {
-      console.log('Loading stats...')
-      const statsData = await DatabaseService.getCleaningStats()
-      console.log('Loaded stats:', statsData)
-      setStats(statsData)
-    } catch (error) {
-      console.error('Failed to load stats:', error)
-    }
-  }
-
-  const checkSystemStatus = async () => {
-    try {
-      // Simular verificação de status do sistema
-      // Em uma implementação real, isso verificaria se os serviços estão rodando
-      setSystemStatus({
-        reactNative: Math.random() > 0.5 ? 'active' : 'idle',
-        metroBundle: Math.random() > 0.3 ? 'active' : 'idle',
-      })
-    } catch (error) {
-      console.error('Failed to check system status:', error)
-      setSystemStatus({
-        reactNative: 'error',
-        metroBundle: 'error',
+  // Debug event listener
+  useEffect(() => {
+    const handleDebugLogTasks = () => {
+      console.log('=== TASK DEBUG FROM DASHBOARD ===')
+      console.log(
+        'Current tasks state:',
+        tasks.map(t => ({
+          id: t.id,
+          name: t.name,
+          status: t.status,
+          size: t.size,
+          itemsLength: t.items.length,
+          items: t.items,
+        }))
+      )
+      console.log('Current states:', {
+        isScanning,
+        isCleaning,
+        totalSpaceFound,
+        cleanableTasks: tasks.filter(
+          task => task.status === 'found' && task.items.length > 0
+        ).length,
       })
     }
-  }
+
+    window.addEventListener('debug-log-tasks', handleDebugLogTasks)
+    return () =>
+      window.removeEventListener('debug-log-tasks', handleDebugLogTasks)
+  }, [tasks, isScanning, isCleaning, totalSpaceFound])
 
   const updateTaskStatus = (taskId: string, updates: Partial<CleaningTask>) => {
     setTasks(prev =>
@@ -551,6 +578,7 @@ export default function Dashboard() {
           let totalFilesDeleted = 0
           let completedTasks = 0
           const errors: string[] = []
+          const warningsLog: string[] = []
 
           for (const task of tasksToClean) {
             try {
@@ -565,6 +593,23 @@ export default function Dashboard() {
                 id: cleanToast,
                 description: `${completedTasks + 1}/${tasksToClean.length} - ${formatBytes(totalSpaceCleaned)} liberados`,
               })
+
+              const warningItems = task.items.filter(item => item.warning)
+              if (warningItems.length > 0) {
+                const summary = warningItems
+                  .map(item => {
+                    const note = item.warning ? ` — ${item.warning}` : ''
+                    return `${item.path}${note}`
+                  })
+                  .join('; ')
+
+                warningsLog.push(`${task.name}: ${summary}`)
+                console.warn(
+                  '[Clean RN] Warnings detected while cleaning',
+                  task.name,
+                  warningItems
+                )
+              }
 
               const filePaths = task.items
                 .filter(item => item.can_delete)
@@ -622,14 +667,17 @@ export default function Dashboard() {
             totalFilesDeleted,
             duration,
             errors,
+            warnings: warningsLog,
           })
 
-          // Toast de sucesso
           const hasErrors = errors.length > 0
-          const toastType = hasErrors ? 'warning' : 'success'
+          const hasWarnings = warningsLog.length > 0
+          const toastType = hasErrors || hasWarnings ? 'warning' : 'success'
           const toastTitle = hasErrors
             ? 'Limpeza concluída com avisos'
-            : 'Limpeza concluída com sucesso!'
+            : hasWarnings
+              ? 'Limpeza concluída com avisos de sistema'
+              : 'Limpeza concluída com sucesso!'
           const toastDescription = `${formatBytes(totalSpaceCleaned)} liberados • ${totalFilesDeleted} arquivos removidos • ${formatDuration(duration)}`
 
           toast[toastType](toastTitle, {
@@ -638,7 +686,6 @@ export default function Dashboard() {
             duration: 7000,
           })
 
-          // Se houver erros, mostrar detalhes
           if (hasErrors) {
             setTimeout(() => {
               toast.error('Alguns erros ocorreram durante a limpeza', {
@@ -646,9 +693,15 @@ export default function Dashboard() {
                 duration: 5000,
               })
             }, 1000)
+          } else if (hasWarnings) {
+            setTimeout(() => {
+              toast.warning('Avisos de dados do sistema registrados', {
+                description: `${warningsLog.length} item(s) com aviso foram limpos. Consulte o console para detalhes.`,
+                duration: 5000,
+              })
+            }, 1000)
           }
 
-          // Salvar resultado no banco de dados
           const cleaningRecord: Omit<CleaningHistory, 'id' | 'created_at'> = {
             date: new Date().toISOString().split('T')[0],
             time: new Date().toTimeString().split(' ')[0],
@@ -656,20 +709,23 @@ export default function Dashboard() {
             files_deleted: totalFilesDeleted,
             duration: duration,
             type: tasksToClean.length > 5 ? 'deep' : 'quick',
-            status: errors.length > 0 ? 'warning' : 'success',
-            errors: errors.length > 0 ? errors.join('; ') : undefined,
+            status: hasErrors || hasWarnings ? 'warning' : 'success',
+            errors:
+              hasErrors || hasWarnings
+                ? [...errors, ...warningsLog].join('; ')
+                : undefined,
           }
 
           console.log('Saving cleaning record to database:', cleaningRecord)
           const recordId = await DatabaseService.addCleaningRecord(cleaningRecord)
           console.log('Successfully saved cleaning record with ID:', recordId)
 
-          // Atualizar resultado para exibição
           setLastCleanResult({
             files_deleted: totalFilesDeleted,
             space_freed: totalSpaceCleaned,
             duration: duration,
             errors: errors,
+            warnings: warningsLog,
           })
 
           // Recarregar dados após pequeno delay
@@ -712,6 +768,7 @@ export default function Dashboard() {
       let totalFilesDeleted = 0
       let completedTasks = 0
       const errors: string[] = []
+      const warningsLog: string[] = []
 
       for (const task of cleanableTasks) {
         try {
@@ -721,15 +778,32 @@ export default function Dashboard() {
           setCurrentTask(`Cleaning ${task.name}`)
           updateTaskStatus(task.id, { status: 'cleaning' })
 
-          // Atualizar toast com progresso
-          toast.loading(`Limpando ${task.name}...`, {
-            id: cleanToast,
-            description: `${completedTasks + 1}/${cleanableTasks.length} - ${formatBytes(totalSpaceCleaned)} liberados`,
-          })
+      // Atualizar toast com progresso
+      toast.loading(`Limpando ${task.name}...`, {
+        id: cleanToast,
+        description: `${completedTasks + 1}/${cleanableTasks.length} - ${formatBytes(totalSpaceCleaned)} liberados`,
+      })
 
-          const filePaths = task.items
-            .filter(item => item.can_delete)
-            .map(item => item.path)
+      const warningItems = task.items.filter(item => item.warning)
+      if (warningItems.length > 0) {
+        const summary = warningItems
+          .map(item => {
+            const note = item.warning ? ` — ${item.warning}` : ''
+            return `${item.path}${note}`
+          })
+          .join('; ')
+
+        warningsLog.push(`${task.name}: ${summary}`)
+        console.warn(
+          '[Clean RN] Warnings detected while cleaning',
+          task.name,
+          warningItems
+        )
+      }
+
+      const filePaths = task.items
+        .filter(item => item.can_delete)
+        .map(item => item.path)
 
           console.log(`Cleaning ${task.name}:`, filePaths.length, 'files')
           console.log('File paths:', filePaths)
@@ -783,14 +857,17 @@ export default function Dashboard() {
         totalFilesDeleted,
         duration,
         errors,
+        warnings: warningsLog,
       })
 
-      // Toast de sucesso
       const hasErrors = errors.length > 0
-      const toastType = hasErrors ? 'warning' : 'success'
+      const hasWarnings = warningsLog.length > 0
+      const toastType = hasErrors || hasWarnings ? 'warning' : 'success'
       const toastTitle = hasErrors
         ? 'Limpeza concluída com avisos'
-        : 'Limpeza concluída com sucesso!'
+        : hasWarnings
+          ? 'Limpeza concluída com avisos de sistema'
+          : 'Limpeza concluída com sucesso!'
       const toastDescription = `${formatBytes(totalSpaceCleaned)} liberados • ${totalFilesDeleted} arquivos removidos • ${formatDuration(duration)}`
 
       toast[toastType](toastTitle, {
@@ -799,7 +876,6 @@ export default function Dashboard() {
         duration: 7000,
       })
 
-      // Se houver erros, mostrar detalhes
       if (hasErrors) {
         setTimeout(() => {
           toast.error('Alguns erros ocorreram durante a limpeza', {
@@ -807,9 +883,15 @@ export default function Dashboard() {
             duration: 5000,
           })
         }, 1000)
+      } else if (hasWarnings) {
+        setTimeout(() => {
+          toast.warning('Avisos de dados do sistema registrados', {
+            description: `${warningsLog.length} item(s) com aviso foram limpos. Consulte o console para detalhes.`,
+            duration: 5000,
+          })
+        }, 1000)
       }
 
-      // Salvar resultado no banco de dados
       const cleaningRecord: Omit<CleaningHistory, 'id' | 'created_at'> = {
         date: new Date().toISOString().split('T')[0],
         time: new Date().toTimeString().split(' ')[0],
@@ -817,20 +899,23 @@ export default function Dashboard() {
         files_deleted: totalFilesDeleted,
         duration: duration,
         type: cleanableTasks.length > 5 ? 'deep' : 'quick',
-        status: errors.length > 0 ? 'warning' : 'success',
-        errors: errors.length > 0 ? errors.join('; ') : undefined,
+        status: hasErrors || hasWarnings ? 'warning' : 'success',
+        errors:
+          hasErrors || hasWarnings
+            ? [...errors, ...warningsLog].join('; ')
+            : undefined,
       }
 
       console.log('Saving cleaning record to database:', cleaningRecord)
       const recordId = await DatabaseService.addCleaningRecord(cleaningRecord)
       console.log('Successfully saved cleaning record with ID:', recordId)
 
-      // Atualizar resultado para exibição
       setLastCleanResult({
         files_deleted: totalFilesDeleted,
         space_freed: totalSpaceCleaned,
         duration: duration,
         errors: errors,
+        warnings: warningsLog,
       })
 
       // Recarregar dados após pequeno delay
@@ -1015,6 +1100,12 @@ export default function Dashboard() {
                       ? `Ready to clean ${tasks.filter(t => t.status === 'found' && t.items.length > 0).length} categories`
                       : 'Scan first to find cleanable files'}
               </p>
+              {totalWarnings > 0 && !isCleaning && (
+                <p className="text-xs text-warning mt-1">
+                  {totalWarnings} warning{totalWarnings === 1 ? '' : 's'} flagged.
+                  Review details below before cleaning.
+                </p>
+              )}
             </div>
           </div>
         </button>
@@ -1035,9 +1126,16 @@ export default function Dashboard() {
                   {lastCleanResult.files_deleted} files • Took{' '}
                   {formatDuration(lastCleanResult.duration)}
                 </p>
-                {lastCleanResult.errors.length > 0 && (
+                {lastCleanResult.warnings.length > 0 && (
                   <p className="text-xs text-warning mt-1">
-                    {lastCleanResult.errors.length} warnings occurred
+                    {lastCleanResult.warnings.length} warning
+                    {lastCleanResult.warnings.length === 1 ? '' : 's'} logged
+                  </p>
+                )}
+                {lastCleanResult.errors.length > 0 && (
+                  <p className="text-xs text-danger mt-1">
+                    {lastCleanResult.errors.length} error
+                    {lastCleanResult.errors.length === 1 ? '' : 's'} occurred
                   </p>
                 )}
               </div>
@@ -1118,59 +1216,92 @@ export default function Dashboard() {
 
       {/* Tasks Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {tasks.map((task) => (
-          <div
-            key={task.id}
-            className={clsx(
-              'glass-effect rounded-xl p-4 border transition-all duration-200',
-              task.status === 'found' && 'border-primary/50 bg-primary/5',
-              task.status === 'scanning' && 'border-warning/50 bg-warning/5',
-              task.status === 'cleaning' && 'border-success/50 bg-success/5',
-              task.status === 'completed' && 'border-success/30 bg-success/10',
-              task.status === 'error' && 'border-danger/50 bg-danger/5'
-            )}
-          >
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 rounded-lg bg-dark-surface-2">
-                  <task.icon className={clsx('w-5 h-5', task.color)} />
+        {tasks.map(task => {
+          const warningItems = task.items.filter(item => item.warning)
+
+          return (
+            <div
+              key={task.id}
+              className={clsx(
+                'glass-effect rounded-xl p-4 border transition-all duration-200',
+                task.status === 'found' && 'border-primary/50 bg-primary/5',
+                task.status === 'scanning' && 'border-warning/50 bg-warning/5',
+                task.status === 'cleaning' && 'border-success/50 bg-success/5',
+                task.status === 'completed' && 'border-success/30 bg-success/10',
+                task.status === 'error' && 'border-danger/50 bg-danger/5',
+                warningItems.length > 0 && 'ring-1 ring-warning/40'
+              )}
+            >
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 rounded-lg bg-dark-surface-2">
+                    <task.icon className={clsx('w-5 h-5', task.color)} />
+                  </div>
+                  <div>
+                    <h3 className="font-medium">{task.name}</h3>
+                    <p className="text-xs text-gray-400">{task.description}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-medium">{task.name}</h3>
-                  <p className="text-xs text-gray-400">{task.description}</p>
-                </div>
+
+                <div>{getStatusIcon(task.status)}</div>
               </div>
 
-              <div>
-                {getStatusIcon(task.status)}
+              <div className="space-y-2">
+                {task.size > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-400">Size:</span>
+                    <span className="font-medium text-primary">
+                      {formatBytes(task.size)}
+                    </span>
+                  </div>
+                )}
+
+                {task.items.length > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-400">Items:</span>
+                    <span className="font-medium">{task.items.length}</span>
+                  </div>
+                )}
+
+                {task.lastUpdated && (
+                  <div className="text-xs text-gray-500">
+                    Last scan: {task.lastUpdated.toLocaleTimeString()}
+                  </div>
+                )}
+
+                {warningItems.length > 0 && (
+                  <div className="mt-2 p-3 rounded-lg border border-warning/40 bg-warning/5">
+                    <div className="flex items-start space-x-2 text-warning">
+                      <AlertTriangle className="w-4 h-4 mt-0.5" />
+                      <div className="space-y-1 w-full">
+                        {warningItems.slice(0, 2).map(item => (
+                          <div key={item.path} className="text-xs leading-relaxed">
+                            <span className="font-medium">
+                              {item.warning ?? 'Review before cleaning'}
+                            </span>
+                            <span
+                              className="block text-warning/70 break-all"
+                              title={item.path}
+                            >
+                              {item.path}
+                              {!item.can_delete && ' • Requires manual removal'}
+                            </span>
+                          </div>
+                        ))}
+                        {warningItems.length > 2 && (
+                          <p className="text-xs text-warning/80">
+                            +{warningItems.length - 2} additional warning
+                            {warningItems.length - 2 === 1 ? '' : 's'}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
-
-            <div className="space-y-2">
-              {task.size > 0 && (
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Size:</span>
-                  <span className="font-medium text-primary">
-                    {formatBytes(task.size)}
-                  </span>
-                </div>
-              )}
-
-              {task.items.length > 0 && (
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Items:</span>
-                  <span className="font-medium">{task.items.length}</span>
-                </div>
-              )}
-
-              {task.lastUpdated && (
-                <div className="text-xs text-gray-500">
-                  Last scan: {task.lastUpdated.toLocaleTimeString()}
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
       {/* Recent History Preview */}

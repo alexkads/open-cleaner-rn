@@ -40,6 +40,7 @@ pub async fn scan_docker_containers() -> Result<Vec<ScanResult>, String> {
                             size,
                             file_type: "docker_container".to_string(),
                             can_delete: true,
+                            warning: None,
                         });
                     }
                 }
@@ -85,6 +86,7 @@ pub async fn scan_docker_images() -> Result<Vec<ScanResult>, String> {
                             size,
                             file_type: "docker_image".to_string(),
                             can_delete: true,
+                            warning: None,
                         });
                     }
                 }
@@ -146,6 +148,7 @@ pub async fn scan_docker_volumes() -> Result<Vec<ScanResult>, String> {
                         size,
                         file_type: "docker_volume".to_string(),
                         can_delete: true,
+                        warning: None,
                     });
                 }
             }
@@ -195,6 +198,7 @@ pub async fn scan_docker_cache() -> Result<Vec<ScanResult>, String> {
                                 size,
                                 file_type: "docker_cache".to_string(),
                                 can_delete: true,
+                                warning: None,
                             });
                         }
                     }

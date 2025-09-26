@@ -232,6 +232,29 @@ const MOCK_SCAN_RESULTS: Record<string, ScanResult[]> = {
       can_delete: true,
     },
   ],
+  systemData: [
+    {
+      path: '/Users/dev/Library/Application Support/Quick Look',
+      size: 1024 * 1024 * 60,
+      file_type: 'system_data',
+      can_delete: true,
+      warning: 'Quick Look cache — macOS rebuilds it automatically.',
+    },
+    {
+      path: '/Users/dev/Library/Application Support/com.apple.sharedfilelist',
+      size: 1024 * 1024 * 15,
+      file_type: 'system_data',
+      can_delete: true,
+      warning: 'Finder recent items list. Clearing resets document history.',
+    },
+    {
+      path: '/Users/dev/Library/Application Support/MobileSync/Backup',
+      size: 1024 * 1024 * 900,
+      file_type: 'system_data',
+      can_delete: false,
+      warning: 'iOS backups detected. Review before deleting to avoid data loss.',
+    },
+  ],
 }
 
 export class MockTauriService {
@@ -338,6 +361,11 @@ export class MockTauriService {
   static async scanSystemLogs(): Promise<ScanResult[]> {
     await delay(900)
     return MOCK_SCAN_RESULTS.systemLogs
+  }
+
+  static async scanSystemData(): Promise<ScanResult[]> {
+    await delay(1100)
+    return MOCK_SCAN_RESULTS.systemData
   }
 
   static async cleanDockerResources(

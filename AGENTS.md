@@ -1,40 +1,41 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-- `src/` hosts the React UI: `components/`, `pages/`, `services/` (Tauri adapters), `utils/`, and `test-setup.ts` for Vitest globals.
-- `src-tauri/` contains the Rust commands, configuration, and release metadata (check `src-tauri/src/commands/`).
-- `public/` stores static assets; app media lives in `src/assets/`.
-- `scripts/` centralizes automation such as `validate-pr.sh` and `update-version.cjs`; `docs-astro/` powers the documentation site.
-- Build artifacts land in `dist/`; keep them out of git.
+- `src/` hosts the React UI: `components/`, `pages/`, `services/` for Tauri bridges, `utils/`, and `test-setup.ts`.
+- Tests stay beside features (`__tests__/` or `*.test.tsx`); see `src/services/__tests__/` for patterns.
+- `src-tauri/` contains Rust commands, deep cleaning logic under `commands/`, and release config in `tauri.conf.json`.
+- `public/` delivers static assets; ship runtime media from `src/assets/`.
+- Automation scripts live in `scripts/`; the docs portal resides in `docs-astro/`.
 
 ## Build, Test & Development Commands
-- `pnpm install` installs JavaScript dependencies; run after cloning or pulling lockfile updates.
-- `pnpm dev` launches the Vite web preview; `pnpm tauri dev` opens the desktop shell for full-stack work.
-- `pnpm build` runs tests, TypeScript emit checks, and the production Vite build; `pnpm build:all` bundles cross-platform installers.
-- Quality gates: `pnpm lint`, `pnpm format:check`, and `pnpm type-check`.
-- Test suite: `pnpm test` (watch), `pnpm test:once` (CI parity), `pnpm test:coverage`, and `pnpm test:ui` for the Vitest dashboard.
-- Make shortcuts (e.g., `make dev`, `make build`, `make release`) wrap the pnpm/Tauri workflows.
+- `pnpm install` (or `make install`) syncs dependencies.
+- `pnpm dev` runs the web preview; `pnpm tauri dev` opens the desktop shell.
+- `pnpm build` executes `test:once`, type checks, and emits the Vite bundle; `pnpm build:all` or `make build-*` create installers.
+- Quality gates: `pnpm lint`, `pnpm format:check`, `pnpm type-check`, and `pnpm test:coverage`.
 
 ## Coding Style & Naming Conventions
-- TypeScript + React functional components; prefer hooks over mutable globals.
-- Adhere to ESLint (`eslint.config.js`) and Prettier defaults (2-space indent, trailing commas, single quotes via formatter).
-- Use `PascalCase` for components/pages, `camelCase` for helpers and hooks (prefixed with `use`), and `SCREAMING_SNAKE_CASE` for shared constants.
-- Keep services pure; colocate styles with the component or `App.css`.
+- Prefer React functional components and hooks; avoid mutable singletons.
+- Prettier enforces 2-space indentation, trailing commas, and single quotes; ESLint (`eslint.config.js`) guards `any`/unused vars.
+- Name components with `PascalCase`, helpers and hooks with `camelCase` (`useCacheScan`), and shared constants with `SCREAMING_SNAKE_CASE`.
+- Keep side effects inside services and export pure helpers from `utils/`.
 
 ## Testing Guidelines
-- Vitest with Testing Library; place specs beside implementation (`__tests__/` folders or `*.test.ts`).
-- Reuse shared mocks and globals from `src/test-setup.ts`.
-- Cover new logic paths before submitting; confirm metrics with `pnpm test:coverage`.
-- Mock Tauri invocations with `vi.mock` as demonstrated in existing service tests.
+- Vitest + Testing Library are required; co-locate specs with code using `*.test.ts(x)` or scoped `__tests__/` directories.
+- Reuse `src/test-setup.ts` for globals and Tauri mocks (`vi.mock('@tauri-apps/api', ...)`).
+- Cover new scanner or service logic and confirm via `pnpm test:coverage` before submitting.
+
+## Deep Clean & System Data Responsibilities
+- Deep-clean routines live in `src-tauri/src/commands/cache_scanners.rs`; group platform paths per function.
+- Document any "System Data" deletions, double-check `can_delete`, and surface warnings in the returned `ScanResult` objects.
+- Keep scan-first, clean-second behavior: expose new targets through the scan API before wiring deletion handlers.
 
 ## Commit & Pull Request Guidelines
-- Follow Conventional Commits (`feat:`, `fix:`, `docs:`); keep subjects imperative and under ~72 characters.
-- Before opening a PR, run `pnpm lint`, `pnpm test:once`, and `pnpm type-check`.
-- PRs should include context, linked issues, and screenshots for UI tweaks.
-- Select the correct template via `?template=<type>.md` and list validation commands so reviewers can reproduce.
+- Follow Conventional Commits (`feat:`, `fix:`, `chore:`, etc.) with imperative, ≤72-character subjects.
+- Run `pnpm lint`, `pnpm test:once`, and `pnpm type-check` prior to pushing.
+- PRs should cite related issues, list validation commands, and attach evidence for UI or cleaning tweaks.
+- Select the correct template via `?template=<type>.md` and note follow-up tasks or migrations.
 
 ## Security & Configuration Tips
-- Copy `env.example` to `.env`; never commit secrets or machine-specific paths.
-- Tauri builds depend on Rust toolchains—use `make setup-targets` when enabling cross-compilation.
-- Keep installers out of git; ship them as release assets.
-- For system-data deep cleans enable Deep Scan Mode and document new paths.
+- Copy `env.example` to `.env`; never commit machine-specific credentials.
+- Run `make setup-targets` (or `rustup target add ...`) before building installers for a new platform.
+- Keep artifacts out of git—publish installers via release assets or CI storage.

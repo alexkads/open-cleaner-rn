@@ -5,6 +5,7 @@ export interface ScanResult {
   size: number
   file_type: string
   can_delete: boolean
+  warning?: string
 }
 
 export interface CleaningResult {
@@ -121,6 +122,10 @@ export class TauriService {
 
   static async scanSystemLogs(): Promise<ScanResult[]> {
     return await invoke('scan_system_logs')
+  }
+
+  static async scanSystemData(): Promise<ScanResult[]> {
+    return await invoke('scan_system_data')
   }
 }
 

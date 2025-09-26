@@ -23,6 +23,7 @@ pub async fn scan_node_modules(project_path: String) -> Result<Vec<ScanResult>, 
                 size,
                 file_type: "node_modules".to_string(),
                 can_delete: true,
+                warning: None,
             });
         }
     }

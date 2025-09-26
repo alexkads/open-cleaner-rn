@@ -14,7 +14,7 @@ import {
   X,
   Zap,
 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { DatabaseService } from '../services/database'
 
 // Variantes de animação
@@ -89,12 +89,7 @@ export default function Settings() {
 
   const saveControls = useAnimation()
 
-  // Carregar configurações do banco
-  useEffect(() => {
-    loadSettings()
-  }, [])
-
-  const loadSettings = async () => {
+  const loadSettings = useCallback(async () => {
     try {
       setLoading(true)
       await DatabaseService.init()
@@ -126,7 +121,12 @@ export default function Settings() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
+
+  // Carregar configurações do banco
+  useEffect(() => {
+    loadSettings()
+  }, [loadSettings])
 
   const handleSave = async () => {
     try {
