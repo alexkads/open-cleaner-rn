@@ -102,8 +102,9 @@ export class TauriService {
     return await invoke('scan_hermes_cache')
   }
 
+  // VS Code scanning DISABLED - User doesn't want VS Code cleaning
   static async scanVsCodeCache(): Promise<ScanResult[]> {
-    return await invoke('scan_vscode_cache')
+    return Promise.resolve([]) // Return empty array instead of calling backend
   }
 
   static async scanAndroidStudioCache(): Promise<ScanResult[]> {
@@ -116,6 +117,10 @@ export class TauriService {
 
   static async scanHomebrewCache(): Promise<ScanResult[]> {
     return await invoke('scan_homebrew_cache')
+  }
+
+  static async scanSystemLogs(): Promise<ScanResult[]> {
+    return await invoke('scan_system_logs')
   }
 }
 

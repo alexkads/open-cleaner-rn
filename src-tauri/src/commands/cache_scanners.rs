@@ -345,35 +345,15 @@ pub async fn scan_hermes_cache() -> Result<Vec<ScanResult>, String> {
     Ok(results)
 }
 
+// VS Code cache scanning DISABLED to protect user configurations and extensions
+// User requested: "na verdade eu não quero que limpe nada no VSCode"
+/*
 #[tauri::command]
 pub async fn scan_vscode_cache() -> Result<Vec<ScanResult>, String> {
-    let mut results = Vec::new();
-
-    let home_dir = dirs::home_dir().ok_or("Could not find home directory")?;
-
-    let cache_paths = vec![
-        home_dir.join(".vscode/extensions"),
-        home_dir.join("Library/Application Support/Code/logs"),
-        home_dir.join("Library/Caches/com.microsoft.VSCode"),
-        home_dir.join("AppData/Roaming/Code/logs"),
-        home_dir.join("AppData/Roaming/Code/CachedExtensions"),
-    ];
-
-    for cache_path in cache_paths {
-        if cache_path.exists() {
-            if let Ok(size) = get_dir_size(&cache_path) {
-                results.push(ScanResult {
-                    path: cache_path.to_string_lossy().to_string(),
-                    size,
-                    file_type: "vscode_cache".to_string(),
-                    can_delete: true,
-                });
-            }
-        }
-    }
-
-    Ok(results)
+    // DISABLED - User does not want any VS Code cleaning
+    Ok(Vec::new())
 }
+*/
 
 #[tauri::command]
 pub async fn scan_android_studio_cache() -> Result<Vec<ScanResult>, String> {
@@ -627,26 +607,184 @@ pub async fn scan_system_logs() -> Result<Vec<ScanResult>, String> {
 
     let home_dir = dirs::home_dir().ok_or("Could not find home directory")?;
 
+    // macOS specific log paths
+    #[cfg(target_os = "macos")]
     let log_paths = vec![
+        // User logs
         home_dir.join("Library/Logs"),
         home_dir.join("Library/Application Support/CrashReporter"),
+        // System logs (safe to clean old ones)
+        std::path::PathBuf::from("/var/log/install.log"),
+        std::path::PathBuf::from("/var/log/system.log"),
+        std::path::PathBuf::from("/var/log/wifi.log"),
+        // Temporary logs
+        std::path::PathBuf::from("/tmp"),
+        std::path::PathBuf::from("/var/tmp"),
+        // Console logs
+        home_dir.join("Library/Logs/DiagnosticReports"),
+        // Application logs
+        home_dir.join("Library/Logs/CoreSimulator"),
+        home_dir.join("Library/Logs/Adobe"),
+        home_dir.join("Library/Logs/Google"),
+        home_dir.join("Library/Logs/Microsoft"),
+        // Cache and temporary files
+        home_dir.join("Library/Caches/com.apple.helpd"),
+        home_dir.join("Library/Caches/com.apple.WebKit.PluginProcess"),
+    ];
+
+    // Windows specific log paths
+    #[cfg(target_os = "windows")]
+    let log_paths = vec![
+        // User logs
+        home_dir.join("AppData/Local/Temp"),
+        home_dir.join("AppData/Roaming/Microsoft/Windows/Recent"),
+        // Windows logs
+        std::path::PathBuf::from("C:/Windows/Logs"),
+        std::path::PathBuf::from("C:/Windows/Temp"),
+        std::path::PathBuf::from("C:/Windows/Prefetch"),
+        // Application logs
+        home_dir.join("AppData/Local/Microsoft/Windows/WebCache"),
+        home_dir.join("AppData/Local/Microsoft/Windows/INetCache"),
+        home_dir.join("AppData/Local/Microsoft/CLR_v4.0_30319"),
+        // Event logs (read-only scan)
+        std::path::PathBuf::from("C:/Windows/System32/winevt/Logs"),
+    ];
+
+    // Linux specific log paths
+    #[cfg(target_os = "linux")]
+    let log_paths = vec![
+        // User logs
+        home_dir.join(".cache"),
+        home_dir.join(".local/share/Trash"),
+        home_dir.join(".xsession-errors"),
+        // System logs (user accessible)
+        std::path::PathBuf::from("/tmp"),
+        std::path::PathBuf::from("/var/tmp"),
+        // Application logs
+        home_dir.join(".local/share/recently-used.xbel"),
+        home_dir.join(".mozilla/firefox/Crash Reports"),
+        home_dir.join(".config/google-chrome/Crash Reports"),
+    ];
+
+    // Generic paths that work on all systems
+    #[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux")))]
+    let log_paths = vec![
+        home_dir.join("Library/Logs"),
         std::path::PathBuf::from("/tmp"),
     ];
 
     for log_path in log_paths {
         if log_path.exists() {
-            if let Ok(size) = get_dir_size(&log_path) {
-                results.push(ScanResult {
-                    path: log_path.to_string_lossy().to_string(),
-                    size,
-                    file_type: "system_logs".to_string(),
-                    can_delete: true,
-                });
+            // Check if it's a directory
+            if log_path.is_dir() {
+                if let Ok(size) = get_dir_size(&log_path) {
+                    // Only include if there's actual content and it's safe to clean
+                    if size > 0 && is_safe_to_clean(&log_path) {
+                        results.push(ScanResult {
+                            path: log_path.to_string_lossy().to_string(),
+                            size,
+                            file_type: "system_logs".to_string(),
+                            can_delete: true,
+                        });
+                    }
+                }
+            } else if log_path.is_file() {
+                // Handle individual log files
+                if let Ok(metadata) = std::fs::metadata(&log_path) {
+                    let size = metadata.len();
+                    if size > 0 && is_safe_log_file(&log_path) {
+                        results.push(ScanResult {
+                            path: log_path.to_string_lossy().to_string(),
+                            size,
+                            file_type: "system_logs".to_string(),
+                            can_delete: is_safe_to_clean(&log_path),
+                        });
+                    }
+                }
             }
         }
     }
 
     Ok(results)
+}
+
+// Helper function to determine if a path is safe to clean
+fn is_safe_to_clean(path: &std::path::Path) -> bool {
+    let path_str = path.to_string_lossy().to_lowercase();
+    
+    // Always safe to clean
+    let safe_patterns = vec![
+        "/tmp",
+        "/var/tmp", 
+        "cache",
+        "logs",
+        "temp",
+        "recent",
+        "crash",
+        "diagnosticreports",
+        "trash",
+        "prefetch",
+        "webkit",
+        "webcache",
+        "inetcache",
+    ];
+
+    // Never safe to clean
+    let unsafe_patterns = vec![
+        "system32",
+        "/etc",
+        "/usr",
+        "/bin",
+        "/sbin",
+        "application support",
+        "keychain",
+        "preferences",
+        "config", // Be careful with config files
+    ];
+
+    // Check if path contains unsafe patterns
+    for pattern in unsafe_patterns {
+        if path_str.contains(pattern) {
+            return false;
+        }
+    }
+
+    // Check if path contains safe patterns
+    for pattern in safe_patterns {
+        if path_str.contains(pattern) {
+            return true;
+        }
+    }
+
+    // Default to false for unknown paths to be safe
+    false
+}
+
+// Helper function to determine if a log file is safe to clean
+fn is_safe_log_file(path: &std::path::Path) -> bool {
+    let filename = path.file_name()
+        .and_then(|name| name.to_str())
+        .unwrap_or("")
+        .to_lowercase();
+    
+    let safe_extensions = vec![".log", ".crash", ".tmp", ".cache", ".old"];
+    let safe_prefixes = vec!["install.", "system.", "wifi.", "crash_", "diag_"];
+    
+    // Check file extensions
+    for ext in safe_extensions {
+        if filename.ends_with(ext) {
+            return true;
+        }
+    }
+    
+    // Check file prefixes
+    for prefix in safe_prefixes {
+        if filename.starts_with(prefix) {
+            return true;
+        }
+    }
+    
+    false
 }
 
 #[tauri::command]

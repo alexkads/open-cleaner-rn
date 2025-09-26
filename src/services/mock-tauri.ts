@@ -200,6 +200,38 @@ const MOCK_SCAN_RESULTS: Record<string, ScanResult[]> = {
       can_delete: true,
     },
   ],
+  systemLogs: [
+    {
+      path: '~/Library/Logs/DiagnosticReports',
+      size: 1024 * 1024 * 150,
+      file_type: 'system_logs',
+      can_delete: true,
+    },
+    {
+      path: '/tmp',
+      size: 1024 * 1024 * 200,
+      file_type: 'system_logs',
+      can_delete: true,
+    },
+    {
+      path: '~/Library/Logs/Adobe',
+      size: 1024 * 1024 * 85,
+      file_type: 'system_logs',
+      can_delete: true,
+    },
+    {
+      path: '/var/log/install.log',
+      size: 1024 * 1024 * 25,
+      file_type: 'system_logs',
+      can_delete: true,
+    },
+    {
+      path: '~/Library/Logs/Google',
+      size: 1024 * 1024 * 60,
+      file_type: 'system_logs',
+      can_delete: true,
+    },
+  ],
 }
 
 export class MockTauriService {
@@ -282,9 +314,10 @@ export class MockTauriService {
     return MOCK_SCAN_RESULTS.hermes
   }
 
+  // VS Code scanning DISABLED - User doesn't want VS Code cleaning
   static async scanVsCodeCache(): Promise<ScanResult[]> {
-    await delay(600)
-    return MOCK_SCAN_RESULTS.vscode
+    await delay(200)
+    return [] // Return empty array - no VS Code items to clean
   }
 
   static async scanAndroidStudioCache(): Promise<ScanResult[]> {
@@ -300,6 +333,11 @@ export class MockTauriService {
   static async scanHomebrewCache(): Promise<ScanResult[]> {
     await delay(800)
     return MOCK_SCAN_RESULTS.homebrew
+  }
+
+  static async scanSystemLogs(): Promise<ScanResult[]> {
+    await delay(900)
+    return MOCK_SCAN_RESULTS.systemLogs
   }
 
   static async cleanDockerResources(

@@ -26,7 +26,7 @@ pub fn run() {
             scan_temp_files,
             scan_react_native_cache,
             scan_hermes_cache,
-            scan_vscode_cache,
+            // scan_vscode_cache, // DISABLED - User doesn't want VS Code cleaning
             scan_android_studio_cache,
             scan_build_artifacts,
             scan_homebrew_cache,

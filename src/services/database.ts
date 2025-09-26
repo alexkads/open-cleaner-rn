@@ -13,9 +13,46 @@ export interface CleaningHistory {
   created_at?: string
 }
 
-// Mock data for development
-const mockHistory: CleaningHistory[] = []
-let mockIdCounter = 1
+// Mock data for development - now persistent
+const MOCK_STORAGE_KEY = 'clean_rn_mock_history'
+const MOCK_COUNTER_KEY = 'clean_rn_mock_counter'
+
+const loadMockData = (): CleaningHistory[] => {
+  try {
+    const stored = localStorage.getItem(MOCK_STORAGE_KEY)
+    return stored ? JSON.parse(stored) : []
+  } catch {
+    return []
+  }
+}
+
+const saveMockData = (data: CleaningHistory[]) => {
+  try {
+    localStorage.setItem(MOCK_STORAGE_KEY, JSON.stringify(data))
+  } catch (error) {
+    console.warn('Failed to save mock data to localStorage:', error)
+  }
+}
+
+const loadMockCounter = (): number => {
+  try {
+    const stored = localStorage.getItem(MOCK_COUNTER_KEY)
+    return stored ? parseInt(stored, 10) : 1
+  } catch {
+    return 1
+  }
+}
+
+const saveMockCounter = (counter: number) => {
+  try {
+    localStorage.setItem(MOCK_COUNTER_KEY, counter.toString())
+  } catch (error) {
+    console.warn('Failed to save mock counter to localStorage:', error)
+  }
+}
+
+const mockHistory: CleaningHistory[] = loadMockData()
+let mockIdCounter = loadMockCounter()
 
 // Detectar mock via .env
 const useMockEnv =
@@ -29,6 +66,7 @@ export class DatabaseService {
   static async init(): Promise<void> {
     if (this.useMock) {
       console.log('Using mock database for development')
+      console.log('Mock: Loaded', mockHistory.length, 'historical records from localStorage')
       return
     }
 
@@ -85,7 +123,12 @@ export class DatabaseService {
         created_at: new Date().toISOString(),
       }
       mockHistory.unshift(newRecord)
+      saveMockData(mockHistory)
+      saveMockCounter(mockIdCounter)
       console.log('Mock: Added cleaning record:', newRecord)
+      console.log('Mock: Current history length:', mockHistory.length)
+      console.log('Mock: Current history:', mockHistory.slice(0, 3))
+      console.log('Mock: Data saved to localStorage')
       return newRecord.id!
     }
 
@@ -164,7 +207,7 @@ export class DatabaseService {
 
       stats.avg_duration =
         stats.total_sessions > 0
-          ? stats.total_space_cleaned / stats.total_sessions
+          ? mockHistory.reduce((sum, record) => sum + record.duration, 0) / stats.total_sessions
           : 0
       console.log('Mock: Getting cleaning stats:', stats)
       return stats
@@ -206,7 +249,9 @@ export class DatabaseService {
       const index = mockHistory.findIndex(record => record.id === id)
       if (index !== -1) {
         mockHistory.splice(index, 1)
+        saveMockData(mockHistory)
         console.log('Mock: Deleted cleaning record with id:', id)
+        console.log('Mock: Updated data saved to localStorage')
       }
       return
     }
@@ -224,7 +269,9 @@ export class DatabaseService {
   static async clearAllHistory(): Promise<void> {
     if (this.useMock) {
       mockHistory.length = 0
+      saveMockData(mockHistory)
       console.log('Mock: Cleared all history')
+      console.log('Mock: Cleared data saved to localStorage')
       return
     }
 
@@ -281,5 +328,20 @@ export class DatabaseService {
 
   static async exportHistory(): Promise<CleaningHistory[]> {
     return await this.getCleaningHistory(1000)
+  }
+
+  // Development utility - clear mock localStorage
+  static clearMockStorage(): void {
+    if (this.useMock) {
+      try {
+        localStorage.removeItem(MOCK_STORAGE_KEY)
+        localStorage.removeItem(MOCK_COUNTER_KEY)
+        mockHistory.length = 0
+        mockIdCounter = 1
+        console.log('Mock: Cleared localStorage and reset mock data')
+      } catch (error) {
+        console.warn('Failed to clear mock storage:', error)
+      }
+    }
   }
 }

@@ -290,6 +290,18 @@ export default function DebugPanel({
                   >
                     Log to Console
                   </button>
+                  
+                  <button
+                    onClick={() => {
+                      DatabaseService.clearMockStorage()
+                      toast.success('Mock storage cleared!', {
+                        description: 'All mock history data has been removed from localStorage'
+                      })
+                    }}
+                    className="p-3 bg-red-600/20 hover:bg-red-600/30 rounded-lg transition-colors text-sm"
+                  >
+                    Clear Mock Storage
+                  </button>
                 </div>
               </div>
 

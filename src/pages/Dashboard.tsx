@@ -1,5 +1,4 @@
 import { clsx } from 'clsx'
-import { AnimatePresence, motion, useAnimation } from 'framer-motion'
 import {
   AlertTriangle,
   Bug,
@@ -28,7 +27,6 @@ import {
   ScanResult,
   TauriService,
 } from '../services/tauri'
-import { runToastDemo } from '../utils/toast-demo'
 
 const useMockEnv =
   import.meta.env.VITE_USE_MOCK === '1' ||
@@ -151,15 +149,18 @@ const CLEANING_TASKS: Omit<CleaningTask, 'status' | 'size' | 'items'>[] = [
     scanFunction: TestTauriService.scanHermesCache,
     color: 'text-violet-400',
   },
+  // VS Code cache scanning DISABLED - User doesn't want VS Code cleaning
+  /*
   {
     id: 'vscode-cache',
-    name: 'VS Code Cache',
+    name: 'VS Code Cache', 
     description: 'Clean Visual Studio Code logs and extensions',
     category: 'tools',
     icon: HardDrive,
     scanFunction: TestTauriService.scanVsCodeCache,
     color: 'text-blue-500',
   },
+  */
   {
     id: 'android-studio-cache',
     name: 'Android Studio Cache',
@@ -187,53 +188,18 @@ const CLEANING_TASKS: Omit<CleaningTask, 'status' | 'size' | 'items'>[] = [
     scanFunction: TestTauriService.scanHomebrewCache,
     color: 'text-orange-500',
   },
+  {
+    id: 'system-logs',
+    name: 'System Logs',
+    description: 'Clean OS logs, crash reports, and temporary system files',
+    category: 'logs',
+    icon: HardDrive,
+    scanFunction: TestTauriService.scanSystemLogs,
+    color: 'text-red-500',
+  },
 ]
 
-// Variantes de animação para containers
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-}
-
-const itemVariants = {
-  hidden: { y: 20, opacity: 0 },
-  visible: {
-    y: 0,
-    opacity: 1,
-    transition: {
-      type: 'spring' as const,
-      stiffness: 100,
-      damping: 15,
-    },
-  },
-}
-
-const pulseAnimation = {
-  scale: [1, 1.02, 1],
-  transition: {
-    duration: 2,
-    repeat: Infinity,
-    ease: 'easeInOut' as const,
-  },
-}
-
-const glowAnimation = {
-  boxShadow: [
-    '0 0 20px rgba(99, 102, 241, 0.3)',
-    '0 0 40px rgba(99, 102, 241, 0.5)',
-    '0 0 20px rgba(99, 102, 241, 0.3)',
-  ],
-  transition: {
-    duration: 2,
-    repeat: Infinity,
-    ease: 'easeInOut' as const,
-  },
-}
+// Removed unnecessary animation variants to simplify the interface
 
 export default function Dashboard() {
   const [tasks, setTasks] = useState<CleaningTask[]>([])
@@ -261,9 +227,6 @@ export default function Dashboard() {
   })
   const [showDebugPanel, setShowDebugPanel] = useState(false)
   const [isInitialized, setIsInitialized] = useState(false)
-
-  const scanButtonControls = useAnimation()
-  const cleanButtonControls = useAnimation()
 
   // Inicializar componente
   useEffect(() => {
@@ -351,7 +314,9 @@ export default function Dashboard() {
 
   const loadRecentHistory = async () => {
     try {
+      console.log('Loading recent history...')
       const history = await DatabaseService.getCleaningHistory(5)
+      console.log('Loaded history:', history)
       setRecentHistory(history)
     } catch (error) {
       console.error('Failed to load recent history:', error)
@@ -360,7 +325,9 @@ export default function Dashboard() {
 
   const loadStats = async () => {
     try {
+      console.log('Loading stats...')
       const statsData = await DatabaseService.getCleaningStats()
+      console.log('Loaded stats:', statsData)
       setStats(statsData)
     } catch (error) {
       console.error('Failed to load stats:', error)
@@ -406,12 +373,6 @@ export default function Dashboard() {
     try {
       setIsScanning(true)
       setTotalSpaceFound(0)
-
-      await scanButtonControls.start({
-        scale: [1, 1.1, 1],
-        rotate: [0, 360],
-        transition: { duration: 0.8 },
-      })
 
       // Reset task status
       setTasks(prev =>
@@ -485,7 +446,7 @@ export default function Dashboard() {
       setIsScanning(false)
       setCurrentTask(null)
     }
-  }, [isScanning, isCleaning, scanButtonControls])
+  }, [isScanning, isCleaning])
 
   const handleClean = useCallback(async () => {
     if (isScanning || isCleaning) return
@@ -590,12 +551,6 @@ export default function Dashboard() {
           let totalFilesDeleted = 0
           let completedTasks = 0
           const errors: string[] = []
-
-          await cleanButtonControls.start({
-            scale: [1, 1.2, 1],
-            rotate: [0, -360],
-            transition: { duration: 0.8 },
-          })
 
           for (const task of tasksToClean) {
             try {
@@ -706,7 +661,8 @@ export default function Dashboard() {
           }
 
           console.log('Saving cleaning record to database:', cleaningRecord)
-          await DatabaseService.addCleaningRecord(cleaningRecord)
+          const recordId = await DatabaseService.addCleaningRecord(cleaningRecord)
+          console.log('Successfully saved cleaning record with ID:', recordId)
 
           // Atualizar resultado para exibição
           setLastCleanResult({
@@ -716,9 +672,11 @@ export default function Dashboard() {
             errors: errors,
           })
 
-          // Recarregar dados
-          console.log('Reloading data...')
+          // Recarregar dados após pequeno delay
+          console.log('Reloading data after cleaning...')
+          await new Promise(resolve => setTimeout(resolve, 100))
           await Promise.all([loadRecentHistory(), loadStats()])
+          console.log('Data reloaded successfully')
 
           setTotalSpaceFound(0)
         } catch (error) {
@@ -754,12 +712,6 @@ export default function Dashboard() {
       let totalFilesDeleted = 0
       let completedTasks = 0
       const errors: string[] = []
-
-      await cleanButtonControls.start({
-        scale: [1, 1.2, 1],
-        rotate: [0, -360],
-        transition: { duration: 0.8 },
-      })
 
       for (const task of cleanableTasks) {
         try {
@@ -870,7 +822,8 @@ export default function Dashboard() {
       }
 
       console.log('Saving cleaning record to database:', cleaningRecord)
-      await DatabaseService.addCleaningRecord(cleaningRecord)
+      const recordId = await DatabaseService.addCleaningRecord(cleaningRecord)
+      console.log('Successfully saved cleaning record with ID:', recordId)
 
       // Atualizar resultado para exibição
       setLastCleanResult({
@@ -880,9 +833,11 @@ export default function Dashboard() {
         errors: errors,
       })
 
-      // Recarregar dados
-      console.log('Reloading data...')
+      // Recarregar dados após pequeno delay
+      console.log('Reloading data after cleaning...')
+      await new Promise(resolve => setTimeout(resolve, 100))
       await Promise.all([loadRecentHistory(), loadStats()])
+      console.log('Data reloaded successfully')
 
       setTotalSpaceFound(0)
     } catch (error) {
@@ -903,7 +858,6 @@ export default function Dashboard() {
     tasks,
     isCleaning,
     isScanning,
-    cleanButtonControls,
     loadRecentHistory,
     loadStats,
     totalSpaceFound,
@@ -953,132 +907,53 @@ export default function Dashboard() {
   }
 
   return (
-    <motion.div
-      className="p-6 space-y-6"
-      initial="hidden"
-      animate="visible"
-      variants={containerVariants}
-    >
+    <div className="p-6 space-y-6">
       {/* Header com stats reais */}
-      <motion.div
-        className="glass-effect rounded-2xl p-6 relative overflow-hidden"
-        variants={itemVariants}
-        whileHover={{ scale: 1.02 }}
-      >
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-primary/10 via-accent/10 to-secondary/10"
-          animate={{
-            x: [-100, 100, -100],
-            opacity: [0.3, 0.7, 0.3],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: 'easeInOut' as const,
-          }}
-        />
-
-        <div className="relative z-10 flex items-center justify-between">
+      <div className="glass-effect rounded-2xl p-6">
+        <div className="flex items-center justify-between">
           <div>
-            <motion.h1
-              className="text-3xl font-bold gradient-text mb-2 cursor-pointer select-none"
-              initial={{ x: -30, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              onDoubleClick={() => {
-                toast.info('🎭 Iniciando Demo das Notificações', {
-                  description:
-                    'Duplo clique detectado! Preparando demonstração...',
-                  duration: 2000,
-                })
-                setTimeout(() => runToastDemo(), 2000)
-              }}
-              title="Duplo clique para ver demo das notificações"
-            >
+            <h1 className="text-3xl font-bold gradient-text mb-2">
               Clean RN
-            </motion.h1>
-            <motion.p
-              className="text-gray-400"
-              initial={{ x: -30, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.4 }}
-            >
+            </h1>
+            <p className="text-gray-400">
               Keep your React Native development environment clean and fast
-            </motion.p>
+            </p>
           </div>
 
           <div className="text-right">
-            <motion.p
-              className="text-sm text-gray-400"
-              initial={{ x: 30, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.5 }}
-            >
+            <p className="text-sm text-gray-400">
               Total Cleaned
-            </motion.p>
-            <motion.p
-              className="text-2xl font-bold gradient-text"
-              initial={{ x: 30, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.6 }}
-            >
+            </p>
+            <p className="text-2xl font-bold gradient-text">
               {formatBytes(stats.total_space_cleaned)}
-            </motion.p>
-            <motion.p
-              className="text-xs text-gray-500"
-              initial={{ x: 30, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.7 }}
-            >
+            </p>
+            <p className="text-xs text-gray-500">
               {stats.total_sessions} sessions
-            </motion.p>
+            </p>
           </div>
         </div>
-      </motion.div>
+      </div>
 
       {/* Action Buttons */}
-      <motion.div
-        className="grid grid-cols-1 md:grid-cols-2 gap-4"
-        variants={containerVariants}
-      >
-        <motion.button
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <button
           className={clsx(
-            'glass-effect rounded-2xl p-6 text-left transition-all duration-300 relative overflow-hidden',
+            'glass-effect rounded-2xl p-6 text-left transition-all duration-200',
             !isScanning && !isCleaning
-              ? 'hover:scale-105 neon-border cursor-pointer'
+              ? 'hover:bg-primary/5 cursor-pointer'
               : 'opacity-75 cursor-not-allowed'
           )}
-          variants={itemVariants}
           onClick={handleScan}
           disabled={isScanning || isCleaning}
-          animate={scanButtonControls}
-          whileHover={!isScanning && !isCleaning ? glowAnimation : {}}
         >
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20"
-            animate={{
-              opacity: isScanning ? [0.5, 0.8, 0.5] : 0.5,
-              scale: isScanning ? [1, 1.05, 1] : 1,
-            }}
-            transition={{
-              duration: 2,
-              repeat: isScanning ? Infinity : 0,
-              ease: 'easeInOut' as const,
-            }}
-          />
-
-          <div className="relative z-10 flex items-center space-x-4">
-            <motion.div
-              className="p-4 rounded-full bg-primary/30"
-              animate={isScanning ? { rotate: 360 } : {}}
-              transition={{
-                duration: 2,
-                repeat: isScanning ? Infinity : 0,
-                ease: 'linear' as const,
-              }}
-            >
-              <Search className="w-8 h-8 text-primary" />
-            </motion.div>
+          <div className="flex items-center space-x-4">
+            <div className="p-4 rounded-full bg-primary/30">
+              {isScanning ? (
+                <Loader2 className="w-8 h-8 text-primary animate-spin" />
+              ) : (
+                <Search className="w-8 h-8 text-primary" />
+              )}
+            </div>
 
             <div>
               <h3 className="text-xl font-bold mb-2">
@@ -1090,29 +965,24 @@ export default function Dashboard() {
                   : 'Scan for React Native cache and temporary files'}
               </p>
               {totalSpaceFound > 0 && (
-                <motion.p
-                  className="text-primary font-bold mt-2"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                >
+                <p className="text-primary font-bold mt-2">
                   Found: {formatBytes(totalSpaceFound)}
-                </motion.p>
+                </p>
               )}
             </div>
           </div>
-        </motion.button>
+        </button>
 
-        <motion.button
+        <button
           className={clsx(
-            'glass-effect rounded-2xl p-6 text-left transition-all duration-300 relative overflow-hidden',
+            'glass-effect rounded-2xl p-6 text-left transition-all duration-200',
             !isScanning &&
               !isCleaning &&
               (totalSpaceFound > 0 ||
                 tasks.some(t => t.status === 'found' && t.items.length > 0))
-              ? 'hover:scale-105 neon-border cursor-pointer'
+              ? 'hover:bg-success/5 cursor-pointer'
               : 'opacity-75 cursor-not-allowed'
           )}
-          variants={itemVariants}
           onClick={handleClean}
           disabled={
             isScanning ||
@@ -1120,37 +990,15 @@ export default function Dashboard() {
             (totalSpaceFound === 0 &&
               !tasks.some(t => t.status === 'found' && t.items.length > 0))
           }
-          animate={cleanButtonControls}
-          whileHover={
-            !isScanning &&
-            !isCleaning &&
-            (totalSpaceFound > 0 ||
-              tasks.some(t => t.status === 'found' && t.items.length > 0))
-              ? glowAnimation
-              : {}
-          }
         >
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-br from-success/20 to-accent/20"
-            animate={{
-              opacity: isCleaning ? [0.5, 0.8, 0.5] : 0.5,
-              scale: isCleaning ? [1, 1.05, 1] : 1,
-            }}
-            transition={{
-              duration: 2,
-              repeat: isCleaning ? Infinity : 0,
-              ease: 'easeInOut' as const,
-            }}
-          />
-
-          <div className="relative z-10 flex items-center space-x-4">
-            <motion.div
-              className="p-4 rounded-full bg-success/30"
-              animate={isCleaning ? { scale: [1, 1.2, 1] } : {}}
-              transition={{ duration: 1, repeat: isCleaning ? Infinity : 0 }}
-            >
-              <Zap className="w-8 h-8 text-success" />
-            </motion.div>
+          <div className="flex items-center space-x-4">
+            <div className="p-4 rounded-full bg-success/30">
+              {isCleaning ? (
+                <Loader2 className="w-8 h-8 text-success animate-spin" />
+              ) : (
+                <Zap className="w-8 h-8 text-success" />
+              )}
+            </div>
 
             <div>
               <h3 className="text-xl font-bold mb-2">
@@ -1169,76 +1017,53 @@ export default function Dashboard() {
               </p>
             </div>
           </div>
-        </motion.button>
-      </motion.div>
+        </button>
+      </div>
 
       {/* Last Clean Result */}
-      <AnimatePresence>
-        {lastCleanResult && (
-          <motion.div
-            className="glass-effect rounded-2xl p-6 border border-success/30"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            variants={itemVariants}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <CheckCircle className="w-6 h-6 text-success" />
-                <div>
-                  <h3 className="font-bold text-success">
-                    Cleaning Completed!
-                  </h3>
-                  <p className="text-sm text-gray-400">
-                    Freed {formatBytes(lastCleanResult.space_freed)} • Deleted{' '}
-                    {lastCleanResult.files_deleted} files • Took{' '}
-                    {formatDuration(lastCleanResult.duration)}
+      {lastCleanResult && (
+        <div className="glass-effect rounded-2xl p-6 border border-success/30">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <CheckCircle className="w-6 h-6 text-success" />
+              <div>
+                <h3 className="font-bold text-success">
+                  Cleaning Completed!
+                </h3>
+                <p className="text-sm text-gray-400">
+                  Freed {formatBytes(lastCleanResult.space_freed)} • Deleted{' '}
+                  {lastCleanResult.files_deleted} files • Took{' '}
+                  {formatDuration(lastCleanResult.duration)}
+                </p>
+                {lastCleanResult.errors.length > 0 && (
+                  <p className="text-xs text-warning mt-1">
+                    {lastCleanResult.errors.length} warnings occurred
                   </p>
-                  {lastCleanResult.errors.length > 0 && (
-                    <p className="text-xs text-warning mt-1">
-                      {lastCleanResult.errors.length} warnings occurred
-                    </p>
-                  )}
-                </div>
+                )}
               </div>
-
-              <motion.button
-                onClick={() => setLastCleanResult(null)}
-                className="p-2 rounded-lg hover:bg-white/10"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <RotateCcw className="w-5 h-5 text-gray-400" />
-              </motion.button>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
-      {/* System Status com dados reais */}
-      <motion.div
-        className="glass-effect rounded-2xl p-6"
-        variants={itemVariants}
-        whileHover={{ scale: 1.02 }}
-      >
+            <button
+              onClick={() => setLastCleanResult(null)}
+              className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+            >
+              <RotateCcw className="w-5 h-5 text-gray-400" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* System Status */}
+      <div className="glass-effect rounded-2xl p-6">
         <h3 className="text-lg font-semibold gradient-text mb-4">
           System Status
         </h3>
         <div className="space-y-3">
-          <motion.div
-            className="flex items-center justify-between"
-            initial={{ x: -20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.1 }}
-          >
+          <div className="flex items-center justify-between">
             <span className="text-gray-400">React Native</span>
-            <motion.div
-              className="flex items-center space-x-2"
-              animate={{ x: [0, 3, 0] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
+            <div className="flex items-center space-x-2">
               <div
-                className={`w-2 h-2 rounded-full animate-pulse ${
+                className={`w-2 h-2 rounded-full ${
                   systemStatus.reactNative === 'active'
                     ? 'bg-success'
                     : systemStatus.reactNative === 'idle'
@@ -1251,23 +1076,14 @@ export default function Dashboard() {
               >
                 {getStatusLabel(systemStatus.reactNative)}
               </span>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
 
-          <motion.div
-            className="flex items-center justify-between"
-            initial={{ x: -20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
+          <div className="flex items-center justify-between">
             <span className="text-gray-400">Metro Bundler</span>
-            <motion.div
-              className="flex items-center space-x-2"
-              animate={{ x: [0, -3, 0] }}
-              transition={{ duration: 2, repeat: Infinity, delay: 1 }}
-            >
+            <div className="flex items-center space-x-2">
               <div
-                className={`w-2 h-2 rounded-full animate-pulse ${
+                className={`w-2 h-2 rounded-full ${
                   systemStatus.metroBundle === 'active'
                     ? 'bg-success'
                     : systemStatus.metroBundle === 'idle'
@@ -1280,152 +1096,94 @@ export default function Dashboard() {
               >
                 {getStatusLabel(systemStatus.metroBundle)}
               </span>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         </div>
-      </motion.div>
+      </div>
 
       {/* Current Activity */}
-      <AnimatePresence>
-        {(isScanning || isCleaning) && (
-          <motion.div
-            className="glass-effect rounded-2xl p-6 border border-primary/30"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{
-              opacity: 1,
-              ...pulseAnimation,
-            }}
-            exit={{ opacity: 0, scale: 0.9 }}
-          >
-            <div className="flex items-center space-x-4">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: 'linear' as const,
-                }}
-              >
-                <Loader2 className="w-6 h-6 text-primary" />
-              </motion.div>
-
-              <div>
-                <h3 className="font-bold text-primary">
-                  {isScanning ? 'Scanning in Progress' : 'Cleaning in Progress'}
-                </h3>
-                <p className="text-sm text-gray-400">{currentTask}</p>
-              </div>
+      {(isScanning || isCleaning) && (
+        <div className="glass-effect rounded-2xl p-6 border border-primary/30">
+          <div className="flex items-center space-x-4">
+            <Loader2 className="w-6 h-6 text-primary animate-spin" />
+            <div>
+              <h3 className="font-bold text-primary">
+                {isScanning ? 'Scanning in Progress' : 'Cleaning in Progress'}
+              </h3>
+              <p className="text-sm text-gray-400">{currentTask}</p>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </div>
+        </div>
+      )}
 
       {/* Tasks Grid */}
-      <motion.div
-        className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        {tasks.map((task, index) => (
-          <motion.div
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        {tasks.map((task) => (
+          <div
             key={task.id}
             className={clsx(
-              'glass-effect rounded-xl p-4 border transition-all duration-300',
+              'glass-effect rounded-xl p-4 border transition-all duration-200',
               task.status === 'found' && 'border-primary/50 bg-primary/5',
               task.status === 'scanning' && 'border-warning/50 bg-warning/5',
               task.status === 'cleaning' && 'border-success/50 bg-success/5',
               task.status === 'completed' && 'border-success/30 bg-success/10',
               task.status === 'error' && 'border-danger/50 bg-danger/5'
             )}
-            variants={itemVariants}
-            whileHover={{
-              scale: 1.03,
-              y: -5,
-              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.2)',
-            }}
-            whileTap={{ scale: 0.98 }}
-            transition={{ delay: index * 0.05 }}
           >
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center space-x-3">
-                <motion.div
-                  className="p-2 rounded-lg bg-dark-surface-2"
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  transition={{ duration: 0.2 }}
-                >
+                <div className="p-2 rounded-lg bg-dark-surface-2">
                   <task.icon className={clsx('w-5 h-5', task.color)} />
-                </motion.div>
+                </div>
                 <div>
                   <h3 className="font-medium">{task.name}</h3>
                   <p className="text-xs text-gray-400">{task.description}</p>
                 </div>
               </div>
 
-              <motion.div
-                whileHover={{ scale: 1.2 }}
-                transition={{ duration: 0.2 }}
-              >
+              <div>
                 {getStatusIcon(task.status)}
-              </motion.div>
+              </div>
             </div>
 
             <div className="space-y-2">
               {task.size > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex justify-between text-sm"
-                >
+                <div className="flex justify-between text-sm">
                   <span className="text-gray-400">Size:</span>
                   <span className="font-medium text-primary">
                     {formatBytes(task.size)}
                   </span>
-                </motion.div>
+                </div>
               )}
 
               {task.items.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex justify-between text-sm"
-                >
+                <div className="flex justify-between text-sm">
                   <span className="text-gray-400">Items:</span>
                   <span className="font-medium">{task.items.length}</span>
-                </motion.div>
+                </div>
               )}
 
               {task.lastUpdated && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="text-xs text-gray-500"
-                >
+                <div className="text-xs text-gray-500">
                   Last scan: {task.lastUpdated.toLocaleTimeString()}
-                </motion.div>
+                </div>
               )}
             </div>
-          </motion.div>
+          </div>
         ))}
-      </motion.div>
+      </div>
 
       {/* Recent History Preview */}
-      {recentHistory.length > 0 && (
-        <motion.div
-          className="glass-effect rounded-2xl p-6"
-          variants={itemVariants}
-        >
+      {recentHistory.length > 0 ? (
+        <div className="glass-effect rounded-2xl p-6">
           <h3 className="text-lg font-semibold gradient-text mb-4">
             Recent Activity
           </h3>
           <div className="space-y-3">
-            {recentHistory.slice(0, 3).map((record, index) => (
-              <motion.div
+            {recentHistory.slice(0, 3).map((record) => (
+              <div
                 key={record.id}
                 className="flex items-center justify-between p-3 rounded-lg bg-dark-surface-2/50"
-                initial={{ x: -20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: index * 0.1 }}
               >
                 <div className="flex items-center space-x-3">
                   {getStatusIcon(record.status)}
@@ -1449,22 +1207,29 @@ export default function Dashboard() {
                 >
                   {record.type}
                 </span>
-              </motion.div>
+              </div>
             ))}
           </div>
-        </motion.div>
+        </div>
+      ) : (
+        <div className="glass-effect rounded-2xl p-6">
+          <h3 className="text-lg font-semibold gradient-text mb-4">
+            Recent Activity
+          </h3>
+          <p className="text-gray-400 text-center py-4">
+            No cleaning history yet. Perform a scan and clean to see activity here.
+          </p>
+        </div>
       )}
 
       {/* Debug Button - Fixed position */}
-      <motion.button
+      <button
         className="fixed bottom-6 right-6 p-3 bg-purple-600/20 hover:bg-purple-600/30 rounded-full transition-colors border border-purple-600/50 z-40"
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
         onClick={() => setShowDebugPanel(true)}
         title="Open Debug Panel"
       >
         <Bug className="w-6 h-6 text-purple-400" />
-      </motion.button>
+      </button>
 
       {/* Debug Panel */}
       <DebugPanel
@@ -1483,6 +1248,6 @@ export default function Dashboard() {
           databaseStatus: 'testing',
         }}
       />
-    </motion.div>
+    </div>
   )
 }
