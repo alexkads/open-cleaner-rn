@@ -16,7 +16,7 @@ function App() {
   const location = useLocation()
 
   return (
-    <div className="h-screen bg-gradient-to-br from-dark-bg to-[#1a1a2e] text-white overflow-hidden">
+    <div className="h-screen bg-linear-to-br from-dark-bg to-[#1a1a2e] text-white overflow-hidden">
       {/* Sonner Toaster */}
       <Toaster
         theme="dark"
@@ -108,9 +108,9 @@ function App() {
                   transition={{ delay: 0.5 }}
                 >
                   <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-accent flex items-center justify-center">
+                                      <div>
+                    <div className="w-10 h-10 rounded-full bg-linear-to-r from-primary to-accent flex items-center justify-center">
                       <span className="font-bold text-sm">v1.0</span>
-                    </div>
                     <div>
                       <p className="text-sm font-medium">System Status</p>
                       <p className="text-xs text-success">

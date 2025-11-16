@@ -235,14 +235,39 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Inspired by the need for efficient development environment management
 - Thanks to all contributors and the open-source community
 
-## 📈 Roadmap
+## 🗺️ Roadmap
 
-- [ ] Plugin system for custom cache scanners
-- [ ] Cloud backup of cleaning history
-- [ ] Team collaboration features
-- [ ] Advanced scheduling and automation
-- [ ] Integration with popular IDEs
-- [ ] Mobile companion app
+> 📋 **[Ver Roadmap Completo de Melhorias →](./IMPROVEMENT_ROADMAP.md)**
+
+### **Concluído ✅**
+- [x] Cross-platform desktop application
+- [x] React Native cache cleaning
+- [x] iOS build cache cleanup
+- [x] Android build cache cleanup
+- [x] Package manager cache cleaning
+- [x] Docker resources cleanup
+- [x] Cleaning history and analytics
+
+### **Em Progresso 🚧**
+- [ ] Scan paralelo (v0.2.0)
+- [ ] Limpeza seletiva com checkboxes (v0.2.0)
+- [ ] Dialog de confirmação antes de limpar (v0.2.0)
+- [ ] Barra de progresso visual (v0.2.0)
+- [ ] Error boundaries (v0.2.0)
+
+### **Planejado 📅**
+- [ ] Dry run mode (preview sem deletar) (v0.3.0)
+- [ ] Notificações desktop (v0.3.0)
+- [ ] Temas claro/escuro (v0.3.0)
+- [ ] Exportar relatórios (CSV/JSON) (v0.3.0)
+- [ ] Atalhos de teclado (v0.3.0)
+- [ ] Scan agendado automático (v0.4.0)
+- [ ] Sistema de backup antes de limpar (v0.4.0)
+- [ ] Sistema de plugins (futuro)
+- [ ] API REST (futuro)
+- [ ] Cloud sync de configurações (futuro)
+
+**📖 Documentação Detalhada:** [IMPROVEMENT_ROADMAP.md](./IMPROVEMENT_ROADMAP.md)
 
 ## 🌟 Star History
 
