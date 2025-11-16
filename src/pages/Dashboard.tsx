@@ -19,6 +19,8 @@ import {
 } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
+import CleanConfirmationDialog from '../components/CleanConfirmationDialog'
+import CleaningProgress from '../components/CleaningProgress'
 import DebugPanel from '../components/DebugPanel'
 import { CleaningHistory, DatabaseService } from '../services/database'
 import { MockTauriService } from '../services/mock-tauri'
@@ -47,10 +49,11 @@ interface CleaningTask {
   size: number
   items: ScanResult[]
   lastUpdated?: Date
+  selected: boolean
 }
 
 // Definição das tarefas de limpeza disponíveis
-const CLEANING_TASKS: Omit<CleaningTask, 'status' | 'size' | 'items'>[] = [
+const CLEANING_TASKS: Omit<CleaningTask, 'status' | 'size' | 'items' | 'selected'>[] = [
   {
     id: 'expo-cache',
     name: 'Expo Cache',
@@ -238,6 +241,17 @@ export default function Dashboard() {
   })
   const [showDebugPanel, setShowDebugPanel] = useState(false)
   const [isInitialized, setIsInitialized] = useState(false)
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false)
+  const [cleaningProgress, setCleaningProgress] = useState({
+    totalTasks: 0,
+    completedTasks: 0,
+    totalSpaceCleaned: 0,
+    totalSpaceToClean: 0,
+    speedMBps: 0,
+    etaSeconds: 0,
+    errors: 0,
+  })
+  const [cancelRequested, setCancelRequested] = useState(false)
 
   const totalWarnings = useMemo(
     () =>
@@ -255,6 +269,7 @@ export default function Dashboard() {
       size: 0,
       status: 'pending',
       items: [],
+      selected: true, // Todas selecionadas por padrão
     }))
     setTasks(initialTasks)
   }, [])
@@ -378,6 +393,18 @@ export default function Dashboard() {
       window.removeEventListener('debug-log-tasks', handleDebugLogTasks)
   }, [tasks, isScanning, isCleaning, totalSpaceFound])
 
+  // ESC key to close confirmation dialog
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showConfirmDialog) {
+        setShowConfirmDialog(false)
+      }
+    }
+
+    window.addEventListener('keydown', handleEscape)
+    return () => window.removeEventListener('keydown', handleEscape)
+  }, [showConfirmDialog])
+
   const updateTaskStatus = (taskId: string, updates: Partial<CleaningTask>) => {
     setTasks(prev =>
       prev.map(task =>
@@ -392,10 +419,12 @@ export default function Dashboard() {
     if (isScanning || isCleaning) return
 
     // Toast de início do scan
-    const scanToast = toast.loading('Iniciando scan do sistema...', {
+    const scanToast = toast.loading('Iniciando scan paralelo do sistema...', {
       duration: Infinity,
-      description: 'Procurando por arquivos cache e temporários',
+      description: 'Scaneando todas as categorias simultaneamente',
     })
+
+    const startTime = Date.now()
 
     try {
       setIsScanning(true)
@@ -411,53 +440,110 @@ export default function Dashboard() {
         }))
       )
 
+      // ✅ SCAN PARALELO: Executar todos os scans simultaneamente
+      console.log('Starting parallel scan for', CLEANING_TASKS.length, 'tasks')
+
+      // Marcar todas as tasks como 'scanning'
+      CLEANING_TASKS.forEach(task => {
+        updateTaskStatus(task.id, { status: 'scanning' })
+      })
+
+      // Criar promises para todos os scans
+      const scanPromises = CLEANING_TASKS.map(task =>
+        task
+          .scanFunction()
+          .then(results => ({
+            taskId: task.id,
+            taskName: task.name,
+            status: 'success' as const,
+            results,
+          }))
+          .catch(error => ({
+            taskId: task.id,
+            taskName: task.name,
+            status: 'error' as const,
+            error: String(error),
+          }))
+      )
+
+      // Atualizar toast mostrando que o scan está em progresso
+      toast.loading('Scan paralelo em andamento...', {
+        id: scanToast,
+        description: `${CLEANING_TASKS.length} categorias sendo scaneadas simultaneamente`,
+      })
+
+      // Aguardar todos os scans (paralelos)
+      const scanResults = await Promise.all(scanPromises)
+
+      // Processar resultados
       let totalFound = 0
-      let completedTasks = 0
+      let successCount = 0
+      let errorCount = 0
 
-      // Scan each task
-      for (const task of CLEANING_TASKS) {
-        try {
-          setCurrentTask(task.name)
-          updateTaskStatus(task.id, { status: 'scanning' })
+      scanResults.forEach(result => {
+        if (result.status === 'success') {
+          const taskSize = result.results.reduce(
+            (sum, item) => sum + item.size,
+            0
+          )
 
-          // Atualizar toast com progresso
-          toast.loading(`Scaneando ${task.name}...`, {
-            id: scanToast,
-            description: `${completedTasks + 1}/${CLEANING_TASKS.length} - ${formatBytes(totalFound)} encontrados`,
-          })
-
-          const results = await task.scanFunction()
-          const taskSize = results.reduce((sum, item) => sum + item.size, 0)
-
-          updateTaskStatus(task.id, {
+          updateTaskStatus(result.taskId, {
             status: taskSize > 0 ? 'found' : 'completed',
             size: taskSize,
-            items: results,
+            items: result.results,
           })
 
           totalFound += taskSize
-          setTotalSpaceFound(totalFound)
-          completedTasks++
-        } catch (error) {
-          console.error(`Failed to scan ${task.name}:`, error)
-          setLastError(`Failed to scan ${task.name}: ${error}`)
-          updateTaskStatus(task.id, { status: 'error' })
+          successCount++
+
+          console.log(
+            `✅ Scan completed for ${result.taskName}: ${formatBytes(taskSize)}`
+          )
+        } else {
+          // Error handling individual por task
+          console.error(`❌ Failed to scan ${result.taskName}:`, result.error)
+          setLastError(`Failed to scan ${result.taskName}: ${result.error}`)
+          updateTaskStatus(result.taskId, { status: 'error' })
+          errorCount++
 
           // Toast de erro específico da task
-          toast.error(`Erro ao scanear ${task.name}`, {
-            description: `${error}`,
+          toast.error(`Erro ao scanear ${result.taskName}`, {
+            description: result.error,
+            duration: 3000,
           })
         }
+      })
 
-        // Pequena pausa para UX
-        await new Promise(resolve => setTimeout(resolve, 300))
-      }
+      setTotalSpaceFound(totalFound)
+
+      const duration = Date.now() - startTime
+      const speedupMessage =
+        duration < 10000
+          ? ' ⚡ Scan ultra-rápido!'
+          : duration < 15000
+            ? ' ⚡ Scan rápido!'
+            : ''
 
       // Toast de sucesso
-      toast.success('Scan concluído com sucesso!', {
-        id: scanToast,
-        description: `${formatBytes(totalFound)} encontrados em ${completedTasks} categorias`,
-        duration: 5000,
+      if (errorCount === 0) {
+        toast.success('Scan paralelo concluído com sucesso!' + speedupMessage, {
+          id: scanToast,
+          description: `${formatBytes(totalFound)} encontrados em ${successCount} categorias • ${formatDuration(duration)}`,
+          duration: 5000,
+        })
+      } else {
+        toast.warning('Scan paralelo concluído com avisos', {
+          id: scanToast,
+          description: `${formatBytes(totalFound)} encontrados em ${successCount} categorias • ${errorCount} erro(s) • ${formatDuration(duration)}`,
+          duration: 5000,
+        })
+      }
+
+      console.log('Parallel scan completed:', {
+        totalFound,
+        successCount,
+        errorCount,
+        duration: formatDuration(duration),
       })
     } catch (error) {
       console.error('Scan failed:', error)
@@ -475,41 +561,23 @@ export default function Dashboard() {
     }
   }, [isScanning, isCleaning])
 
-  const handleClean = useCallback(async () => {
+  // Executar limpeza (chamado após confirmação)
+  const executeClean = useCallback(async () => {
     if (isScanning || isCleaning) return
 
     // Debug: Log estado atual das tasks
-    console.log('=== DEBUG CLEAN ===')
+    console.log('=== EXECUTE CLEAN ===')
     console.log('Total tasks:', tasks.length)
     console.log('Total space found:', totalSpaceFound)
-    console.log(
-      'Tasks detail:',
-      tasks.map(t => ({
-        id: t.id,
-        name: t.name,
-        status: t.status,
-        itemsLength: t.items.length,
-        size: t.size,
-      }))
-    )
 
     const cleanableTasks = tasks.filter(
-      task => task.status === 'found' && task.items.length > 0
+      task => task.status === 'found' && task.items.length > 0 && task.selected
     )
 
-    console.log('Cleanable tasks:', cleanableTasks.length)
-    console.log(
-      'Cleanable tasks detail:',
-      cleanableTasks.map(t => ({
-        id: t.id,
-        name: t.name,
-        status: t.status,
-        itemsLength: t.items.length,
-      }))
-    )
+    console.log('Cleanable tasks (selected):', cleanableTasks.length)
 
-    // Verificar se há espaço encontrado OU tarefas limpeáveis
-    const hasCleanableContent = totalSpaceFound > 0 || cleanableTasks.length > 0
+    // Verificar se há tarefas limpeáveis selecionadas
+    const hasCleanableContent = cleanableTasks.length > 0
 
     if (!hasCleanableContent) {
       // Check what's wrong
@@ -573,12 +641,28 @@ export default function Dashboard() {
         try {
           console.log('Starting cleaning process with reloaded tasks...')
           setIsCleaning(true)
+          setCancelRequested(false)
           const startTime = Date.now()
           let totalSpaceCleaned = 0
           let totalFilesDeleted = 0
           let completedTasks = 0
           const errors: string[] = []
           const warningsLog: string[] = []
+
+          // Inicializar progresso
+          const totalSpaceToClean = tasksToClean.reduce(
+            (sum, task) => sum + task.size,
+            0
+          )
+          setCleaningProgress({
+            totalTasks: tasksToClean.length,
+            completedTasks: 0,
+            totalSpaceCleaned: 0,
+            totalSpaceToClean,
+            speedMBps: 0,
+            etaSeconds: 0,
+            errors: 0,
+          })
 
           for (const task of tasksToClean) {
             try {
@@ -645,6 +729,39 @@ export default function Dashboard() {
               })
 
               completedTasks++
+
+              // Atualizar progresso
+              const elapsedSeconds = (Date.now() - startTime) / 1000
+              const speedMBps =
+                elapsedSeconds > 0
+                  ? totalSpaceCleaned / (1024 * 1024) / elapsedSeconds
+                  : 0
+              const remainingTasks = tasksToClean.length - completedTasks
+              const etaSeconds =
+                speedMBps > 0 && remainingTasks > 0
+                  ? ((totalSpaceToClean - totalSpaceCleaned) / (1024 * 1024)) /
+                    speedMBps
+                  : 0
+
+              setCleaningProgress({
+                totalTasks: tasksToClean.length,
+                completedTasks,
+                totalSpaceCleaned,
+                totalSpaceToClean,
+                speedMBps,
+                etaSeconds,
+                errors: errors.length,
+              })
+
+              // Verificar se cancelamento foi solicitado
+              if (cancelRequested) {
+                console.log('Cleaning cancelled by user')
+                toast.warning('Limpeza cancelada', {
+                  description: `${completedTasks} de ${tasksToClean.length} categorias foram limpas`,
+                  duration: 5000,
+                })
+                break
+              }
             } catch (error) {
               console.error(`Failed to clean ${task.name}:`, error)
               setLastError(`Failed to clean ${task.name}: ${error}`)
@@ -763,12 +880,28 @@ export default function Dashboard() {
     try {
       console.log('Starting cleaning process with original tasks...')
       setIsCleaning(true)
+      setCancelRequested(false)
       const startTime = Date.now()
       let totalSpaceCleaned = 0
       let totalFilesDeleted = 0
       let completedTasks = 0
       const errors: string[] = []
       const warningsLog: string[] = []
+
+      // Inicializar progresso
+      const totalSpaceToClean = cleanableTasks.reduce(
+        (sum, task) => sum + task.size,
+        0
+      )
+      setCleaningProgress({
+        totalTasks: cleanableTasks.length,
+        completedTasks: 0,
+        totalSpaceCleaned: 0,
+        totalSpaceToClean,
+        speedMBps: 0,
+        etaSeconds: 0,
+        errors: 0,
+      })
 
       for (const task of cleanableTasks) {
         try {
@@ -835,6 +968,39 @@ export default function Dashboard() {
           })
 
           completedTasks++
+
+          // Atualizar progresso
+          const elapsedSeconds = (Date.now() - startTime) / 1000
+          const speedMBps =
+            elapsedSeconds > 0
+              ? totalSpaceCleaned / (1024 * 1024) / elapsedSeconds
+              : 0
+          const remainingTasks = cleanableTasks.length - completedTasks
+          const etaSeconds =
+            speedMBps > 0 && remainingTasks > 0
+              ? ((totalSpaceToClean - totalSpaceCleaned) / (1024 * 1024)) /
+                speedMBps
+              : 0
+
+          setCleaningProgress({
+            totalTasks: cleanableTasks.length,
+            completedTasks,
+            totalSpaceCleaned,
+            totalSpaceToClean,
+            speedMBps,
+            etaSeconds,
+            errors: errors.length,
+          })
+
+          // Verificar se cancelamento foi solicitado
+          if (cancelRequested) {
+            console.log('Cleaning cancelled by user')
+            toast.warning('Limpeza cancelada', {
+              description: `${completedTasks} de ${cleanableTasks.length} categorias foram limpas`,
+              duration: 5000,
+            })
+            break
+          }
         } catch (error) {
           console.error(`Failed to clean ${task.name}:`, error)
           setLastError(`Failed to clean ${task.name}: ${error}`)
@@ -947,6 +1113,48 @@ export default function Dashboard() {
     loadStats,
     totalSpaceFound,
   ])
+
+  // Selecionar/Desmarcar todas as tasks
+  const selectAllTasks = useCallback(() => {
+    setTasks(prev =>
+      prev.map(task => ({
+        ...task,
+        selected: task.status === 'found' ? true : task.selected,
+      }))
+    )
+  }, [])
+
+  const deselectAllTasks = useCallback(() => {
+    setTasks(prev =>
+      prev.map(task => ({
+        ...task,
+        selected: task.status === 'found' ? false : task.selected,
+      }))
+    )
+  }, [])
+
+  // Mostrar dialog de confirmação antes de limpar
+  const handleClean = useCallback(() => {
+    if (isScanning || isCleaning) return
+
+    const cleanableTasks = tasks.filter(
+      task => task.status === 'found' && task.items.length > 0 && task.selected
+    )
+
+    // Verificar se há conteúdo limpável
+    const hasCleanableContent = cleanableTasks.length > 0
+
+    if (!hasCleanableContent) {
+      toast.warning('Nenhum item selecionado para limpeza', {
+        description: 'Selecione pelo menos uma categoria para limpar.',
+        duration: 5000,
+      })
+      return
+    }
+
+    // Mostrar dialog de confirmação
+    setShowConfirmDialog(true)
+  }, [tasks, isScanning, isCleaning])
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -1092,13 +1300,26 @@ export default function Dashboard() {
               <p className="text-gray-400 text-sm">
                 {isCleaning
                   ? currentTask || 'Cleaning files...'
-                  : totalSpaceFound > 0
-                    ? `Ready to clean ${formatBytes(totalSpaceFound)}`
-                    : tasks.some(
-                          t => t.status === 'found' && t.items.length > 0
-                        )
-                      ? `Ready to clean ${tasks.filter(t => t.status === 'found' && t.items.length > 0).length} categories`
-                      : 'Scan first to find cleanable files'}
+                  : (() => {
+                      const selectedTasks = tasks.filter(
+                        t => t.status === 'found' && t.items.length > 0 && t.selected
+                      )
+                      const selectedSize = selectedTasks.reduce(
+                        (sum, t) => sum + t.size,
+                        0
+                      )
+                      const totalFound = tasks.filter(
+                        t => t.status === 'found' && t.items.length > 0
+                      ).length
+
+                      if (selectedTasks.length === 0) {
+                        return totalFound > 0
+                          ? 'Selecione categorias para limpar'
+                          : 'Scan first to find cleanable files'
+                      }
+
+                      return `${selectedTasks.length} categoria${selectedTasks.length > 1 ? 's' : ''} selecionada${selectedTasks.length > 1 ? 's' : ''} • ${formatBytes(selectedSize)}`
+                    })()}
               </p>
               {totalWarnings > 0 && !isCleaning && (
                 <p className="text-xs text-warning mt-1">
@@ -1199,16 +1420,66 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Current Activity */}
-      {(isScanning || isCleaning) && (
+      {/* Cleaning Progress */}
+      {isCleaning && (
+        <CleaningProgress
+          isVisible={isCleaning}
+          currentTask={currentTask || 'Iniciando...'}
+          totalTasks={cleaningProgress.totalTasks}
+          completedTasks={cleaningProgress.completedTasks}
+          totalSpaceCleaned={cleaningProgress.totalSpaceCleaned}
+          totalSpaceToClean={cleaningProgress.totalSpaceToClean}
+          speedMBps={cleaningProgress.speedMBps}
+          etaSeconds={cleaningProgress.etaSeconds}
+          errors={cleaningProgress.errors}
+          onCancel={() => setCancelRequested(true)}
+        />
+      )}
+
+      {/* Scanning Activity */}
+      {isScanning && !isCleaning && (
         <div className="glass-effect rounded-2xl p-6 border border-primary/30">
           <div className="flex items-center space-x-4">
             <Loader2 className="w-6 h-6 text-primary animate-spin" />
             <div>
-              <h3 className="font-bold text-primary">
-                {isScanning ? 'Scanning in Progress' : 'Cleaning in Progress'}
-              </h3>
+              <h3 className="font-bold text-primary">Scanning in Progress</h3>
               <p className="text-sm text-gray-400">{currentTask}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Selection Controls */}
+      {tasks.some(task => task.status === 'found') && (
+        <div className="glass-effect rounded-xl p-4 border border-primary/30">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <p className="text-sm text-gray-400">
+                {tasks.filter(task => task.status === 'found' && task.selected).length} de{' '}
+                {tasks.filter(task => task.status === 'found').length} categorias selecionadas
+              </p>
+              <span className="text-sm font-medium text-primary">
+                ({formatBytes(
+                  tasks
+                    .filter(task => task.status === 'found' && task.selected)
+                    .reduce((sum, task) => sum + task.size, 0)
+                )})
+              </span>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={selectAllTasks}
+                className="px-3 py-2 text-sm bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors border border-primary/30"
+              >
+                Selecionar Tudo
+              </button>
+              <button
+                onClick={deselectAllTasks}
+                className="px-3 py-2 text-sm bg-dark-surface-2 hover:bg-dark-surface text-white rounded-lg transition-colors border border-gray-600"
+              >
+                Desmarcar Tudo
+              </button>
             </div>
           </div>
         </div>
@@ -1233,7 +1504,21 @@ export default function Dashboard() {
               )}
             >
               <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-3 flex-1">
+                  {/* Checkbox for selection */}
+                  {task.status === 'found' && (
+                    <label className="flex items-center cursor-pointer group">
+                      <input
+                        type="checkbox"
+                        checked={task.selected}
+                        onChange={(e) => {
+                          updateTaskStatus(task.id, { selected: e.target.checked })
+                        }}
+                        className="w-5 h-5 rounded border-2 border-primary/50 text-primary focus:ring-2 focus:ring-primary/20 bg-dark-surface-2 cursor-pointer transition-all duration-200"
+                      />
+                    </label>
+                  )}
+
                   <div className="p-2 rounded-lg bg-dark-surface-2">
                     <task.icon className={clsx('w-5 h-5', task.color)} />
                   </div>
@@ -1361,6 +1646,30 @@ export default function Dashboard() {
       >
         <Bug className="w-6 h-6 text-purple-400" />
       </button>
+
+      {/* Clean Confirmation Dialog */}
+      <CleanConfirmationDialog
+        isVisible={showConfirmDialog}
+        categories={tasks
+          .filter(task => task.status === 'found' && task.items.length > 0)
+          .map(task => task.name)}
+        totalSize={totalSpaceFound}
+        fileCount={tasks
+          .filter(task => task.status === 'found' && task.items.length > 0)
+          .reduce((total, task) => total + task.items.length, 0)}
+        warnings={[
+          ...tasks
+            .filter(task => task.status === 'found' && task.items.length > 0)
+            .flatMap(task =>
+              task.items
+                .filter(item => item.warning)
+                .map(item => `${task.name}: ${item.warning}`)
+            ),
+          'Esta ação não pode ser desfeita',
+        ]}
+        onConfirm={executeClean}
+        onCancel={() => setShowConfirmDialog(false)}
+      />
 
       {/* Debug Panel */}
       <DebugPanel
