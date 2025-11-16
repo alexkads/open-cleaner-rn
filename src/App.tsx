@@ -108,9 +108,9 @@ function App() {
                   transition={{ delay: 0.5 }}
                 >
                   <div className="flex items-center space-x-3">
-                                      <div>
                     <div className="w-10 h-10 rounded-full bg-linear-to-r from-primary to-accent flex items-center justify-center">
                       <span className="font-bold text-sm">v1.0</span>
+                    </div>
                     <div>
                       <p className="text-sm font-medium">System Status</p>
                       <p className="text-xs text-success">
