@@ -47,7 +47,10 @@ pub fn run() {
             scan_system_data,
             scan_pnpm_cache,
             scan_unity_cache,
-            scan_simulator_cache
+            scan_simulator_cache,
+            scan_yarn_cache,
+            scan_xcode_derived_data,
+            scan_application_logs
         ])
         .setup(|app| {
             create_tray(app.handle())?;

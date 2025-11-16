@@ -1004,6 +1004,154 @@ pub async fn scan_unity_cache() -> Result<Vec<ScanResult>, String> {
 }
 
 #[tauri::command]
+pub async fn scan_yarn_cache() -> Result<Vec<ScanResult>, String> {
+    let mut results = Vec::new();
+
+    let home_dir = dirs::home_dir().ok_or("Could not find home directory")?;
+
+    let cache_paths = vec![
+        home_dir.join(".yarn/cache"),
+        home_dir.join(".cache/yarn"),
+        home_dir.join("Library/Caches/Yarn"),
+        home_dir.join("AppData/Local/Yarn/Cache"),
+    ];
+
+    for cache_path in cache_paths {
+        if cache_path.exists() {
+            if let Ok(size) = get_dir_size(&cache_path) {
+                results.push(ScanResult {
+                    path: cache_path.to_string_lossy().to_string(),
+                    size,
+                    file_type: "yarn_cache".to_string(),
+                    can_delete: true,
+                    warning: Some("Yarn cache. Safe to delete; packages will be re-downloaded when needed.".to_string()),
+                });
+            }
+        }
+    }
+
+    Ok(results)
+}
+
+#[tauri::command]
+pub async fn scan_xcode_derived_data() -> Result<Vec<ScanResult>, String> {
+    let mut results = Vec::new();
+
+    let home_dir = dirs::home_dir().ok_or("Could not find home directory")?;
+
+    #[cfg(target_os = "macos")]
+    {
+        let derived_data_path = home_dir.join("Library/Developer/Xcode/DerivedData");
+        
+        if derived_data_path.exists() {
+            if let Ok(size) = get_dir_size(&derived_data_path) {
+                results.push(ScanResult {
+                    path: derived_data_path.to_string_lossy().to_string(),
+                    size,
+                    file_type: "xcode_derived_data".to_string(),
+                    can_delete: true,
+                    warning: Some("Xcode build cache and indexes. Xcode will rebuild when needed; may slow next build.".to_string()),
+                });
+            }
+        }
+
+        // Archives (IPAs antigas)
+        let archives_path = home_dir.join("Library/Developer/Xcode/Archives");
+        if archives_path.exists() {
+            if let Ok(size) = get_dir_size(&archives_path) {
+                if size > 100_000_000 { // Apenas mostrar se > 100MB
+                    results.push(ScanResult {
+                        path: archives_path.to_string_lossy().to_string(),
+                        size,
+                        file_type: "xcode_archives".to_string(),
+                        can_delete: false,
+                        warning: Some("Xcode app archives. Delete only old ones you don't need for re-signing or distribution.".to_string()),
+                    });
+                }
+            }
+        }
+    }
+
+    Ok(results)
+}
+
+#[tauri::command]
+pub async fn scan_application_logs() -> Result<Vec<ScanResult>, String> {
+    let mut results = Vec::new();
+
+    let home_dir = dirs::home_dir().ok_or("Could not find home directory")?;
+
+    #[cfg(target_os = "macos")]
+    {
+        // Crash Reports
+        let crash_reports = home_dir.join("Library/Logs/DiagnosticReports");
+        if crash_reports.exists() {
+            if let Ok(size) = get_dir_size(&crash_reports) {
+                results.push(ScanResult {
+                    path: crash_reports.to_string_lossy().to_string(),
+                    size,
+                    file_type: "crash_reports".to_string(),
+                    can_delete: true,
+                    warning: Some("Application crash reports. Safe to delete after reviewing for debugging.".to_string()),
+                });
+            }
+        }
+
+        // Application Logs gerais
+        let app_logs = home_dir.join("Library/Logs");
+        if app_logs.exists() {
+            if let Ok(size) = get_dir_size(&app_logs) {
+                if size > 50_000_000 { // Apenas mostrar se > 50MB
+                    results.push(ScanResult {
+                        path: app_logs.to_string_lossy().to_string(),
+                        size,
+                        file_type: "application_logs".to_string(),
+                        can_delete: true,
+                        warning: Some("Application logs directory. Review contents before deleting; some apps may need recent logs.".to_string()),
+                    });
+                }
+            }
+        }
+    }
+
+    #[cfg(target_os = "windows")]
+    {
+        // Windows Event Logs e Application Data logs
+        let local_logs = home_dir.join("AppData/Local/CrashDumps");
+        if local_logs.exists() {
+            if let Ok(size) = get_dir_size(&local_logs) {
+                results.push(ScanResult {
+                    path: local_logs.to_string_lossy().to_string(),
+                    size,
+                    file_type: "crash_dumps".to_string(),
+                    can_delete: true,
+                    warning: Some("Windows crash dump files. Safe to delete after debugging.".to_string()),
+                });
+            }
+        }
+    }
+
+    #[cfg(target_os = "linux")]
+    {
+        // Linux crash reports
+        let crash_dir = home_dir.join(".local/share/apport/coredump");
+        if crash_dir.exists() {
+            if let Ok(size) = get_dir_size(&crash_dir) {
+                results.push(ScanResult {
+                    path: crash_dir.to_string_lossy().to_string(),
+                    size,
+                    file_type: "crash_dumps".to_string(),
+                    can_delete: true,
+                    warning: Some("Linux core dumps. Safe to delete after debugging.".to_string()),
+                });
+            }
+        }
+    }
+
+    Ok(results)
+}
+
+#[tauri::command]
 pub async fn scan_simulator_cache() -> Result<Vec<ScanResult>, String> {
     let mut results = Vec::new();
 

@@ -238,7 +238,7 @@ const MOCK_SCAN_RESULTS: Record<string, ScanResult[]> = {
       size: 1024 * 1024 * 60,
       file_type: 'system_data',
       can_delete: true,
-      warning: 'Quick Look cache — macOS rebuilds it automatically.',
+      warning: 'Quick Look thumbnail cache. macOS rebuilds it automatically.',
     },
     {
       path: '/Users/dev/Library/Application Support/com.apple.sharedfilelist',
@@ -252,7 +252,69 @@ const MOCK_SCAN_RESULTS: Record<string, ScanResult[]> = {
       size: 1024 * 1024 * 900,
       file_type: 'system_data',
       can_delete: false,
-      warning: 'iOS backups detected. Review before deleting to avoid data loss.',
+      warning: 'Local iOS device backups. Delete only if you have external copies.',
+    },
+    {
+      path: '/System/Volumes/Data/private/var/folders',
+      size: 1024 * 1024 * 450,
+      file_type: 'system_data',
+      can_delete: false,
+      warning: 'macOS system caches. Requires admin permission and may slow the next login.',
+    },
+    {
+      path: '/Users/dev/Library/Application Support/com.apple.ProtectedCloudStorage',
+      size: 1024 * 1024 * 320,
+      file_type: 'system_data',
+      can_delete: false,
+      warning: 'iCloud document cache. Removing forces re-downloads.',
+    },
+  ],
+  yarn: [
+    {
+      path: '/Users/dev/.yarn/cache',
+      size: 1024 * 1024 * 280,
+      file_type: 'yarn_cache',
+      can_delete: true,
+      warning: 'Yarn cache. Safe to delete; packages will be re-downloaded when needed.',
+    },
+    {
+      path: '/Users/dev/.cache/yarn',
+      size: 1024 * 1024 * 95,
+      file_type: 'yarn_cache',
+      can_delete: true,
+      warning: 'Yarn cache. Safe to delete; packages will be re-downloaded when needed.',
+    },
+  ],
+  xcodeDerivedData: [
+    {
+      path: '/Users/dev/Library/Developer/Xcode/DerivedData',
+      size: 1024 * 1024 * 1800,
+      file_type: 'xcode_derived_data',
+      can_delete: true,
+      warning: 'Xcode build cache and indexes. Xcode will rebuild when needed; may slow next build.',
+    },
+    {
+      path: '/Users/dev/Library/Developer/Xcode/Archives',
+      size: 1024 * 1024 * 650,
+      file_type: 'xcode_archives',
+      can_delete: false,
+      warning: 'Xcode app archives. Delete only old ones you don\'t need for re-signing or distribution.',
+    },
+  ],
+  applicationLogs: [
+    {
+      path: '/Users/dev/Library/Logs/DiagnosticReports',
+      size: 1024 * 1024 * 120,
+      file_type: 'crash_reports',
+      can_delete: true,
+      warning: 'Application crash reports. Safe to delete after reviewing for debugging.',
+    },
+    {
+      path: '/Users/dev/Library/Logs',
+      size: 1024 * 1024 * 230,
+      file_type: 'application_logs',
+      can_delete: true,
+      warning: 'Application logs directory. Review contents before deleting; some apps may need recent logs.',
     },
   ],
 }
@@ -366,6 +428,21 @@ export class MockTauriService {
   static async scanSystemData(): Promise<ScanResult[]> {
     await delay(1100)
     return MOCK_SCAN_RESULTS.systemData
+  }
+
+  static async scanYarnCache(): Promise<ScanResult[]> {
+    await delay(850)
+    return MOCK_SCAN_RESULTS.yarn
+  }
+
+  static async scanXcodeDerivedData(): Promise<ScanResult[]> {
+    await delay(1400)
+    return MOCK_SCAN_RESULTS.xcodeDerivedData
+  }
+
+  static async scanApplicationLogs(): Promise<ScanResult[]> {
+    await delay(950)
+    return MOCK_SCAN_RESULTS.applicationLogs
   }
 
   static async cleanDockerResources(

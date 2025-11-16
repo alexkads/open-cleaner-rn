@@ -127,6 +127,18 @@ export class TauriService {
   static async scanSystemData(): Promise<ScanResult[]> {
     return await invoke('scan_system_data')
   }
+
+  static async scanYarnCache(): Promise<ScanResult[]> {
+    return await invoke('scan_yarn_cache')
+  }
+
+  static async scanXcodeDerivedData(): Promise<ScanResult[]> {
+    return await invoke('scan_xcode_derived_data')
+  }
+
+  static async scanApplicationLogs(): Promise<ScanResult[]> {
+    return await invoke('scan_application_logs')
+  }
 }
 
 export const formatBytes = (bytes: number): string => {

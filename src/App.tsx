@@ -17,13 +17,14 @@ function App() {
 
   return (
     <div className="h-screen bg-linear-to-br from-dark-bg to-[#1a1a2e] text-white overflow-hidden">
-      {/* Sonner Toaster */}
+      {/* Sonner Toaster - Single instance */}
       <Toaster
         theme="dark"
         richColors
         position="top-right"
         expand={true}
         closeButton
+        visibleToasts={3}
         toastOptions={{
           style: {
             background: 'rgba(16, 19, 32, 0.9)',
@@ -32,6 +33,7 @@ function App() {
             color: 'white',
           },
           className: 'sonner-toast',
+          duration: 4000,
         }}
       />
 

@@ -207,6 +207,11 @@ body {
   font-family: 'Inter', sans-serif !important;
 }
 
+/* Ensure only one Toaster container */
+[data-sonner-toaster] ~ [data-sonner-toaster] {
+  display: none !important;
+}
+
 [data-sonner-toast] {
   background: var(--dark-surface) !important;
   border: 1px solid var(--dark-border) !important;

@@ -314,6 +314,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 [![Star History Chart](https://api.star-history.com/svg?repos=alexkads/open-cleaner-rn&type=Date)](https://star-history.com/#alexkads/open-cleaner-rn&Date)
 
+## 🐛 Bug Fixes
+
+### v0.2.0 (16/11/2025)
+- **Fixed**: Notificações toast duplicadas no Sonner após conclusão de limpeza
+  - Anteriormente, ao completar a limpeza com erros/avisos, eram exibidas 2 notificações
+  - Agora, todos os detalhes são consolidados em uma única notificação
+  - Melhora significativa na experiência do usuário
+
 ---
 
 <div align="center">
@@ -322,4 +330,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 [⭐ Star this repo](https://github.com/alexkads/open-cleaner-rn) • [🐛 Report bugs](https://github.com/alexkads/open-cleaner-rn/issues) • [💬 Join discussions](https://github.com/alexkads/open-cleaner-rn/discussions)
 
-</div># CI/CD funcionando! ✅
+</div>

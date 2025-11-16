@@ -543,9 +543,55 @@ GET  /api/stats         # Estatísticas
 
 ## 🐛 Bugs Conhecidos
 
+### **🟢 Bugs Corrigidos**
+
+#### Bug #1: Notificações Toast Duplicadas (Sonner) ✅
+**Status:** 🟢 Corrigido (16/11/2025)
+**Impacto:** Médio - UX prejudicada com múltiplas notificações para mesma ação
+
+**Descrição:** Após a conclusão da limpeza, eram exibidas notificações toast duplicadas quando havia erros ou avisos:
+1. Toast principal de conclusão
+2. Toast adicional com detalhes de erro/aviso (1 segundo depois)
+
+**Causa Raiz:**
+```typescript
+// ❌ Problema: setTimeout criando toasts adicionais
+toast[toastType](toastTitle, { description: toastDescription })
+
+// Toast duplicado aparecia 1s depois
+if (hasErrors) {
+  setTimeout(() => {
+    toast.error('Alguns erros ocorreram...') // DUPLICADO!
+  }, 1000)
+}
+```
+
+**Solução Implementada:**
+```typescript
+// ✅ Solução: Incluir detalhes na descrição do toast principal
+let toastDescription = `${formatBytes(totalSpaceCleaned)} liberados...`
+if (hasErrors) {
+  toastDescription += `\n${errors.length} erro(s) encontrado(s)...`
+}
+
+toast[toastType](toastTitle, { description: toastDescription })
+// Nenhum toast adicional necessário
+```
+
+**Benefícios:**
+- 🎯 UX mais limpa - uma notificação por ação
+- 📊 Informações consolidadas em um único toast
+- ⚡ Feedback mais direto sem delays desnecessários
+
+**Arquivos Modificados:**
+- `src/pages/Dashboard.tsx:790-811` (primeiro bloco de limpeza)
+- `src/pages/Dashboard.tsx:1020-1041` (segundo bloco de limpeza)
+
+---
+
 ### **🔴 Críticos**
 
-#### Bug #1: Race Condition no handleClean
+#### Bug #2: Race Condition no handleClean
 **Descrição:** Múltiplas chamadas de `handleClean` podem causar estado inconsistente
 
 **Reprodução:**

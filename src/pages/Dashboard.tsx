@@ -7,9 +7,11 @@ import {
   Cpu,
   Database,
   Download,
+  FileText,
   HardDrive,
   Layers,
   Loader2,
+  Package,
   RotateCcw,
   Search,
   Shield,
@@ -210,6 +212,33 @@ const CLEANING_TASKS: Omit<CleaningTask, 'status' | 'size' | 'items' | 'selected
     scanFunction: TestTauriService.scanSystemLogs,
     color: 'text-red-500',
   },
+  {
+    id: 'yarn-cache',
+    name: 'Yarn Cache',
+    description: 'Clean Yarn package manager cache',
+    category: 'cache',
+    icon: Package,
+    scanFunction: TestTauriService.scanYarnCache,
+    color: 'text-blue-300',
+  },
+  {
+    id: 'xcode-derived-data',
+    name: 'Xcode DerivedData',
+    description: 'Clean Xcode build cache, indexes, and archives',
+    category: 'build',
+    icon: Cpu,
+    scanFunction: TestTauriService.scanXcodeDerivedData,
+    color: 'text-indigo-400',
+  },
+  {
+    id: 'application-logs',
+    name: 'Application Logs',
+    description: 'Clean crash reports and application logs',
+    category: 'logs',
+    icon: FileText,
+    scanFunction: TestTauriService.scanApplicationLogs,
+    color: 'text-amber-300',
+  },
 ]
 
 // Removed unnecessary animation variants to simplify the interface
@@ -330,12 +359,16 @@ export default function Dashboard() {
         checkSystemStatus(),
       ])
 
-      // Toast de boas-vindas
-      toast.success('Sistema inicializado com sucesso!', {
-        description:
-          'Clean RN está pronto para otimizar seu ambiente de desenvolvimento',
-        duration: 3000,
-      })
+      // Toast de boas-vindas (apenas uma vez por sessão)
+      const welcomeShown = sessionStorage.getItem('welcomeToastShown')
+      if (!welcomeShown) {
+        toast.success('Sistema inicializado com sucesso!', {
+          description:
+            'Clean RN está pronto para otimizar seu ambiente de desenvolvimento',
+          duration: 3000,
+        })
+        sessionStorage.setItem('welcomeToastShown', 'true')
+      }
 
       setIsInitialized(true)
       console.log('Dashboard initialized successfully')
@@ -795,29 +828,20 @@ export default function Dashboard() {
             : hasWarnings
               ? 'Limpeza concluída com avisos de sistema'
               : 'Limpeza concluída com sucesso!'
-          const toastDescription = `${formatBytes(totalSpaceCleaned)} liberados • ${totalFilesDeleted} arquivos removidos • ${formatDuration(duration)}`
+
+          // Construir descrição com detalhes de erros/avisos
+          let toastDescription = `${formatBytes(totalSpaceCleaned)} liberados • ${totalFilesDeleted} arquivos removidos • ${formatDuration(duration)}`
+          if (hasErrors) {
+            toastDescription += `\n${errors.length} erro(s) encontrado(s). Consulte o console para detalhes.`
+          } else if (hasWarnings) {
+            toastDescription += `\n${warningsLog.length} item(s) com aviso foram limpos.`
+          }
 
           toast[toastType](toastTitle, {
             id: cleanToast,
             description: toastDescription,
             duration: 7000,
           })
-
-          if (hasErrors) {
-            setTimeout(() => {
-              toast.error('Alguns erros ocorreram durante a limpeza', {
-                description: `${errors.length} erro(s) encontrado(s). Verifique o console para detalhes.`,
-                duration: 5000,
-              })
-            }, 1000)
-          } else if (hasWarnings) {
-            setTimeout(() => {
-              toast.warning('Avisos de dados do sistema registrados', {
-                description: `${warningsLog.length} item(s) com aviso foram limpos. Consulte o console para detalhes.`,
-                duration: 5000,
-              })
-            }, 1000)
-          }
 
           const cleaningRecord: Omit<CleaningHistory, 'id' | 'created_at'> = {
             date: new Date().toISOString().split('T')[0],
@@ -1034,29 +1058,20 @@ export default function Dashboard() {
         : hasWarnings
           ? 'Limpeza concluída com avisos de sistema'
           : 'Limpeza concluída com sucesso!'
-      const toastDescription = `${formatBytes(totalSpaceCleaned)} liberados • ${totalFilesDeleted} arquivos removidos • ${formatDuration(duration)}`
+
+      // Construir descrição com detalhes de erros/avisos
+      let toastDescription = `${formatBytes(totalSpaceCleaned)} liberados • ${totalFilesDeleted} arquivos removidos • ${formatDuration(duration)}`
+      if (hasErrors) {
+        toastDescription += `\n${errors.length} erro(s) encontrado(s). Consulte o console para detalhes.`
+      } else if (hasWarnings) {
+        toastDescription += `\n${warningsLog.length} item(s) com aviso foram limpos.`
+      }
 
       toast[toastType](toastTitle, {
         id: cleanToast,
         description: toastDescription,
         duration: 7000,
       })
-
-      if (hasErrors) {
-        setTimeout(() => {
-          toast.error('Alguns erros ocorreram durante a limpeza', {
-            description: `${errors.length} erro(s) encontrado(s). Verifique o console para detalhes.`,
-            duration: 5000,
-          })
-        }, 1000)
-      } else if (hasWarnings) {
-        setTimeout(() => {
-          toast.warning('Avisos de dados do sistema registrados', {
-            description: `${warningsLog.length} item(s) com aviso foram limpos. Consulte o console para detalhes.`,
-            duration: 5000,
-          })
-        }, 1000)
-      }
 
       const cleaningRecord: Omit<CleaningHistory, 'id' | 'created_at'> = {
         date: new Date().toISOString().split('T')[0],
